@@ -1,2 +1,2 @@
-# usora
+# Usora
 User management system.
