@@ -20,15 +20,20 @@ class UsoraServiceProvider extends ServiceProvider
             ]
         );
 
+        // authentication
+        ConfigService::$authenticationMode = config('usora.authentication_mode');
+
         // database
-        ConfigService::$databaseConnectionName = config('railcontent.database_connection_name');
-        ConfigService::$connectionMaskPrefix = config('railcontent.connection_mask_prefix');
+        ConfigService::$databaseConnectionName = config('usora.database_connection_name');
+        ConfigService::$connectionMaskPrefix = config('usora.connection_mask_prefix');
 
         // tables
-        ConfigService::$tablePrefix = config('railcontent.table_prefix');
+        ConfigService::$tablePrefix = config('usora.table_prefix');
         ConfigService::$tableUsers = ConfigService::$tablePrefix . 'users';
 
+        // migrations and routes
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
     }
 
     /**

@@ -5,9 +5,9 @@ namespace Railroad\Usora\Services;
 class ConfigService
 {
     /**
-     * @var int
+     * @var string
      */
-    public static $cacheTime;
+    public static $authenticationMode;
 
     /**
      * @var string
