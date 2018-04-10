@@ -5,5 +5,11 @@ return [
     'connection_mask_prefix' => 'usora_',
     'table_prefix' => 'usora_',
 
-    'authentication_mode' => 'service_provider',
+    'domains_to_authenticate_on' => [
+        'dev.musora.com',
+        'dev.recordeo.com',
+    ],
+
+    'login_page_url' => 'https://www.domain.com/login',
+    'login_success_redirect_url' => 'https://www.domain.com/my-restricted-area',
 ];

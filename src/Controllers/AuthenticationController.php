@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Railroad\Usora\Services\ClientRelayService;
+use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
 
 class AuthenticationController extends Controller
@@ -54,19 +56,28 @@ class AuthenticationController extends Controller
             $this->fireLockoutEvent($request);
 
             // todo: error and route
-            return redirect()->route('');
+            return redirect()->away(ConfigService::$loginPageUrl);
         }
 
         if (auth()->attempt($request->only('email', 'password'), true)) {
+            $user = $this->userService->getById(auth()->id());
+
+            foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
+                ClientRelayService::authorizeUserOnDomain(
+                    $user['id'],
+                    $this->hasher->make($user['id'] . $user['password'] . $user['remember_token']),
+                    $domain
+                );
+            }
 
             // todo: success
-            return redirect()->route('');
+            return redirect()->away(ConfigService::$loginSuccessRedirect);
         }
 
         $this->incrementLoginAttempts($request);
 
         // todo: error and route
-        return redirect()->route('');
+        return redirect()->away(ConfigService::$loginPageUrl);
     }
 
     /**

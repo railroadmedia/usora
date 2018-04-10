@@ -27,10 +27,21 @@ class ConfigService
     /**
      * @var string
      */
-    public static $mode;
+    public static $tableUsers;
+
+    /**
+     * @var array
+     */
+    public static $domainsToAuthenticateOn;
 
     /**
      * @var string
      */
-    public static $tableUsers;
+    public static $loginPageUrl;
+
+    /**
+     * @var string
+     */
+    public static $loginSuccessRedirect
+Url;
 }

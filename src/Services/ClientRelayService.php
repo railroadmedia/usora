@@ -2,6 +2,8 @@
 
 namespace Railroad\Usora\Services;
 
+use Illuminate\Support\Facades\Route;
+
 class ClientRelayService
 {
     /**
@@ -26,10 +28,12 @@ class ClientRelayService
      */
     public static function authorizeUserOnDomain($userId, $verificationToken, $domain)
     {
+        $urlParts = parse_url(route('authenticate.token'))['path'] ?? '';
+
         self::addToBodyTop(
             '<img src="https://' .
             $domain .
-            '/cookietest?v=' .
+            '/' . $urlParts . '?v=' .
             urlencode($verificationToken) .
             '&uid' .
             urlencode($userId) .

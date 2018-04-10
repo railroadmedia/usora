@@ -26,6 +26,9 @@ class UsoraServiceProvider extends ServiceProvider
 
         // authentication
         ConfigService::$authenticationMode = config('usora.authentication_mode');
+        ConfigService::$domainsToAuthenticateOn = config('usora.domains_to_authenticate_on');
+        ConfigService::$loginPageUrl = config('usora.login_page_url');
+        ConfigService::$loginSuccessRedirect = config('usora.login_success_redirect_url');
 
         // database
         ConfigService::$databaseConnectionName = config('usora.database_connection_name');
