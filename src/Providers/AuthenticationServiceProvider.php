@@ -13,11 +13,12 @@ class AuthenticationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app['auth']->extend('custom',function()
-        {
-
-            return new CustomUserProvider();
-        });
+        $this->app['auth']->provider(
+            'usora',
+            function () {
+                return app()->make(UserServiceProvider::class);
+            }
+        );
     }
 
     /**

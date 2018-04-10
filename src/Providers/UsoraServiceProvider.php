@@ -2,7 +2,10 @@
 
 namespace Railroad\Usora\Providers;
 
+use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use PDO;
 use Railroad\Usora\Services\ConfigService;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -14,6 +17,7 @@ class UsoraServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // publish config file
         $this->publishes(
             [
                 __DIR__ . '/../config/usora.php' => config_path('usora.php'),
@@ -34,6 +38,24 @@ class UsoraServiceProvider extends ServiceProvider
         // migrations and routes
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
+
+        // events
+        $listens = [
+            StatementPrepared::class => [
+                function (StatementPrepared $event) {
+                    if ($event->connection->getName() ==
+                        ConfigService::$connectionMaskPrefix . ConfigService::$databaseConnectionName) {
+                        $event->statement->setFetchMode(PDO::FETCH_ASSOC);
+                    }
+                }
+            ],
+        ];
+
+        foreach ($listens as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                Event::listen($event, $listener);
+            }
+        }
     }
 
     /**
@@ -43,6 +65,6 @@ class UsoraServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        $this->app->register(AuthenticationServiceProvider::class);
     }
 }

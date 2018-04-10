@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Faker\Generator;
 use Illuminate\Auth\AuthManager;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
@@ -13,8 +14,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
+use Railroad\Usora\Providers\AuthenticationServiceProvider;
+use Railroad\Usora\Providers\UserServiceProvider;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\RepositoryBase;
+use Railroad\Usora\Services\ConfigService;
 
 class UsoraTestCase extends TestCase
 {
@@ -65,18 +69,22 @@ class UsoraTestCase extends TestCase
     {
         $defaultConfig = require(__DIR__ . '/../config/usora.php');
 
-        $app['config']->set('railcontent.table_prefix', $defaultConfig['table_prefix']);
+        $app['config']->set('usora.database_connection_name', 'sqlite');
+        $app['config']->set('usora.table_prefix', $defaultConfig['table_prefix']);
 
-        $app['config']->set('railcontent.database_connection_name', 'sqlite');
-        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.default', ConfigService::$connectionMaskPrefix . 'sqlite');
         $app['config']->set(
-            'database.connections.sqlite',
+            'database.connections.' . ConfigService::$connectionMaskPrefix . 'sqlite',
             [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
                 'prefix' => '',
             ]
         );
+
+        // set auth to our custom provider
+        $app['config']->set('auth.providers.usora.driver', 'usora');
+        $app['config']->set('auth.guards.web.provider', 'usora');
 
         $app->register(UsoraServiceProvider::class);
     }

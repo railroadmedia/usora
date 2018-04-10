@@ -26,6 +26,11 @@ class ExampleTest extends UsoraTestCase
                 'updated_at' => time(),
             ]);
 
+        $response = $this->call('GET', '/authenticate/token',
+            ['uid' => $userId, 'v' => rand()]);
+
+        $this->assertEmpty($this->app->make('auth')->guard()->id());
+
         $this->assertTrue(true);
     }
 }

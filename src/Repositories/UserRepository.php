@@ -3,7 +3,13 @@
 namespace Railroad\Usora\Repositories;
 
 
-class UserRepository
-{
+use Illuminate\Database\Query\Builder;
+use Railroad\Usora\Services\ConfigService;
 
+class UserRepository extends RepositoryBase
+{
+    protected function query()
+    {
+        return $this->databaseManager->table(ConfigService::$tableUsers);
+    }
 }
