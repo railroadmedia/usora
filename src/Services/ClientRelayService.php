@@ -35,7 +35,7 @@ class ClientRelayService
             rtrim($domain, '/') .
             '/' . ltrim($urlPath, '/') . '?v=' .
             urlencode($verificationToken) .
-            '&uid' .
+            '&uid=' .
             urlencode($userId) .
             '" style="display:none;" />'
         );
