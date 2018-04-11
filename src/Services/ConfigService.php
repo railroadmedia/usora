@@ -35,6 +35,11 @@ class ConfigService
     public static $domainsToAuthenticateOn;
 
     /**
+     * @var array
+     */
+    public static $domainsToCheckForAuthenticateOn;
+
+    /**
      * @var string
      */
     public static $loginPageUrl;

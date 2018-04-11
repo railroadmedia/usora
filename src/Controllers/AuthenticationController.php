@@ -10,9 +10,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Railroad\Usora\Services\ClientRelayService;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
@@ -119,5 +117,45 @@ class AuthenticationController extends Controller
         }
 
         return response('');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function authenticateViaThirdParty(Request $request)
+    {
+        if (!empty(auth()->user())) {
+            if (!empty($request->get('success_redirect'))) {
+                return redirect()->away($request->get('success_redirect'));
+            }
+
+            return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
+        }
+
+        return view('usora::authentication-check');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function renderAuthenticationCookieViaPostMessage(Request $request)
+    {
+        $sessionCookieName = config('session.cookie');
+        $sessionCookieValue = $request->cookie(config('session.cookie'));
+
+        $rememberCookieName = auth()->guard()->getRecallerName();
+        $rememberCookieValue = $request->cookie(auth()->guard()->getRecallerName());
+
+        return view(
+            'usora::post-message-authentication-cookie',
+            [
+                'sessionCookieName' => $sessionCookieName,
+                'sessionCookieValue' => $sessionCookieValue,
+                'rememberCookieName' => $rememberCookieName,
+                'rememberCookieValue' => $rememberCookieValue,
+            ]
+        );
     }
 }

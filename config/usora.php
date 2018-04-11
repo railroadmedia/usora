@@ -6,8 +6,11 @@ return [
     'table_prefix' => 'usora_',
 
     'domains_to_authenticate_on' => [
-        'dev.musora.com',
-        'dev.recordeo.com',
+        'dev.domain1.com',
+    ],
+
+    'domains_to_check_for_authentication' => [
+        'dev.domain2.com',
     ],
 
     'login_page_url' => 'https://www.domain.com/login',

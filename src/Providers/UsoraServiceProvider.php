@@ -27,6 +27,8 @@ class UsoraServiceProvider extends ServiceProvider
         // authentication
         ConfigService::$authenticationMode = config('usora.authentication_mode');
         ConfigService::$domainsToAuthenticateOn = config('usora.domains_to_authenticate_on');
+        ConfigService::$domainsToCheckForAuthenticateOn = config('usora.domains_to_check_for_authentication');
+
         ConfigService::$loginPageUrl = config('usora.login_page_url');
         ConfigService::$loginSuccessRedirectUrl = config('usora.login_success_redirect_url');
 
@@ -38,9 +40,10 @@ class UsoraServiceProvider extends ServiceProvider
         ConfigService::$tablePrefix = config('usora.table_prefix');
         ConfigService::$tableUsers = ConfigService::$tablePrefix . 'users';
 
-        // migrations and routes
+        // migrations and routes and views
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
+        $this->loadViewsFrom(__DIR__.'/../../views', 'usora');
 
         // events
         $listens = [
