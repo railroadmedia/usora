@@ -45,19 +45,18 @@ class AuthenticationController extends Controller
     public function authenticateViaCredentials(Request $request)
     {
         $request->validate(
-            $request,
             [
                 'email' => 'required|string',
                 'password' => 'required|string',
             ]
         );
 
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            // todo: error and route
-            return redirect()->away(ConfigService::$loginPageUrl);
-        }
+//        if ($this->hasTooManyLoginAttempts($request)) {
+//            $this->fireLockoutEvent($request);
+//
+//            // todo: error and route
+//            return redirect()->away(ConfigService::$loginPageUrl);
+//        }
 
         if (auth()->attempt($request->only('email', 'password'), true)) {
             $user = $this->userService->getById(auth()->id());
@@ -71,7 +70,7 @@ class AuthenticationController extends Controller
             }
 
             // todo: success
-            return redirect()->away(ConfigService::$loginSuccessRedirect);
+            return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
         }
 
         $this->incrementLoginAttempts($request);

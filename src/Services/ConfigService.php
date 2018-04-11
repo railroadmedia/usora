@@ -42,6 +42,5 @@ class ConfigService
     /**
      * @var string
      */
-    public static $loginSuccessRedirect
-Url;
+    public static $loginSuccessRedirectUrl;
 }

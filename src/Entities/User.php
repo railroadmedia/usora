@@ -95,4 +95,13 @@ class User implements Authenticatable, ArrayAccess
     {
         return isset($this->data[$offset]) ? $this->data[$offset] : null;
     }
+
+    /**
+     * @param $name
+     * @return mixed|null
+     */
+    public function __get($name)
+    {
+        return $this[$name] ?? null;
+    }
 }

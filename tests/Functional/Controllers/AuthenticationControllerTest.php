@@ -6,7 +6,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
 
-class CookieControllerTest extends UsoraTestCase
+class AuthenticationControllerTest extends UsoraTestCase
 {
     /**
      * @var $hasher Hasher
