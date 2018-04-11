@@ -20,7 +20,7 @@ class UsoraServiceProvider extends ServiceProvider
         // publish config file
         $this->publishes(
             [
-                __DIR__ . '/../config/usora.php' => config_path('usora.php'),
+                __DIR__ . '/../../config/usora.php' => config_path('usora.php'),
             ]
         );
 

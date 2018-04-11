@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Railroad\Usora\Services\ConfigService;
 
-class CreateUsersTable extends Migration
+class UsoraCreateUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -25,8 +25,8 @@ class CreateUsersTable extends Migration
 
                 $table->string('display_name')->index();
 
-                $table->timestamp('created_at')->index();
-                $table->timestamp('updated_at')->index();
+                $table->timestamp('created_at')->nullable()->index();
+                $table->timestamp('updated_at')->nullable()->index();
             }
         );
     }
