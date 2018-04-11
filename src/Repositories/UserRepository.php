@@ -10,6 +10,6 @@ class UserRepository extends RepositoryBase
 {
     protected function query()
     {
-        return $this->databaseManager->table(ConfigService::$tableUsers);
+        return self::$connectionMask->table(ConfigService::$tableUsers);
     }
 }

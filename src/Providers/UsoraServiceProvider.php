@@ -44,6 +44,8 @@ class UsoraServiceProvider extends ServiceProvider
 
         // events
         $listens = [
+
+            // always return associated arrays from database queries
             StatementPrepared::class => [
                 function (StatementPrepared $event) {
                     if ($event->connection->getName() ==
