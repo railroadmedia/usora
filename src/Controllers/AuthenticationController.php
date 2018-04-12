@@ -14,6 +14,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Railroad\Usora\Services\ClientRelayService;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthenticationController extends Controller
 {
@@ -133,29 +134,60 @@ class AuthenticationController extends Controller
             return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
         }
 
-        return view('usora::authentication-check');
+        return view(
+            'usora::authentication-check',
+            [
+                'loginSuccessRedirectUrl' => ConfigService::$loginSuccessRedirectUrl,
+                'loginPageUrl' => ConfigService::$loginPageUrl
+            ]
+        );
     }
 
     /**
      * @param Request $request
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
-    public function renderAuthenticationCookieViaPostMessage(Request $request)
+    public function renderRememberTokenViaPostMessage(Request $request)
     {
-        $sessionCookieName = config('session.cookie');
-        $sessionCookieValue = $request->cookie(config('session.cookie'));
+        $user = auth()->user();
 
-        $rememberCookieName = auth()->guard()->getRecallerName();
-        $rememberCookieValue = $request->cookie(auth()->guard()->getRecallerName());
+        if (empty($user)) {
+            throw new NotFoundHttpException();
+        }
 
         return view(
-            'usora::post-message-authentication-cookie',
+            'usora::post-message-remember-token',
             [
-                'sessionCookieName' => $sessionCookieName,
-                'sessionCookieValue' => $sessionCookieValue,
-                'rememberCookieName' => $rememberCookieName,
-                'rememberCookieValue' => $rememberCookieValue,
+                'rememberToken' => $user['remember_token'],
+                'userId' => $user['id'],
             ]
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+    public function setAuthenticationCookieViaRememberToken(Request $request)
+    {
+        $request->validate(
+            [
+                'uid' => 'required|integer|exists:' . ConfigService::$tableUsers . ',id',
+                'rt' => 'required|string',
+            ]
+        );
+
+        $userId = $request->get('uid');
+        $rememberMeToken = $request->get('rt');
+
+        $user = $this->userService->getById($userId);
+
+        if ($user['remember_token'] === $rememberMeToken) {
+            auth()->loginUsingId($userId, true);
+
+            return response()->json(['success' => 'true']);
+        }
+
+        return response()->json(['success' => 'false']);
     }
 }

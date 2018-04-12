@@ -16,6 +16,11 @@ Route::get(
 )->name('authenticate.third-party');
 
 Route::get(
-    'authenticate/post-message-authentication-cookie',
-    \Railroad\Usora\Controllers\AuthenticationController::class . '@renderAuthenticationCookieViaPostMessage'
-)->name('authenticate.post-message-authentication-cookie');
+    'authenticate/post-message-remember-token',
+    \Railroad\Usora\Controllers\AuthenticationController::class . '@renderRememberTokenViaPostMessage'
+)->name('authenticate.post-message-remember-token');
+
+Route::post(
+    'authenticate/set-authentication-cookie',
+    \Railroad\Usora\Controllers\AuthenticationController::class . '@setAuthenticationCookieViaRememberToken'
+)->name('authenticate.set-authentication-cookie');
