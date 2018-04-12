@@ -6,9 +6,9 @@ Route::post(
 )->name('authenticate.credentials');
 
 Route::get(
-    'authenticate/token',
-    \Railroad\Usora\Controllers\AuthenticationController::class . '@authenticateViaToken'
-)->name('authenticate.token');
+    'authenticate/verification-token',
+    \Railroad\Usora\Controllers\AuthenticationController::class . '@authenticateViaVerificationToken'
+)->name('authenticate.verification-token');
 
 Route::get(
     'authenticate/third-party',
@@ -16,13 +16,13 @@ Route::get(
 )->name('authenticate.third-party');
 
 Route::get(
-    'authenticate/post-message-remember-token',
-    \Railroad\Usora\Controllers\AuthenticationController::class . '@renderRememberTokenViaPostMessage'
-)->name('authenticate.post-message-remember-token');
+    'authenticate/post-message-verification-token',
+    \Railroad\Usora\Controllers\AuthenticationController::class . '@renderVerificationTokenViaPostMessage'
+)->name('authenticate.post-message-verification-token');
 
 Route::post(
     'authenticate/set-authentication-cookie',
-    \Railroad\Usora\Controllers\AuthenticationController::class . '@setAuthenticationCookieViaRememberToken'
+    \Railroad\Usora\Controllers\AuthenticationController::class . '@setAuthenticationCookieViaVerificationToken'
 )->name('authenticate.set-authentication-cookie');
 
 Route::get(

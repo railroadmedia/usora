@@ -28,12 +28,12 @@ class ClientRelayService
      */
     public static function authorizeUserOnDomain($userId, $verificationToken, $domain)
     {
-        $urlPath = parse_url(route('authenticate.token'))['path'] ?? '';
+        $urlPath = parse_url(route('authenticate.verification-token'))['path'] ?? '';
 
         self::addToBodyTop(
             '<img src="https://' .
             rtrim($domain, '/') .
-            '/' . ltrim($urlPath, '/') . '?v=' .
+            '/' . ltrim($urlPath, '/') . '?vt=' .
             urlencode($verificationToken) .
             '&uid=' .
             urlencode($userId) .

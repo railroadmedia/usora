@@ -5,7 +5,7 @@
     window.onload = function () {
         function receiveMessage(e) {
             var failed = e.data['failed'];
-            var rememberToken = e.data['remember_token'];
+            var token = e.data['token'];
             var userId = e.data['user_id'];
 
             if (failed) {
@@ -27,7 +27,7 @@
                 }
             };
             xhr.send(JSON.stringify({
-                rt: rememberToken,
+                vt: token,
                 uid: userId,
                 _token: "{{ csrf_token() }}",
             }));
@@ -39,7 +39,7 @@
 
 @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)
     <iframe id="receiver"
-            src="https://{{ $domain }}/{{ ltrim(parse_url(route('authenticate.post-message-remember-token'))['path'] ?? '', '/') }}"
+            src="https://{{ $domain }}/{{ ltrim(parse_url(route('authenticate.post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">
     </iframe>
 @endforeach

@@ -6,7 +6,7 @@
 </head>
 <body>
 <script type="application/javascript">
-    var rememberToken = '{{ $rememberToken }}';
+    var token = '{{ $token }}';
     var userId = '{{ $userId }}';
     var failed = '{{ $failed }}';
 
@@ -17,7 +17,7 @@
 
         @foreach(\Railroad\Usora\Services\ConfigService::$domainsToAuthenticateOn as $domain)
             window.parent.postMessage(
-                {remember_token: rememberToken, user_id: userId, failed: false},
+                {token: token, user_id: userId, failed: false},
                 'https://' + '{{ $domain }}'
             );
         @endforeach

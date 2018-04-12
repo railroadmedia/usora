@@ -68,12 +68,12 @@ class AuthenticationController extends Controller
             ]
         );
 
-//        if ($this->hasTooManyLoginAttempts($request)) {
-//            $this->fireLockoutEvent($request);
-//
-//            // todo: error and route
-//            return redirect()->away(ConfigService::$loginPageUrl);
-//        }
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+
+            return redirect()->away(ConfigService::$loginPageUrl)
+                ->withErrors(['Too many login attempts. Try again later.']);
+        }
 
         if (auth()->attempt($request->only('email', 'password'), true)) {
             $user = $this->userService->getById(auth()->id());
@@ -81,41 +81,40 @@ class AuthenticationController extends Controller
             foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
                 ClientRelayService::authorizeUserOnDomain(
                     $user['id'],
-                    $this->hasher->make($user['id'] . $user['password'] . $user['remember_token']),
+                    $this->hasher->make($user['id'] . $user['password'] . $user['session_salt']),
                     $domain
                 );
             }
 
-            // todo: success
             return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
         }
 
-//        $this->incrementLoginAttempts($request);
+        $this->incrementLoginAttempts($request);
 
-        // todo: error and route
-        return redirect()->away(ConfigService::$loginPageUrl);
+        return redirect()->away(ConfigService::$loginPageUrl)
+            ->withErrors(['Login credentials invalid. Please try again.']);
     }
 
     /**
      * @param Request $request
      * @return Response
      */
-    public function authenticateViaToken(Request $request)
+    public function authenticateViaVerificationToken(Request $request)
     {
         $request->validate(
             [
-                'v' => 'required|string',
+                'vt' => 'required|string',
                 'uid' => 'required|integer',
             ]
         );
 
-        $verificationToken = $request->get('v');
+        $verificationToken = $request->get('vt');
         $userId = $request->get('uid');
 
         $user = $this->userService->getById($userId);
 
         if (!empty($user) &&
-            $this->hasher->check($user['id'] . $user['password'] . $user['remember_token'], $verificationToken)) {
+            $this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
 
             SaltedSessionGuard::$updateSalt = false;
 
@@ -152,26 +151,26 @@ class AuthenticationController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function renderRememberTokenViaPostMessage(Request $request)
+    public function renderVerificationTokenViaPostMessage(Request $request)
     {
         $user = auth()->user();
 
         if (empty($user)) {
             return view(
-                'usora::post-message-remember-token',
+                'usora::post-message-verification-token',
                 [
                     'failed' => true,
-                    'rememberToken' => null,
+                    'token' => null,
                     'userId' => null,
                 ]
             );
         }
 
         return view(
-            'usora::post-message-remember-token',
+            'usora::post-message-verification-token',
             [
                 'failed' => false,
-                'rememberToken' => $user['remember_token'],
+                'token' => $this->hasher->make($user['id'] . $user['password'] . $user['session_salt']),
                 'userId' => $user['id'],
             ]
         );
@@ -181,21 +180,21 @@ class AuthenticationController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function setAuthenticationCookieViaRememberToken(Request $request)
+    public function setAuthenticationCookieViaVerificationToken(Request $request)
     {
         $request->validate(
             [
                 'uid' => 'required|integer|exists:' . ConfigService::$tableUsers . ',id',
-                'rt' => 'required|string',
+                'vt' => 'required|string',
             ]
         );
 
         $userId = $request->get('uid');
-        $rememberMeToken = $request->get('rt');
+        $verificationToken = $request->get('vt');
 
         $user = $this->userService->getById($userId);
 
-        if ($user['remember_token'] === $rememberMeToken) {
+        if ($this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
             auth()->loginUsingId($userId, true);
 
             return response()->json(['success' => 'true']);
@@ -215,5 +214,10 @@ class AuthenticationController extends Controller
         auth()->logout();
 
         return redirect()->away(ConfigService::$loginPageUrl);
+    }
+
+    public function username()
+    {
+        return 'email';
     }
 }
