@@ -73,6 +73,19 @@ class UserServiceProvider implements UserProvider
     }
 
     /**
+     * @param Authenticatable $user
+     * @param string $salt
+     * @return int|null
+     */
+    public function updateSessionSalt(Authenticatable $user, $salt)
+    {
+        return $this->userService->updateOrCreate(
+            [$user->getAuthIdentifierName() => $user->getAuthIdentifier()],
+            ['session_salt' => $salt]
+        );
+    }
+
+    /**
      * @param array $credentials
      * @return Authenticatable|null
      */

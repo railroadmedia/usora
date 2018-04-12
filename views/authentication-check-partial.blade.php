@@ -4,8 +4,13 @@
 
     window.onload = function () {
         function receiveMessage(e) {
+            var failed = e.data['failed'];
             var rememberToken = e.data['remember_token'];
             var userId = e.data['user_id'];
+
+            if (failed) {
+                window.location.replace(loginPageUrl);
+            }
 
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '{{ url()->route('authenticate.set-authentication-cookie') }}');

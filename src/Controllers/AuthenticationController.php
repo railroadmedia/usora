@@ -7,13 +7,16 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Session\Middleware\StartSession;
+use Railroad\Usora\Guards\SaltedSessionGuard;
 use Railroad\Usora\Services\ClientRelayService;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthenticationController extends Controller
@@ -87,7 +90,7 @@ class AuthenticationController extends Controller
             return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
         }
 
-        $this->incrementLoginAttempts($request);
+//        $this->incrementLoginAttempts($request);
 
         // todo: error and route
         return redirect()->away(ConfigService::$loginPageUrl);
@@ -95,7 +98,7 @@ class AuthenticationController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function authenticateViaToken(Request $request)
     {
@@ -114,6 +117,8 @@ class AuthenticationController extends Controller
         if (!empty($user) &&
             $this->hasher->check($user['id'] . $user['password'] . $user['remember_token'], $verificationToken)) {
 
+            SaltedSessionGuard::$updateSalt = false;
+
             auth()->loginUsingId($user['id'], true);
         }
 
@@ -122,7 +127,7 @@ class AuthenticationController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function authenticateViaThirdParty(Request $request)
     {
@@ -145,19 +150,27 @@ class AuthenticationController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function renderRememberTokenViaPostMessage(Request $request)
     {
         $user = auth()->user();
 
         if (empty($user)) {
-            throw new NotFoundHttpException();
+            return view(
+                'usora::post-message-remember-token',
+                [
+                    'failed' => true,
+                    'rememberToken' => null,
+                    'userId' => null,
+                ]
+            );
         }
 
         return view(
             'usora::post-message-remember-token',
             [
+                'failed' => false,
                 'rememberToken' => $user['remember_token'],
                 'userId' => $user['id'],
             ]
@@ -166,7 +179,7 @@ class AuthenticationController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse
      */
     public function setAuthenticationCookieViaRememberToken(Request $request)
     {
@@ -189,5 +202,18 @@ class AuthenticationController extends Controller
         }
 
         return response()->json(['success' => 'false']);
+    }
+
+    public function deauthenticate(Request $request)
+    {
+        $user = auth()->user();
+
+        if (empty($user)) {
+            throw new NotFoundHttpException();
+        }
+
+        auth()->logout();
+
+        return redirect()->away(ConfigService::$loginPageUrl);
     }
 }

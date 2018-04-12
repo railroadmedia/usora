@@ -24,3 +24,8 @@ Route::post(
     'authenticate/set-authentication-cookie',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@setAuthenticationCookieViaRememberToken'
 )->name('authenticate.set-authentication-cookie');
+
+Route::get(
+    'deauthenticate',
+    \Railroad\Usora\Controllers\AuthenticationController::class . '@deauthenticate'
+)->name('deauthenticate');

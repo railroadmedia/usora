@@ -8,10 +8,18 @@
 <script type="application/javascript">
     var rememberToken = '{{ $rememberToken }}';
     var userId = '{{ $userId }}';
+    var failed = '{{ $failed }}';
 
     window.onload = function () {
+        if (failed) {
+            window.parent.postMessage({failed: true}, '*');
+        }
+
         @foreach(\Railroad\Usora\Services\ConfigService::$domainsToAuthenticateOn as $domain)
-            window.parent.postMessage({remember_token: rememberToken, user_id: userId}, 'https://' + '{{ $domain }}');
+            window.parent.postMessage(
+                {remember_token: rememberToken, user_id: userId, failed: false},
+                'https://' + '{{ $domain }}'
+            );
         @endforeach
     }
 </script>
