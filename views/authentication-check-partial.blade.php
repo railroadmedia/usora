@@ -2,39 +2,44 @@
     var loginSuccessRedirectUrl = '{{ $loginSuccessRedirectUrl }}';
     var loginPageUrl = '{{ $loginPageUrl }}';
 
-    window.onload = function () {
-        function receiveMessage(e) {
-            var failed = e.data['failed'];
-            var token = e.data['token'];
-            var userId = e.data['user_id'];
+    function receiveMessage(e) {
+        var failed = e.data['failed'];
+        var token = e.data['token'];
+        var userId = e.data['user_id'];
 
-            if (failed) {
-                window.location.replace(loginPageUrl);
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '{{ url()->route('authenticate.set-authentication-cookie') }}');
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var result = JSON.parse(xhr.responseText);
-
-                    if (result.success) {
-                        window.location.replace(loginSuccessRedirectUrl);
-                    } else {
-                        window.location.replace(loginPageUrl);
-                    }
-                }
-            };
-            xhr.send(JSON.stringify({
-                vt: token,
-                uid: userId,
-                _token: "{{ csrf_token() }}",
-            }));
+        if (failed) {
+            window.location.replace(loginPageUrl);
         }
 
-        window.addEventListener('message', receiveMessage);
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('POST', '{{ url()->route('authenticate.set-authentication-cookie') }}');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                var result = JSON.parse(xhr.responseText);
+
+                if (result.success) {
+                    window.location.replace(loginSuccessRedirectUrl);
+                } else {
+                    window.location.replace(loginPageUrl);
+                }
+            }
+
+            window.location.replace(loginPageUrl);
+        };
+        xhr.send(JSON.stringify({
+            vt: token,
+            uid: userId,
+            _token: "{{ csrf_token() }}",
+        }));
     }
+
+    window.addEventListener('message', receiveMessage);
+
+    setTimeout(function() {
+        window.location.replace(loginPageUrl);
+    }, 8000);
 </script>
 
 @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)

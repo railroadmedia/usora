@@ -42,10 +42,15 @@ class ConfigService
     /**
      * @var string
      */
-    public static $loginPageUrl;
+    public static $loginPagePath;
 
     /**
      * @var string
      */
-    public static $loginSuccessRedirectUrl;
+    public static $loginSuccessRedirectPath;
+
+    /**
+     * @var bool
+     */
+    public static $rememberMe;
 }

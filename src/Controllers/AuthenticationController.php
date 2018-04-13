@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Session\Middleware\StartSession;
 use Railroad\Usora\Guards\SaltedSessionGuard;
+use Railroad\Usora\Middleware\ReFlashSession;
 use Railroad\Usora\Services\ClientRelayService;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
@@ -30,6 +31,7 @@ class AuthenticationController extends Controller
      * @var UserService
      */
     private $userService;
+
     /**
      * @var Hasher
      */
@@ -51,6 +53,7 @@ class AuthenticationController extends Controller
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 VerifyCsrfToken::class,
+                ReFlashSession::class,
             ]
         );
     }
@@ -71,11 +74,11 @@ class AuthenticationController extends Controller
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
-            return redirect()->away(ConfigService::$loginPageUrl)
+            return redirect()->to(ConfigService::$loginPagePath)
                 ->withErrors(['Too many login attempts. Try again later.']);
         }
 
-        if (auth()->attempt($request->only('email', 'password'), true)) {
+        if (auth()->attempt($request->only('email', 'password'), ConfigService::$rememberMe)) {
             $user = $this->userService->getById(auth()->id());
 
             foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
@@ -86,13 +89,13 @@ class AuthenticationController extends Controller
                 );
             }
 
-            return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
+            return redirect()->away(ConfigService::$loginSuccessRedirectPath);
         }
 
         $this->incrementLoginAttempts($request);
 
-        return redirect()->away(ConfigService::$loginPageUrl)
-            ->withErrors(['Login credentials invalid. Please try again.']);
+        return redirect()->to(ConfigService::$loginPagePath)
+            ->withErrors(['Invalid authentication credentials, please try again.']);
     }
 
     /**
@@ -101,12 +104,17 @@ class AuthenticationController extends Controller
      */
     public function authenticateViaVerificationToken(Request $request)
     {
-        $request->validate(
+        $validator = validator(
+            $request->all(),
             [
                 'vt' => 'required|string',
                 'uid' => 'required|integer',
             ]
         );
+
+        if ($validator->fails()) {
+            return response('');
+        }
 
         $verificationToken = $request->get('vt');
         $userId = $request->get('uid');
@@ -118,7 +126,7 @@ class AuthenticationController extends Controller
 
             SaltedSessionGuard::$updateSalt = false;
 
-            auth()->loginUsingId($user['id'], true);
+            auth()->loginUsingId($user['id'], ConfigService::$rememberMe);
         }
 
         return response('');
@@ -130,19 +138,21 @@ class AuthenticationController extends Controller
      */
     public function authenticateViaThirdParty(Request $request)
     {
+        session()->put('skip-third-party-auth-check', true);
+
         if (!empty(auth()->user())) {
             if (!empty($request->get('success_redirect'))) {
                 return redirect()->away($request->get('success_redirect'));
             }
 
-            return redirect()->away(ConfigService::$loginSuccessRedirectUrl);
+            return redirect()->to(ConfigService::$loginSuccessRedirectPath);
         }
 
         return view(
             'usora::authentication-check',
             [
-                'loginSuccessRedirectUrl' => ConfigService::$loginSuccessRedirectUrl,
-                'loginPageUrl' => ConfigService::$loginPageUrl
+                'loginSuccessRedirectUrl' => url()->to(ConfigService::$loginSuccessRedirectPath),
+                'loginPageUrl' => url()->to(ConfigService::$loginPagePath)
             ]
         );
     }
@@ -182,12 +192,17 @@ class AuthenticationController extends Controller
      */
     public function setAuthenticationCookieViaVerificationToken(Request $request)
     {
-        $request->validate(
+        $validator = validator(
+            $request->all(),
             [
                 'uid' => 'required|integer|exists:' . ConfigService::$tableUsers . ',id',
                 'vt' => 'required|string',
             ]
         );
+
+        if ($validator->fails()) {
+            return response('');
+        }
 
         $userId = $request->get('uid');
         $verificationToken = $request->get('vt');
@@ -195,7 +210,7 @@ class AuthenticationController extends Controller
         $user = $this->userService->getById($userId);
 
         if ($this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
-            auth()->loginUsingId($userId, true);
+            auth()->loginUsingId($userId, ConfigService::$rememberMe);
 
             return response()->json(['success' => 'true']);
         }
@@ -203,6 +218,10 @@ class AuthenticationController extends Controller
         return response()->json(['success' => 'false']);
     }
 
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
     public function deauthenticate(Request $request)
     {
         $user = auth()->user();
@@ -213,9 +232,12 @@ class AuthenticationController extends Controller
 
         auth()->logout();
 
-        return redirect()->away(ConfigService::$loginPageUrl);
+        return redirect()->to(ConfigService::$loginPagePath);
     }
 
+    /**
+     * @return string
+     */
     public function username()
     {
         return 'email';

@@ -13,6 +13,8 @@ return [
         'dev.domain2.com',
     ],
 
-    'login_page_url' => 'https://www.domain.com/login',
-    'login_success_redirect_url' => 'https://www.domain.com/my-restricted-area',
+    'login_page_path' => 'login',
+    'login_success_redirect_path' => 'my-restricted-area',
+
+    'remember_me' => true,
 ];

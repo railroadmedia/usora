@@ -10,6 +10,7 @@ class ThirdPartyAuthenticationCheck
     {
         if (!auth()->check() & session()->get('skip-third-party-auth-check') != true) {
             session()->put('skip-third-party-auth-check', true);
+            session()->reflash();
 
             return redirect()->route('authenticate.third-party');
         }

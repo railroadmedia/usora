@@ -21,6 +21,8 @@
                 'https://' + '{{ $domain }}'
             );
         @endforeach
+
+        window.parent.postMessage({failed: true}, '*');
     }
 </script>
 </body>

@@ -29,8 +29,9 @@ class UsoraServiceProvider extends ServiceProvider
         ConfigService::$domainsToAuthenticateOn = config('usora.domains_to_authenticate_on');
         ConfigService::$domainsToCheckForAuthenticateOn = config('usora.domains_to_check_for_authentication');
 
-        ConfigService::$loginPageUrl = config('usora.login_page_url');
-        ConfigService::$loginSuccessRedirectUrl = config('usora.login_success_redirect_url');
+        ConfigService::$loginPagePath = config('usora.login_page_path');
+        ConfigService::$loginSuccessRedirectPath = config('usora.login_success_redirect_path');
+        ConfigService::$rememberMe = config('usora.remember_me');
 
         // database
         ConfigService::$databaseConnectionName = config('usora.database_connection_name');
