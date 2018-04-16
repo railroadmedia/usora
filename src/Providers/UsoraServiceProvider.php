@@ -36,6 +36,7 @@ class UsoraServiceProvider extends ServiceProvider
         // database
         ConfigService::$databaseConnectionName = config('usora.database_connection_name');
         ConfigService::$connectionMaskPrefix = config('usora.connection_mask_prefix');
+        ConfigService::$dataMode = config('usora.data_mode');
 
         // tables
         ConfigService::$tablePrefix = config('usora.table_prefix');
@@ -45,9 +46,11 @@ class UsoraServiceProvider extends ServiceProvider
         ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');
 
         // migrations and routes and views
-        $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
+        if (ConfigService::$dataMode == 'host') {
+            $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
+        }
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
-        $this->loadViewsFrom(__DIR__.'/../../views', 'usora');
+        $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
         // events
         $listens = [

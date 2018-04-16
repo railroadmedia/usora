@@ -5,6 +5,9 @@ return [
     'connection_mask_prefix' => 'usora_',
     'table_prefix' => 'usora_',
 
+    // host does the db migrations, clients do not
+    'data_mode' => 'host', // 'host' or 'client'
+
     'domains_to_authenticate_on' => [
         'dev.domain1.com',
     ],

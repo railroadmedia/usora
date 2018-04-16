@@ -22,6 +22,11 @@ class ConfigService
     /**
      * @var string
      */
+    public static $dataMode;
+
+    /**
+     * @var string
+     */
     public static $tablePrefix;
 
     /**
