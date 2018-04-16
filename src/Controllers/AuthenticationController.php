@@ -211,6 +211,8 @@ class AuthenticationController extends Controller
      */
     public function deauthenticate(Request $request)
     {
+        session()->put('skip-third-party-auth-check', true);
+
         $user = auth()->user();
 
         if (empty($user)) {

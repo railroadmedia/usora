@@ -4,7 +4,7 @@ namespace Railroad\Usora\Middleware;
 
 use Closure;
 
-class ThirdPartyAuthenticationCheck
+class AuthenticateViaThirdParty
 {
     public function handle($request, Closure $next)
     {
