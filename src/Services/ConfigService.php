@@ -53,4 +53,9 @@ class ConfigService
      * @var bool
      */
     public static $rememberMe;
+
+    /**
+     * @var array
+     */
+    public static $authenticationControllerMiddleware;
 }

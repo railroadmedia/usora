@@ -17,4 +17,13 @@ return [
     'login_success_redirect_path' => 'my-restricted-area',
 
     'remember_me' => true,
+
+    // if you have any of these middleware classes in your global http kernel, they must be removed from this array
+    'authentication_controller_middleware' => [
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        \Railroad\Usora\Middleware\ReFlashSession::class,
+    ],
 ];

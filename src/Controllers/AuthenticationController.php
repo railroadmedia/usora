@@ -3,17 +3,12 @@
 namespace Railroad\Usora\Controllers;
 
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Session\Middleware\StartSession;
 use Railroad\Usora\Guards\SaltedSessionGuard;
-use Railroad\Usora\Middleware\ReFlashSession;
 use Railroad\Usora\Services\ClientRelayService;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
@@ -47,15 +42,7 @@ class AuthenticationController extends Controller
         $this->userService = $userService;
         $this->hasher = $hasher;
 
-        $this->middleware(
-            [
-                EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                VerifyCsrfToken::class,
-                ReFlashSession::class,
-            ]
-        );
+        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

@@ -41,6 +41,9 @@ class UsoraServiceProvider extends ServiceProvider
         ConfigService::$tablePrefix = config('usora.table_prefix');
         ConfigService::$tableUsers = ConfigService::$tablePrefix . 'users';
 
+        // middleware
+        ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');
+
         // migrations and routes and views
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
