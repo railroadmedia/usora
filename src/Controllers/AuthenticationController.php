@@ -96,6 +96,7 @@ class AuthenticationController extends Controller
             [
                 'vt' => 'required|string',
                 'uid' => 'required|integer',
+
             ]
         );
 
