@@ -182,7 +182,9 @@ class AuthenticationController extends Controller
         $validator = validator(
             $request->all(),
             [
-                'uid' => 'required|integer|exists:' . ConfigService::$tableUsers . ',id',
+                'uid' => 'required|integer|exists:' .
+                    ConfigService::$databaseConnectionName . '.' .
+                    ConfigService::$tableUsers . ',id',
                 'vt' => 'required|string',
             ]
         );

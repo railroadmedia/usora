@@ -1,15 +1,34 @@
 <script type="application/javascript">
     var loginSuccessRedirectUrl = '{{ $loginSuccessRedirectUrl }}';
     var loginPageUrl = '{{ $loginPageUrl }}';
+    var domainsToAuthenticateFromChecked = [];
+    var domainsToAuthenticateFromCount =
+            {{ count(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn) }};
+    var failedDomains = 0;
+
+    @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)
+        domainsToAuthenticateFromChecked['{{ $domain }}'] = true;
+
+    @endforeach
 
     function receiveMessage(e) {
         var failed = e.data['failed'];
         var token = e.data['token'];
         var userId = e.data['user_id'];
+        var domain = extractHostname(e.origin);
 
-        if (failed) {
-            window.location.replace(loginPageUrl);
+        if (failed || token.length < 1 || domainsToAuthenticateFromChecked[domain] === undefined) {
+            failedDomains++;
+            console.log('Failed: ' + domain);
+
+            if (failedDomains => domainsToAuthenticateFromCount) {
+                window.location.replace(loginPageUrl);
+            }
+
+            return;
         }
+
+        console.log('Success: ' + domain);
 
         var xhr = new XMLHttpRequest();
 
@@ -22,11 +41,10 @@
                 if (result.success) {
                     window.location.replace(loginSuccessRedirectUrl);
                 } else {
+                    console.log(xhr);
                     window.location.replace(loginPageUrl);
                 }
             }
-
-            window.location.replace(loginPageUrl);
         };
         xhr.send(JSON.stringify({
             vt: token,
@@ -37,9 +55,24 @@
 
     window.addEventListener('message', receiveMessage);
 
-    setTimeout(function() {
-        window.location.replace(loginPageUrl);
+    setTimeout(function () {
+        // window.location.replace(loginPageUrl);
     }, 8000);
+
+    function extractHostname(url) {
+        var hostname;
+
+        if (url.indexOf("://") > -1) {
+            hostname = url.split('/')[2];
+        } else {
+            hostname = url.split('/')[0];
+        }
+
+        hostname = hostname.split(':')[0];
+        hostname = hostname.split('?')[0];
+
+        return hostname;
+    }
 </script>
 
 @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)

@@ -4,6 +4,7 @@ namespace Railroad\Usora\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Railroad\Usora\Services\ConfigService;
 
 class AuthenticatedOnly
 {
@@ -18,7 +19,7 @@ class AuthenticatedOnly
     public function handle($request, Closure $next, $guard = null)
     {
         if (!Auth::guard($guard)->check()) {
-            return redirect('/home');
+            return redirect(ConfigService::$loginPagePath);
         }
 
         return $next($request);

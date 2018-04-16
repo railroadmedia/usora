@@ -13,6 +13,7 @@
     window.onload = function () {
         if (failed) {
             window.parent.postMessage({failed: true}, '*');
+            return;
         }
 
         @foreach(\Railroad\Usora\Services\ConfigService::$domainsToAuthenticateOn as $domain)
@@ -21,8 +22,6 @@
                 'https://' + '{{ $domain }}'
             );
         @endforeach
-
-        window.parent.postMessage({failed: true}, '*');
     }
 </script>
 </body>
