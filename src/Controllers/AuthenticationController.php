@@ -199,6 +199,8 @@ class AuthenticationController extends Controller
         $user = $this->userService->getById($userId);
 
         if ($this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
+            SaltedSessionGuard::$updateSalt = false;
+
             auth()->loginUsingId($userId, ConfigService::$rememberMe);
 
             return response()->json(['success' => 'true']);
