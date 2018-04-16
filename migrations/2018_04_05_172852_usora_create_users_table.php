@@ -21,8 +21,8 @@ class UsoraCreateUsersTable extends Migration
                 
                 $table->string('email')->index();
                 $table->string('password');
-                $table->string('remember_token');
-                $table->string('session_salt');
+                $table->string('remember_token')->nullable();
+                $table->string('session_salt')->nullable();
 
                 $table->string('display_name')->index();
 

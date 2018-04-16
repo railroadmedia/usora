@@ -49,6 +49,7 @@ class UsoraServiceProvider extends ServiceProvider
         if (ConfigService::$dataMode == 'host') {
             $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         }
+
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 

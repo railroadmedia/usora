@@ -3,19 +3,11 @@
 namespace Railroad\Usora\Tests;
 
 use Carbon\Carbon;
-use Exception;
 use Faker\Generator;
 use Illuminate\Auth\AuthManager;
-use Illuminate\Config\Repository;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Hashing\BcryptHasher;
-use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
-use Railroad\Usora\Providers\AuthenticationServiceProvider;
-use Railroad\Usora\Providers\UserServiceProvider;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\RepositoryBase;
 use Railroad\Usora\Services\ConfigService;
@@ -71,6 +63,16 @@ class UsoraTestCase extends TestCase
 
         $app['config']->set('usora.database_connection_name', 'sqlite');
         $app['config']->set('usora.table_prefix', $defaultConfig['table_prefix']);
+        $app['config']->set('usora.data_mode', $defaultConfig['data_mode']);
+
+        $app['config']->set('usora.domains_to_authenticate_on', $defaultConfig['domains_to_authenticate_on']);
+        $app['config']->set(
+            'usora.domains_to_check_for_authentication',
+            $defaultConfig['domains_to_check_for_authentication']
+        );
+
+        $app['config']->set('usora.login_page_path', $defaultConfig['login_page_path']);
+        $app['config']->set('usora.login_success_redirect_path', $defaultConfig['login_success_redirect_path']);
 
         $app['config']->set('database.default', ConfigService::$connectionMaskPrefix . 'sqlite');
         $app['config']->set(

@@ -62,7 +62,7 @@ class AuthenticationController extends Controller
             $this->fireLockoutEvent($request);
 
             return redirect()->to(ConfigService::$loginPagePath)
-                ->withErrors(['Too many login attempts. Try again later.']);
+                ->withErrors(['throttle' => 'Too many login attempts. Try again later.']);
         }
 
         if (auth()->attempt($request->only('email', 'password'), ConfigService::$rememberMe)) {
@@ -82,7 +82,7 @@ class AuthenticationController extends Controller
         $this->incrementLoginAttempts($request);
 
         return redirect()->to(ConfigService::$loginPagePath)
-            ->withErrors(['Invalid authentication credentials, please try again.']);
+            ->withErrors(['invalid-credentials' => 'Invalid authentication credentials, please try again.']);
     }
 
     /**

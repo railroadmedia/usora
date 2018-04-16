@@ -20,14 +20,70 @@ class AuthenticationControllerTest extends UsoraTestCase
         $this->hasher = app()->make(Hasher::class);
     }
 
-    public function test_validation()
+    public function test_authenticate_via_credentials_validation_fails()
     {
         $response = $this->call(
-            'GET',
-            '/authenticate/token'
+            'POST',
+            '/authenticate/credentials',
+            ['email' => 'fail', 'password' => '123']
         );
 
-        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['invalid-credentials']);
+
+        $this->assertEmpty($this->app->make('auth')->guard()->id());
+    }
+
+    public function test_authenticate_via_credentials_too_many_attempts()
+    {
+        $user = [
+            'email' => $this->faker->email,
+            'password' => $this->hasher->make($this->faker->word),
+            'remember_token' => str_random(60),
+            'display_name' => $this->faker->words(4, true),
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+
+        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
+            ->insertGetId($user);
+
+        for ($i = 0; $i < 9; $i++) {
+            $response = $this->call(
+                'POST',
+                '/authenticate/credentials',
+                ['email' => $user['email'], 'password' => '123']
+            );
+        }
+
+        $response->assertSessionHasErrors(['throttle']);
+
+        $this->assertEmpty($this->app->make('auth')->guard()->id());
+    }
+
+    public function test_authenticate_via_credentials()
+    {
+        $rawPassword = $this->faker->word;
+
+        $user = [
+            'email' => $this->faker->email,
+            'password' => $this->hasher->make($rawPassword),
+            'remember_token' => str_random(60),
+            'display_name' => $this->faker->words(4, true),
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+
+        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
+            ->insertGetId($user);
+
+        $response = $this->call(
+            'POST',
+            '/authenticate/credentials',
+            ['email' => $user['email'], 'password' => $rawPassword]
+        );
+
+        $this->assertEquals($userId, $this->app->make('auth')->guard()->id());
+        $response->assertRedirect(ConfigService::$loginSuccessRedirectPath);
     }
 
     public function test_verification_failed()
