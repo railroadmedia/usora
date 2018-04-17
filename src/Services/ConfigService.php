@@ -35,6 +35,11 @@ class ConfigService
     public static $tableUsers;
 
     /**
+     * @var string
+     */
+    public static $tablePasswordResets;
+
+    /**
      * @var array
      */
     public static $domainsToAuthenticateOn;
@@ -58,6 +63,16 @@ class ConfigService
      * @var bool
      */
     public static $rememberMe;
+
+    /**
+     * @var string
+     */
+    public static $passwordResetNotificationClass;
+
+    /**
+     * @var string
+     */
+    public static $passwordResetNotificationChannel;
 
     /**
      * @var array

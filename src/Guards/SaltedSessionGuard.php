@@ -42,7 +42,7 @@ class SaltedSessionGuard extends SessionGuard
     {
         parent::login($user, $remember);
 
-        if (self::$updateSalt || empty($this->session->get($this->getSaltName()))) {
+        if (self::$updateSalt && empty($user['session_salt'])) {
             $salt = Str::random(60);
 
             $this->session->put($this->getSaltName(), $salt);

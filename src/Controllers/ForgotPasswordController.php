@@ -2,31 +2,52 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Password;
+use Railroad\Usora\Services\ConfigService;
 
 class ForgotPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset emails and
-    | includes a trait which assists in sending these notifications from
-    | your application to your users. Feel free to explore this trait.
-    |
-    */
+    /**
+     * Send a reset link to the given user.
+     *
+     * @param  Request $request
+     * @return RedirectResponse
+     */
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(
+            [
+                'email' => 'required|email|exists:' .
+                    ConfigService::$databaseConnectionName .
+                    '.' .
+                    ConfigService::$tableUsers . ',email'
+            ]
+        );
 
-    use SendsPasswordResetEmails;
+        $response = $this->broker()->sendResetLink(
+            $request->only('email')
+        );
+
+        if ($response === Password::RESET_LINK_SENT) {
+            return back()->with('successes', ['Password reset link has been sent to your email.']);
+        }
+
+        return back()->withErrors(
+            ['email' => 'Failed to reset password, please double check your email or contact support.']
+        );
+    }
 
     /**
-     * Create a new controller instance.
+     * Get the broker to be used during password reset.
      *
-     * @return void
+     * @return \Illuminate\Contracts\Auth\PasswordBroker
      */
-    public function __construct()
+    public function broker()
     {
-        $this->middleware('guest');
+        return Password::broker();
     }
 }

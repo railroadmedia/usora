@@ -1,13 +1,21 @@
 <?php
 
 return [
+    // database
     'database_connection_name' => 'mysql',
     'connection_mask_prefix' => 'usora_',
-    'table_prefix' => 'usora_',
 
     // host does the db migrations, clients do not
     'data_mode' => 'host', // 'host' or 'client'
 
+    // tables
+    'table_prefix' => 'usora_',
+    'tables' => [
+        'users' => 'users',
+        'password_resets' => 'password_resets',
+    ],
+
+    // authentication domains
     'domains_to_authenticate_on' => [
         'dev.domain1.com',
     ],
@@ -16,10 +24,16 @@ return [
         'dev.domain2.com',
     ],
 
+    // authentication redirects
     'login_page_path' => 'login',
     'login_success_redirect_path' => 'my-restricted-area',
 
+    // use remember me by default?
     'remember_me' => true,
+
+    // password reset
+    'password_reset_notification_class' => \Illuminate\Auth\Notifications\ResetPassword::class,
+    'password_reset_notification_channel' => 'mail',
 
     // if you have any of these middleware classes in your global http kernel, they must be removed from this array
     'authentication_controller_middleware' => [

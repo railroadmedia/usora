@@ -1,5 +1,6 @@
 <?php
 
+// authentication
 Route::post(
     'authenticate/credentials',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@authenticateViaCredentials'
@@ -29,3 +30,9 @@ Route::get(
     'deauthenticate',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@deauthenticate'
 )->name('deauthenticate');
+
+// password reset
+Route::post(
+    'password/send-reset-email',
+    \Railroad\Usora\Controllers\ForgotPasswordController::class . '@sendResetLinkEmail'
+)->name('password.send-reset-email');

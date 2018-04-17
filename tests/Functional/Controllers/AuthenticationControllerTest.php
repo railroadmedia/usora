@@ -8,16 +8,9 @@ use Railroad\Usora\Tests\UsoraTestCase;
 
 class AuthenticationControllerTest extends UsoraTestCase
 {
-    /**
-     * @var $hasher Hasher
-     */
-    protected $hasher;
-
     protected function setUp()
     {
         parent::setUp();
-
-        $this->hasher = app()->make(Hasher::class);
     }
 
     public function test_authenticate_via_credentials_validation_failed()

@@ -65,6 +65,8 @@ class UsoraTestCase extends TestCase
         $app['config']->set('usora.table_prefix', $defaultConfig['table_prefix']);
         $app['config']->set('usora.data_mode', $defaultConfig['data_mode']);
 
+        $app['config']->set('usora.tables', $defaultConfig['tables']);
+
         $app['config']->set('usora.domains_to_authenticate_on', $defaultConfig['domains_to_authenticate_on']);
         $app['config']->set(
             'usora.domains_to_check_for_authentication',
@@ -87,6 +89,10 @@ class UsoraTestCase extends TestCase
         // set auth to our custom provider
         $app['config']->set('auth.providers.usora.driver', 'usora');
         $app['config']->set('auth.guards.web.provider', 'usora');
+
+        // set password configuration
+        $app['config']->set('auth.passwords.users.provider', 'usora');
+        $app['config']->set('auth.passwords.users.table', 'usora');
 
         $app->register(UsoraServiceProvider::class);
     }

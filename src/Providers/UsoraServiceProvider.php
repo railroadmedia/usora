@@ -40,7 +40,8 @@ class UsoraServiceProvider extends ServiceProvider
 
         // tables
         ConfigService::$tablePrefix = config('usora.table_prefix');
-        ConfigService::$tableUsers = ConfigService::$tablePrefix . 'users';
+        ConfigService::$tableUsers = ConfigService::$tablePrefix . config('usora.tables.users');
+        ConfigService::$tablePasswordResets = ConfigService::$tablePrefix . config('usora.tables.password_resets');
 
         // middleware
         ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');
