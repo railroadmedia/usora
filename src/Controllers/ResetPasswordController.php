@@ -75,6 +75,8 @@ class ResetPasswordController extends Controller
         );
 
         if ($response === Password::PASSWORD_RESET) {
+            session()->put('skip-third-party-auth-check', true);
+
             return redirect()->to(ConfigService::$loginSuccessRedirectPath)
                 ->with(
                     'successes',
