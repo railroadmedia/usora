@@ -7,6 +7,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\MessageBag;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Services\UserService;
 
@@ -25,6 +26,7 @@ class ResetPasswordController extends Controller
 
     /**
      * CookieController constructor.
+     *
      * @param UserService $userService
      * @param Hasher $hasher
      */
@@ -32,6 +34,8 @@ class ResetPasswordController extends Controller
     {
         $this->userService = $userService;
         $this->hasher = $hasher;
+
+        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**
@@ -72,7 +76,10 @@ class ResetPasswordController extends Controller
 
         if ($response === Password::PASSWORD_RESET) {
             return redirect()->to(ConfigService::$loginSuccessRedirectPath)
-                ->with(['successes' => ['password' => 'Your password has been reset successfully.']]);
+                ->with(
+                    'successes',
+                    new MessageBag(['password' => 'Your password has been reset successfully.'])
+                );
         }
 
         return redirect()->back()->withErrors(['password' => 'Password reset failed, please try again.']);

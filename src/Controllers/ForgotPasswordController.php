@@ -6,10 +6,19 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\MessageBag;
 use Railroad\Usora\Services\ConfigService;
 
 class ForgotPasswordController extends Controller
 {
+    /**
+     * ForgotPasswordController constructor.
+     */
+    public function __construct()
+    {
+        $this->middleware(ConfigService::$authenticationControllerMiddleware);
+    }
+
     /**
      * Send a reset link to the given user.
      *
@@ -33,7 +42,10 @@ class ForgotPasswordController extends Controller
 
         if ($response === Password::RESET_LINK_SENT) {
             return redirect()->to(ConfigService::$loginPagePath)
-                ->with('successes', ['password' => 'Password reset link has been sent to your email.']);
+                ->with(
+                    'successes',
+                    new MessageBag(['password' => 'Password reset link has been sent to your email.'])
+                );
         }
 
         return back()->withErrors(
