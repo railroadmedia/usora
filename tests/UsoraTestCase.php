@@ -7,10 +7,15 @@ use Faker\Generator;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Mail\Mailer;
+use Illuminate\Notifications\ChannelManager;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Testing\Fakes\MailFake;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Orchestra\Testbench\TestCase;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\RepositoryBase;
-use Railroad\Usora\Services\ConfigService;
 
 class UsoraTestCase extends TestCase
 {
@@ -34,6 +39,16 @@ class UsoraTestCase extends TestCase
      */
     protected $hasher;
 
+    /**
+     * @var MailFake
+     */
+    protected $mailFake;
+
+    /**
+     * @var NotificationFake
+     */
+    protected $notificationFake;
+
     protected function setUp()
     {
         parent::setUp();
@@ -45,6 +60,10 @@ class UsoraTestCase extends TestCase
         $this->databaseManager = $this->app->make(DatabaseManager::class);
         $this->authManager = $this->app->make(AuthManager::class);
         $this->hasher = $this->app->make(BcryptHasher::class);
+        $this->notificationFake = Notification::fake();
+
+        Mail::fake();
+        $this->mailFake = Mail::getFacadeRoot();
 
         RepositoryBase::$connectionMask = null;
 
@@ -61,24 +80,17 @@ class UsoraTestCase extends TestCase
     {
         $defaultConfig = require(__DIR__ . '/../config/usora.php');
 
-        $app['config']->set('usora.database_connection_name', 'sqlite');
-        $app['config']->set('usora.table_prefix', $defaultConfig['table_prefix']);
-        $app['config']->set('usora.data_mode', $defaultConfig['data_mode']);
+        foreach ($defaultConfig as $key => $value) {
+            config()->set('usora.' . $key, $value);
+        }
 
-        $app['config']->set('usora.tables', $defaultConfig['tables']);
-
-        $app['config']->set('usora.domains_to_authenticate_on', $defaultConfig['domains_to_authenticate_on']);
-        $app['config']->set(
-            'usora.domains_to_check_for_authentication',
-            $defaultConfig['domains_to_check_for_authentication']
-        );
-
-        $app['config']->set('usora.login_page_path', $defaultConfig['login_page_path']);
-        $app['config']->set('usora.login_success_redirect_path', $defaultConfig['login_success_redirect_path']);
-
-        $app['config']->set('database.default', ConfigService::$connectionMaskPrefix . 'sqlite');
-        $app['config']->set(
-            'database.connections.' . ConfigService::$connectionMaskPrefix . 'sqlite',
+        // set database
+        config()->set('usora.data_mode', 'host');
+        config()->set('usora.database_connection_name', config('usora.connection_mask_prefix') . 'sqlite');
+        config()->set('usora.authentication_controller_middleware', []);
+        config()->set('database.default', config('usora.connection_mask_prefix') . 'sqlite');
+        config()->set(
+            'database.connections.' . config('usora.connection_mask_prefix') . 'sqlite',
             [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
@@ -87,12 +99,12 @@ class UsoraTestCase extends TestCase
         );
 
         // set auth to our custom provider
-        $app['config']->set('auth.providers.usora.driver', 'usora');
-        $app['config']->set('auth.guards.web.provider', 'usora');
+        config()->set('auth.providers.usora.driver', 'usora');
+        config()->set('auth.guards.web.provider', 'usora');
 
         // set password configuration
-        $app['config']->set('auth.passwords.users.provider', 'usora');
-        $app['config']->set('auth.passwords.users.table', 'usora');
+        config()->set('auth.passwords.users.provider', 'usora');
+        config()->set('auth.passwords.users.table', config('usora.table_prefix') . 'password_resets');
 
         $app->register(UsoraServiceProvider::class);
     }

@@ -32,7 +32,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        xhr.open('POST', '{{ url()->route('authenticate.set-authentication-cookie') }}');
+        xhr.open('POST', '{{ url()->route('usora.authenticate.set-authentication-cookie') }}');
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onload = function () {
             if (xhr.status === 200) {
@@ -77,7 +77,7 @@
 
 @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)
     <iframe id="receiver"
-            src="https://{{ $domain }}/{{ ltrim(parse_url(route('authenticate.post-message-verification-token'))['path'] ?? '', '/') }}"
+            src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">
     </iframe>
 @endforeach

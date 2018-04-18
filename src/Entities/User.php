@@ -3,11 +3,10 @@
 namespace Railroad\Usora\Entities;
 
 use ArrayAccess;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Support\Facades\Notification;
+use Railroad\Usora\Services\ConfigService;
 
 class User implements Authenticatable, ArrayAccess, CanResetPassword
 {
@@ -71,8 +70,9 @@ class User implements Authenticatable, ArrayAccess, CanResetPassword
      */
     public function sendPasswordResetNotification($token)
     {
-        (new AnonymousNotifiable)->route($channel, $this->getEmailForPasswordReset())
-            ->notify(new ResetPassword($token));
+        (new AnonymousNotifiable)
+            ->route(ConfigService::$passwordResetNotificationChannel, $this->getEmailForPasswordReset())
+            ->notify(new ConfigService::$passwordResetNotificationClass($token));
     }
 
     /**

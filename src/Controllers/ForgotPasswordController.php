@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -24,7 +23,7 @@ class ForgotPasswordController extends Controller
                 'email' => 'required|email|exists:' .
                     ConfigService::$databaseConnectionName .
                     '.' .
-                    ConfigService::$tableUsers . ',email'
+                    ConfigService::$tableUsers . ',email',
             ]
         );
 
@@ -33,7 +32,8 @@ class ForgotPasswordController extends Controller
         );
 
         if ($response === Password::RESET_LINK_SENT) {
-            return back()->with('successes', ['Password reset link has been sent to your email.']);
+            return redirect()->to(ConfigService::$loginPagePath)
+                ->with('successes', ['password' => 'Password reset link has been sent to your email.']);
         }
 
         return back()->withErrors(

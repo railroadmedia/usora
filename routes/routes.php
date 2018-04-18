@@ -4,35 +4,40 @@
 Route::post(
     'authenticate/credentials',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@authenticateViaCredentials'
-)->name('authenticate.credentials');
+)->name('usora.authenticate.credentials');
 
 Route::get(
     'authenticate/verification-token',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@authenticateViaVerificationToken'
-)->name('authenticate.verification-token');
+)->name('usora.authenticate.verification-token');
 
 Route::get(
     'authenticate/third-party',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@authenticateViaThirdParty'
-)->name('authenticate.third-party');
+)->name('usora.authenticate.third-party');
 
 Route::get(
     'authenticate/post-message-verification-token',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@renderVerificationTokenViaPostMessage'
-)->name('authenticate.post-message-verification-token');
+)->name('usora.authenticate.post-message-verification-token');
 
 Route::post(
     'authenticate/set-authentication-cookie',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@setAuthenticationCookieViaVerificationToken'
-)->name('authenticate.set-authentication-cookie');
+)->name('usora.authenticate.set-authentication-cookie');
 
 Route::get(
     'deauthenticate',
     \Railroad\Usora\Controllers\AuthenticationController::class . '@deauthenticate'
-)->name('deauthenticate');
+)->name('usora.deauthenticate');
 
 // password reset
 Route::post(
     'password/send-reset-email',
     \Railroad\Usora\Controllers\ForgotPasswordController::class . '@sendResetLinkEmail'
-)->name('password.send-reset-email');
+)->name('usora.password.send-reset-email');
+
+Route::post(
+    'password/reset',
+    \Railroad\Usora\Controllers\ResetPasswordController::class . '@reset'
+)->name('usora.password.reset');

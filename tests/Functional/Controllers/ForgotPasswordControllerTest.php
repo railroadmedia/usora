@@ -2,6 +2,10 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Mail;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
 
@@ -30,18 +34,22 @@ class ForgotPasswordControllerTest extends UsoraTestCase
             'password' => $this->hasher->make($this->faker->word),
             'remember_token' => str_random(60),
             'display_name' => $this->faker->words(4, true),
-            'created_at' => time(),
             'updated_at' => time(),
         ];
 
         $userId = $this->databaseManager->table(ConfigService::$tableUsers)
             ->insertGetId($user);
 
+        $userEntity = new User();
+        $userEntity['id'] = $userId;
+
         $response = $this->call(
             'POST',
             'password/send-reset-email',
             ['email' => $user['email']]
         );
+
+        $this->notificationFake->assertSentTo(new AnonymousNotifiable(), ConfigService::$passwordResetNotificationClass);
 
         $this->assertEmpty($this->app->make('auth')->guard()->id());
     }

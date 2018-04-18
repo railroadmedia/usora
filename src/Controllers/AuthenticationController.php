@@ -140,7 +140,7 @@ class AuthenticationController extends Controller
             'usora::authentication-check',
             [
                 'loginSuccessRedirectUrl' => url()->to(ConfigService::$loginSuccessRedirectPath),
-                'loginPageUrl' => url()->to(ConfigService::$loginPagePath)
+                'loginPageUrl' => session()->get('failure-redirect-url', url()->to(ConfigService::$loginPagePath))
             ]
         );
     }

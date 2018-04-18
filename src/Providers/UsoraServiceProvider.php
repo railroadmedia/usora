@@ -43,6 +43,10 @@ class UsoraServiceProvider extends ServiceProvider
         ConfigService::$tableUsers = ConfigService::$tablePrefix . config('usora.tables.users');
         ConfigService::$tablePasswordResets = ConfigService::$tablePrefix . config('usora.tables.password_resets');
 
+        // password reset
+        ConfigService::$passwordResetNotificationClass = config('usora.password_reset_notification_class');
+        ConfigService::$passwordResetNotificationChannel = config('usora.password_reset_notification_channel');
+
         // middleware
         ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');
 

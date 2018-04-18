@@ -24,7 +24,7 @@ return [
         'dev.domain2.com',
     ],
 
-    // authentication redirects
+    // authentication
     'login_page_path' => 'login',
     'login_success_redirect_path' => 'my-restricted-area',
 
