@@ -30,6 +30,24 @@ class UserService
     }
 
     /**
+     * @param array $ids
+     * @return array
+     */
+    public function getByIds(array $ids)
+    {
+        return $this->userRepository->getByIds($ids);
+    }
+
+    /**
+     * @param array $attributes
+     * @return array|null
+     */
+    public function getFirstBy(array $attributes)
+    {
+        return $this->userRepository->getFirstBy($attributes);
+    }
+
+    /**
      * @param array $credentials
      * @return array|null
      */
