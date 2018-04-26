@@ -77,7 +77,7 @@ abstract class RepositoryBase
      */
     public function getByIds($ids)
     {
-        return $this->query()->whereIn('id', $ids)->get();
+        return $this->query()->whereIn('id', $ids)->get()->toArray();
     }
 
     /**
