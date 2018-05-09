@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use PDO;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
+use Railroad\Usora\Decorators\UserAccessDecorator;
 use Railroad\Usora\Services\ConfigService;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -63,7 +64,10 @@ class UsoraServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
         config()->set('resora.default_connection_name', ConfigService::$databaseConnectionName);
-        config()->set('resora.decorators.users', [UserFieldDecorator::class, UserEntityDecorator::class]);
+        config()->set(
+            'resora.decorators.users',
+            [UserFieldDecorator::class, UserAccessDecorator::class, UserEntityDecorator::class]
+        );
 
         // events
         $listens = [

@@ -3,7 +3,6 @@
 namespace Railroad\Usora\Tests;
 
 use Carbon\Carbon;
-use Faker\Generator;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Hashing\BcryptHasher;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Orchestra\Testbench\TestCase;
+use Railroad\Permissions\Providers\PermissionsServiceProvider;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Providers\UsoraServiceProvider;
@@ -104,5 +104,16 @@ class UsoraTestCase extends TestCase
         config()->set('auth.passwords.users.table', config('usora.table_prefix') . 'password_resets');
 
         $app->register(UsoraServiceProvider::class);
+
+        // setup permissions
+        config()->set('permissions.cache_duration', 60 * 60 * 24 * 30);
+        config()->set('permissions.database_connection_name', config('usora.connection_mask_prefix') . 'sqlite');
+        config()->set('permissions.connection_mask_prefix', 'permissions_');
+        config()->set('permissions.data_mode', 'host');
+        config()->set('permissions.table_prefix', 'permissions_');
+        config()->set('permissions.table_users', config('usora.tables.users'));
+        config()->set('permissions.brand', 'drumeo');
+
+        $app->register(PermissionsServiceProvider::class);
     }
 }

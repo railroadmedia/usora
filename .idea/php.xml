@@ -97,6 +97,7 @@
       <path value="$PROJECT_DIR$/vendor/mtdowling/jmespath.php" />
       <path value="$PROJECT_DIR$/vendor/phpseclib/phpseclib" />
       <path value="$PROJECT_DIR$/../resora" />
+      <path value="$PROJECT_DIR$/vendor/railroad/permissions" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
