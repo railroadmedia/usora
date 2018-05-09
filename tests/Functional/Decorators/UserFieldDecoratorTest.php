@@ -26,12 +26,12 @@ class UserFieldDecoratorTest extends UsoraTestCase
         $this->userFieldRepository = app(UserFieldRepository::class);
     }
 
-    public function test_decorate_()
+    public function test_decorate_none()
     {
         $user = $this->userRepository->create($this->faker->user());
         $response = $this->userRepository->read($user['id']);
 
-        $this->assertEquals($response['fields'], []);
+        $this->assertEquals([], $response['fields']);
     }
 
     public function test_decorate_single()
@@ -41,7 +41,7 @@ class UserFieldDecoratorTest extends UsoraTestCase
 
         $response = $this->userRepository->read($user['id']);
 
-        $this->assertEquals($response['fields'], [$userField]);
+        $this->assertEquals([$userField], $response['fields']);
     }
 
     public function test_decorate_multiple()
@@ -53,6 +53,6 @@ class UserFieldDecoratorTest extends UsoraTestCase
 
         $response = $this->userRepository->read($user['id']);
 
-        $this->assertEquals($response['fields'], [$userField1, $userField2, $userField3]);
+        $this->assertEquals([$userField1, $userField2, $userField3], $response['fields']);
     }
 }
