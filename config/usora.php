@@ -13,6 +13,8 @@ return [
     'tables' => [
         'users' => 'users',
         'password_resets' => 'password_resets',
+        'user_fields' => 'user_fields',
+        'user_data' => 'user_data',
     ],
 
     // authentication domains

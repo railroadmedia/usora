@@ -7,20 +7,19 @@ use Faker\Generator;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Hashing\BcryptHasher;
-use Illuminate\Mail\Mailer;
-use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Orchestra\Testbench\TestCase;
+use Railroad\Usora\Faker\Factory;
+use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Providers\UsoraServiceProvider;
-use Railroad\Usora\Repositories\RepositoryBase;
 
 class UsoraTestCase extends TestCase
 {
     /**
-     * @var Generator
+     * @var Faker
      */
     protected $faker;
 
@@ -56,7 +55,7 @@ class UsoraTestCase extends TestCase
         $this->artisan('migrate:fresh', []);
         $this->artisan('cache:clear', []);
 
-        $this->faker = $this->app->make(Generator::class);
+        $this->faker = Factory::create();
         $this->databaseManager = $this->app->make(DatabaseManager::class);
         $this->authManager = $this->app->make(AuthManager::class);
         $this->hasher = $this->app->make(BcryptHasher::class);

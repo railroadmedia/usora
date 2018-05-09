@@ -6,6 +6,7 @@ use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use PDO;
+use Railroad\Usora\Decorators\UserFieldDecorator;
 use Railroad\Usora\Services\ConfigService;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -41,6 +42,8 @@ class UsoraServiceProvider extends ServiceProvider
         // tables
         ConfigService::$tablePrefix = config('usora.table_prefix');
         ConfigService::$tableUsers = ConfigService::$tablePrefix . config('usora.tables.users');
+        ConfigService::$tableUserFields = ConfigService::$tablePrefix . config('usora.tables.user_fields');
+        ConfigService::$tableUserData = ConfigService::$tablePrefix . config('usora.tables.user_data');
         ConfigService::$tablePasswordResets = ConfigService::$tablePrefix . config('usora.tables.password_resets');
 
         // password reset
@@ -59,6 +62,7 @@ class UsoraServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
         config()->set('resora.default_connection_name', ConfigService::$databaseConnectionName);
+        config()->set('resora.decorators.users', [UserFieldDecorator::class]);
 
         // events
         $listens = [
@@ -70,7 +74,7 @@ class UsoraServiceProvider extends ServiceProvider
                         ConfigService::$connectionMaskPrefix . ConfigService::$databaseConnectionName) {
                         $event->statement->setFetchMode(PDO::FETCH_ASSOC);
                     }
-                }
+                },
             ],
         ];
 

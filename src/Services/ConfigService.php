@@ -37,6 +37,16 @@ class ConfigService
     /**
      * @var string
      */
+    public static $tableUserFields;
+
+    /**
+     * @var string
+     */
+    public static $tableUserData;
+
+    /**
+     * @var string
+     */
     public static $tablePasswordResets;
 
     /**
