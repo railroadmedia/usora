@@ -58,6 +58,8 @@ class UsoraServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
+        config()->set('resora.default_connection_name', ConfigService::$databaseConnectionName);
+
         // events
         $listens = [
 

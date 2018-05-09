@@ -7,14 +7,14 @@ use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
 use Railroad\Usora\Entities\User;
-use Railroad\Usora\Services\UserService;
+use Railroad\Usora\Repositories\UserRepository;
 
 class UserServiceProvider implements UserProvider
 {
     /**
-     * @var UserService
+     * @var UserRepository
      */
-    private $userService;
+    private $userRepository;
 
     /**
      * @var Hasher
@@ -23,12 +23,13 @@ class UserServiceProvider implements UserProvider
 
     /**
      * UserServiceProvider constructor.
-     * @param UserService $userService
+     *
+     * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(UserService $userService, Hasher $hasher)
+    public function __construct(UserRepository $userRepository, Hasher $hasher)
     {
-        $this->userService = $userService;
+        $this->userRepository = $userRepository;
         $this->hasher = $hasher;
     }
 
@@ -38,7 +39,7 @@ class UserServiceProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return $this->mapToEntity($this->userService->getById($identifier));
+        return $this->mapToEntity($this->userRepository->read($identifier));
     }
 
     /**
@@ -66,8 +67,8 @@ class UserServiceProvider implements UserProvider
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return $this->userService->updateOrCreate(
-            [$user->getAuthIdentifierName() => $user->getAuthIdentifier()],
+        return $this->userRepository->update(
+            $user->getAuthIdentifier(),
             [$user->getRememberTokenName() => $token]
         );
     }
@@ -79,8 +80,8 @@ class UserServiceProvider implements UserProvider
      */
     public function updateSessionSalt(Authenticatable $user, $salt)
     {
-        return $this->userService->updateOrCreate(
-            [$user->getAuthIdentifierName() => $user->getAuthIdentifier()],
+        return $this->userRepository->update(
+            $user->getAuthIdentifier(),
             ['session_salt' => $salt]
         );
     }
@@ -105,7 +106,7 @@ class UserServiceProvider implements UserProvider
             }
         }
 
-        return $this->mapToEntity($this->userService->getByCredentials($getByAttributes));
+        return $this->mapToEntity($this->userRepository->query()->where($getByAttributes)->first());
     }
 
     public function validateCredentials(Authenticatable $user, array $credentials)

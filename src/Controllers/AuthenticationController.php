@@ -9,9 +9,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Usora\Guards\SaltedSessionGuard;
+use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ClientRelayService;
 use Railroad\Usora\Services\ConfigService;
-use Railroad\Usora\Services\UserService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -19,27 +19,27 @@ class AuthenticationController extends Controller
 {
     use ThrottlesLogins;
 
-    // the max login attempts allowed before lockout
-    protected $maxAttempts = 8;
-
     /**
-     * @var UserService
+     * @var UserRepository
      */
-    private $userService;
-
+    private $userRepository;
     /**
      * @var Hasher
      */
     private $hasher;
 
+    // the max login attempts allowed before lockout
+    protected $maxAttempts = 8;
+
     /**
      * CookieController constructor.
-     * @param UserService $userService
+     *
+     * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(UserService $userService, Hasher $hasher)
+    public function __construct(UserRepository $userRepository, Hasher $hasher)
     {
-        $this->userService = $userService;
+        $this->userRepository = $userRepository;
         $this->hasher = $hasher;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
@@ -66,7 +66,7 @@ class AuthenticationController extends Controller
         }
 
         if (auth()->attempt($request->only('email', 'password'), ConfigService::$rememberMe)) {
-            $user = $this->userService->getById(auth()->id());
+            $user = $this->userRepository->read(auth()->id());
 
             foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
                 ClientRelayService::authorizeUserOnDomain(
@@ -107,7 +107,7 @@ class AuthenticationController extends Controller
         $verificationToken = $request->get('vt');
         $userId = $request->get('uid');
 
-        $user = $this->userService->getById($userId);
+        $user = $this->userRepository->read($userId);
 
         if (!empty($user) &&
             $this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
@@ -140,7 +140,7 @@ class AuthenticationController extends Controller
             'usora::authentication-check',
             [
                 'loginSuccessRedirectUrl' => url()->to(ConfigService::$loginSuccessRedirectPath),
-                'loginPageUrl' => session()->get('failure-redirect-url', url()->to(ConfigService::$loginPagePath))
+                'loginPageUrl' => session()->get('failure-redirect-url', url()->to(ConfigService::$loginPagePath)),
             ]
         );
     }
@@ -197,7 +197,7 @@ class AuthenticationController extends Controller
         $userId = $request->get('uid');
         $verificationToken = $request->get('vt');
 
-        $user = $this->userService->getById($userId);
+        $user = $this->userRepository->read($userId);
 
         if ($this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
             SaltedSessionGuard::$updateSalt = false;

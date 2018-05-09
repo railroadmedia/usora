@@ -65,8 +65,6 @@ class UsoraTestCase extends TestCase
         Mail::fake();
         $this->mailFake = Mail::getFacadeRoot();
 
-        RepositoryBase::$connectionMask = null;
-
         Carbon::setTestNow(Carbon::now());
     }
 
