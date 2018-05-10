@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "02cd29970add0f69c3a48b469016f2bb",
+    "content-hash": "d4fa58cf47116494d98d4fb0537e49e1",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2376,16 +2376,16 @@
         },
         {
             "name": "railroad/resora",
-            "version": "v0.0.01",
+            "version": "v0.0.02",
             "source": {
                 "type": "git",
                 "url": "https://github.com/railroadmedia/resora.git",
-                "reference": "21fc739c0ea258ab2bbfba4ab438034bbb8f2ffa"
+                "reference": "53dbf86e9bacb9efa237e641cf7baec8d2547a35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/railroadmedia/resora/zipball/21fc739c0ea258ab2bbfba4ab438034bbb8f2ffa",
-                "reference": "21fc739c0ea258ab2bbfba4ab438034bbb8f2ffa",
+                "url": "https://api.github.com/repos/railroadmedia/resora/zipball/53dbf86e9bacb9efa237e641cf7baec8d2547a35",
+                "reference": "53dbf86e9bacb9efa237e641cf7baec8d2547a35",
                 "shasum": ""
             },
             "require": {
@@ -2429,7 +2429,7 @@
                 "database",
                 "resora"
             ],
-            "time": "2018-05-08T23:08:13+00:00"
+            "time": "2018-05-09T20:53:58+00:00"
         },
         {
             "name": "ramsey/uuid",

@@ -12,6 +12,21 @@ use Railroad\Usora\Services\ConfigService;
 class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassword
 {
     /**
+     * @param $accessSlug
+     * @return bool
+     */
+    public function can($accessSlug)
+    {
+        foreach (array_column($this['access'], 'slug') as $userAccessSlug) {
+            if ($userAccessSlug === $accessSlug) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function getAuthIdentifierName()
