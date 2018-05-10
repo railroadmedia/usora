@@ -15,6 +15,10 @@ use Railroad\Permissions\Providers\PermissionsServiceProvider;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Providers\UsoraServiceProvider;
+use Railroad\Usora\Services\ConfigService;
+use Railroad\Usora\Repositories\UserRepository;
+use Railroad\Permissions\Factories\UserAccessFactory;
+use Railroad\Permissions\Factories\AccessFactory;
 
 class UsoraTestCase extends TestCase
 {
@@ -48,6 +52,21 @@ class UsoraTestCase extends TestCase
      */
     protected $notificationFake;
 
+    /**
+     * @var UserRepository
+     */
+    protected $userRepository;
+
+    /**
+     * @var AccessFactory
+     */
+    protected $accessFactory;
+
+    /**
+     * @var UserAccessFactory
+     */
+    protected $userAccessFactory;
+
     protected function setUp()
     {
         parent::setUp();
@@ -57,6 +76,11 @@ class UsoraTestCase extends TestCase
 
         $this->faker = Factory::create();
         $this->databaseManager = $this->app->make(DatabaseManager::class);
+        $this->userRepository = $this->app->make(UserRepository::class);
+        
+        $this->accessFactory = $this->app->make(AccessFactory::class);
+        $this->userAccessFactory = $this->app->make(UserAccessFactory::class);
+
         $this->authManager = $this->app->make(AuthManager::class);
         $this->hasher = $this->app->make(BcryptHasher::class);
         $this->notificationFake = Notification::fake();
@@ -115,5 +139,44 @@ class UsoraTestCase extends TestCase
         config()->set('permissions.brand', 'drumeo');
 
         $app->register(PermissionsServiceProvider::class);
+    }
+
+    /**
+     * Create and store a new user
+     *
+     * @return int
+     */
+    public function createNewUser()
+    {
+        $rawPassword = $this->faker->word;
+
+        $user = [
+            'email' => $this->faker->email,
+            'password' => $this->hasher->make($rawPassword),
+            'remember_token' => str_random(60),
+            'session_salt' => str_random(60),
+            'display_name' => $this->faker->words(4, true),
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+
+        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
+            ->insertGetId($user);
+
+        return $userId;
+    }
+
+    /**
+     * Create, store and associate access to user
+     *
+     * @return array
+     */
+    public function createUserAccess($userId, $slug)
+    {
+        $access = $this->accessFactory->store($slug, $slug, $this->faker->text);
+
+        $userAccess = $this->userAccessFactory->store($access['id'], $userId);
+
+        return ["access" => $access, "userAccess" => $userAccess];
     }
 }

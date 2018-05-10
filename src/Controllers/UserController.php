@@ -108,13 +108,9 @@ class UserController extends Controller
 
         $user = $this->userRepository->update(
             $id,
-            $request->except(
+            $request->only(
                 [
-                    'id',
-                    'email',
-                    'password',
-                    'remember_token',
-                    'session_salt',
+                    'display_name'
                 ]
             )
         );

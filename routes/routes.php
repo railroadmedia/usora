@@ -41,3 +41,9 @@ Route::post(
     'password/reset',
     \Railroad\Usora\Controllers\ResetPasswordController::class . '@reset'
 )->name('usora.password.reset');
+
+// user crud
+Route::post(
+    'users/update/{id}',
+    \Railroad\Usora\Controllers\UserController::class . '@update'
+)->name('usora.users.update');
