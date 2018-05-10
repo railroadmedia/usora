@@ -10,7 +10,7 @@ use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UserController extends Controller
+class UserJsonController extends Controller
 {
     /**
      * @var UserRepository
@@ -82,13 +82,10 @@ class UserController extends Controller
         }
 
         $user = $this->userRepository->create(
-            $request->except(
+            $request->only(
                 [
                     'id',
                     'email',
-                    'password',
-                    'remember_token',
-                    'session_salt',
                 ]
             )
         );

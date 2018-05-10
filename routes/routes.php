@@ -42,8 +42,37 @@ Route::post(
     \Railroad\Usora\Controllers\ResetPasswordController::class . '@reset'
 )->name('usora.password.reset');
 
-// user crud
-Route::post(
-    'users/update/{id}',
+// -----------------------
+// user form api
+
+// user
+Route::put(
+    'user/store',
+    \Railroad\Usora\Controllers\UserController::class . '@store'
+)->name('usora.user.store');
+
+Route::patch(
+    'user/update/{id}',
     \Railroad\Usora\Controllers\UserController::class . '@update'
-)->name('usora.users.update');
+)->name('usora.user.update');
+
+Route::delete(
+    'user/delete/{id}',
+    \Railroad\Usora\Controllers\UserController::class . '@delete'
+)->name('usora.user.delete');
+
+// user fields
+Route::put(
+    'user-field/store',
+    \Railroad\Usora\Controllers\UserFieldController::class . '@store'
+)->name('usora.user-field.store');
+
+Route::patch(
+    'user-field/update/{id}',
+    \Railroad\Usora\Controllers\UserFieldController::class . '@update'
+)->name('usora.user-field.update');
+
+Route::delete(
+    'user-field/delete/{id}',
+    \Railroad\Usora\Controllers\UserFieldController::class . '@delete'
+)->name('usora.user-field.delete');
