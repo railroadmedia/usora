@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
+use Railroad\Usora\Requests\UserCreateRequest;
+use Railroad\Usora\Requests\UserUpdateRequest;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -45,16 +47,14 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param UserCreateRequest $request
      * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(UserCreateRequest $request)
     {
         if (!$this->permissionService->can(auth()->id(), 'create-users')) {
             throw new NotFoundHttpException();
         }
-
-        // todo: validation
 
         $user = $this->userRepository->create(
             array_merge(
@@ -80,12 +80,15 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param UserUpdateRequest $request
      * @return RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request, $id)
     {
-        if (!$request->user()->can('users.update') || auth()->id() !== $id) {
+        if (
+            !$this->permissionService->can(auth()->id(), 'update-users')
+            && auth()->id() !== $id
+        ) {
             throw new NotFoundHttpException();
         }
 
@@ -110,5 +113,22 @@ class UserController extends Controller
             redirect()->back()->with($message);
     }
 
-    // todo: delete
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function delete(Request $request, $id)
+    {
+        if (!$this->permissionService->can(auth()->id(), 'delete-users')) {
+            throw new NotFoundHttpException();
+        }
+
+        $this->userRepository->destroy($id);
+
+        $message = ['success' => true];
+
+        return $request->has('redirect') ?
+            redirect()->away($request->has('redirect'))->with($message) :
+            redirect()->back()->with($message);
+    }
 }
