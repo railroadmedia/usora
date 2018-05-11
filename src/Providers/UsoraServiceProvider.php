@@ -63,31 +63,12 @@ class UsoraServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
-        config()->set('resora.default_connection_name', ConfigService::$databaseConnectionName);
+        // configure permissions
+        config()->set('permissions.role_abilities', ConfigService::$databaseConnectionName);
         config()->set(
             'resora.decorators.users',
-            [UserFieldDecorator::class, UserAccessDecorator::class, UserEntityDecorator::class]
+            [UserFieldDecorator::class, UserEntityDecorator::class]
         );
-
-        // events
-        $listens = [
-
-            // always return associated arrays from database queries
-            StatementPrepared::class => [
-                function (StatementPrepared $event) {
-                    if ($event->connection->getName() ==
-                        ConfigService::$connectionMaskPrefix . ConfigService::$databaseConnectionName) {
-                        $event->statement->setFetchMode(PDO::FETCH_ASSOC);
-                    }
-                },
-            ],
-        ];
-
-        foreach ($listens as $event => $listeners) {
-            foreach ($listeners as $listener) {
-                Event::listen($event, $listener);
-            }
-        }
     }
 
     /**

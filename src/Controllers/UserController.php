@@ -7,6 +7,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,14 +20,26 @@ class UserController extends Controller
     private $userRepository;
 
     /**
+     * @var PermissionService
+     */
+    private $permissionService;
+
+    /**
+     * @var Hasher
+     */
+    private $hasher;
+
+    /**
      * UserController constructor.
      *
      * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, PermissionService $permissionService, Hasher $hasher)
     {
         $this->userRepository = $userRepository;
+        $this->permissionService = $permissionService;
+        $this->hasher = $hasher;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -37,9 +50,11 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        if (!$request->user()->can('users.store')) {
+        if (!$this->permissionService->can(auth()->id(), 'create-users')) {
             throw new NotFoundHttpException();
         }
+
+        // todo: validation
 
         $user = $this->userRepository->create(
             array_merge(
@@ -50,6 +65,7 @@ class UserController extends Controller
                     ]
                 ),
                 [
+                    'password' => $this->hasher->make($request->get('password')),
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]

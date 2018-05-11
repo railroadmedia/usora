@@ -45,13 +45,4 @@ return [
         \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         \Railroad\Usora\Middleware\ReFlashSession::class,
     ],
-
-    'accesses' => [
-    ],
-
-    'roles' => [
-        'administrator' => [
-            ''
-        ]
-    ],
 ];

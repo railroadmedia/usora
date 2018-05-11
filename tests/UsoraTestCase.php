@@ -5,23 +5,30 @@ namespace Railroad\Usora\Tests;
 use Carbon\Carbon;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Foundation\Application;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\MockObject\MockBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Railroad\Permissions\Providers\PermissionsServiceProvider;
+use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Providers\UsoraServiceProvider;
-use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Repositories\UserRepository;
-use Railroad\Permissions\Factories\UserAccessFactory;
-use Railroad\Permissions\Factories\AccessFactory;
+use Railroad\Usora\Services\ConfigService;
 
 class UsoraTestCase extends TestCase
 {
+    /**
+     * @var Application
+     */
+    protected $app;
+
     /**
      * @var Faker
      */
@@ -58,14 +65,9 @@ class UsoraTestCase extends TestCase
     protected $userRepository;
 
     /**
-     * @var AccessFactory
+     * @var MockObject
      */
-    protected $accessFactory;
-
-    /**
-     * @var UserAccessFactory
-     */
-    protected $userAccessFactory;
+    protected $permissionServiceMock;
 
     protected function setUp()
     {
@@ -77,9 +79,12 @@ class UsoraTestCase extends TestCase
         $this->faker = Factory::create();
         $this->databaseManager = $this->app->make(DatabaseManager::class);
         $this->userRepository = $this->app->make(UserRepository::class);
-        
-        $this->accessFactory = $this->app->make(AccessFactory::class);
-        $this->userAccessFactory = $this->app->make(UserAccessFactory::class);
+
+        $this->permissionServiceMock = $this->getMockBuilder(PermissionService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->app->instance(PermissionService::class, $this->permissionServiceMock);
 
         $this->authManager = $this->app->make(AuthManager::class);
         $this->hasher = $this->app->make(BcryptHasher::class);
@@ -164,19 +169,5 @@ class UsoraTestCase extends TestCase
             ->insertGetId($user);
 
         return $userId;
-    }
-
-    /**
-     * Create, store and associate access to user
-     *
-     * @return array
-     */
-    public function createUserAccess($userId, $slug)
-    {
-        $access = $this->accessFactory->store($slug, $slug, $this->faker->text);
-
-        $userAccess = $this->userAccessFactory->store($access['id'], $userId);
-
-        return ["access" => $access, "userAccess" => $userAccess];
     }
 }

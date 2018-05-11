@@ -98,6 +98,7 @@
       <path value="$PROJECT_DIR$/vendor/phpseclib/phpseclib" />
       <path value="$PROJECT_DIR$/../resora" />
       <path value="$PROJECT_DIR$/vendor/railroad/permissions" />
+      <path value="$PROJECT_DIR$/../permissions" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
