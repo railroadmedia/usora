@@ -25,7 +25,7 @@
     "guzzlehttp/guzzle": "~6.0",
     "doctrine/dbal": "^2.5",
     "railroad/resora": "0.0.02",
-    "railroad/permissions": "5.60.01"
+    "railroad/permissions": "5.61.01"
   },
   "require-dev": {
     "filp/whoops": "^2.0",

@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d4fa58cf47116494d98d4fb0537e49e1",
+    "content-hash": "20d4d9a561d2eb83684a7203675b71be",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.55.9",
+            "version": "3.55.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "ec7b972330ce65fa33875025ffec8e09e0476a8f"
+                "reference": "5177cbe73c96d25ff759e406ac81b8e25557482c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/ec7b972330ce65fa33875025ffec8e09e0476a8f",
-                "reference": "ec7b972330ce65fa33875025ffec8e09e0476a8f",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5177cbe73c96d25ff759e406ac81b8e25557482c",
+                "reference": "5177cbe73c96d25ff759e406ac81b8e25557482c",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +84,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2018-05-08T16:37:41+00:00"
+            "time": "2018-05-10T23:23:00+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2334,22 +2334,23 @@
         },
         {
             "name": "railroad/permissions",
-            "version": "v5.60.01",
+            "version": "v5.61.01",
             "source": {
                 "type": "git",
                 "url": "https://github.com/railroadmedia/permissions.git",
-                "reference": "3754ba254e22cd83f4041a2e4c9225703f1f14d8"
+                "reference": "ad859c332a94d760fc3463a6dd0cde4afa3d507d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/railroadmedia/permissions/zipball/3754ba254e22cd83f4041a2e4c9225703f1f14d8",
-                "reference": "3754ba254e22cd83f4041a2e4c9225703f1f14d8",
+                "url": "https://api.github.com/repos/railroadmedia/permissions/zipball/ad859c332a94d760fc3463a6dd0cde4afa3d507d",
+                "reference": "ad859c332a94d760fc3463a6dd0cde4afa3d507d",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "~6.0",
                 "laravel/framework": "5.6.*",
-                "php": "~7"
+                "php": "~7",
+                "railroad/resora": "0.0.02"
             },
             "require-dev": {
                 "filp/whoops": "~2.1",
@@ -2371,8 +2372,11 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "description": "Permissions service",
-            "time": "2018-04-04T13:41:13+00:00"
+            "time": "2018-05-10T22:43:18+00:00"
         },
         {
             "name": "railroad/resora",
