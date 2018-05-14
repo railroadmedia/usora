@@ -44,6 +44,36 @@ Route::post(
 
 // -----------------------
 // user form api
+Route::group(
+    [
+        'prefix' => 'api',
+    ],
+    function () {
+        Route::get(
+            'user/index',
+            \Railroad\Usora\Controllers\UserJsonController::class . '@index'
+        )->name('usora.api.user.index');
+
+        Route::get(
+            'user/show/{id}',
+            \Railroad\Usora\Controllers\UserJsonController::class . '@show'
+        )->name('usora.api.user.show');
+
+        Route::put(
+            'user/store',
+            \Railroad\Usora\Controllers\UserJsonController::class . '@store'
+        )->name('usora.api.user.store');
+
+        Route::patch(
+            'user/update/{id}',
+            \Railroad\Usora\Controllers\UserJsonController::class . '@update'
+        )->name('usora.api.user.update');
+
+        Route::delete(
+            'user/delete/{id}',
+            \Railroad\Usora\Controllers\UserJsonController::class . '@delete'
+        )->name('usora.api.user.delete');
+    });
 
 // user
 Route::put(

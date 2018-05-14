@@ -2,11 +2,15 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Repositories\UserRepository;
+use Railroad\Usora\Requests\UserJsonCreateRequest;
+use Railroad\Usora\Requests\UserJsonUpdateRequest;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -16,6 +20,11 @@ class UserJsonController extends Controller
      * @var UserRepository
      */
     private $userRepository;
+
+    /**
+     * @var PermissionService
+     */
+    private $permissionService;
 
     /**
      * @var Hasher
@@ -28,9 +37,10 @@ class UserJsonController extends Controller
      * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository, Hasher $hasher)
+    public function __construct(UserRepository $userRepository, PermissionService $permissionService, Hasher $hasher)
     {
         $this->userRepository = $userRepository;
+        $this->permissionService = $permissionService;
         $this->hasher = $hasher;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
@@ -42,7 +52,7 @@ class UserJsonController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$request->user()->can('users.index')) {
+        if (!$this->permissionService->can(auth()->id(), 'index-users')) {
             throw new NotFoundHttpException();
         }
 
@@ -56,13 +66,12 @@ class UserJsonController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param integer $id
      * @return JsonResponse
      */
-    public function show(Request $request, $id)
+    public function show($id)
     {
-        if (!$request->user()->can('users.show')) {
+        if (!$this->permissionService->can(auth()->id(), 'show-users')) {
             throw new NotFoundHttpException();
         }
 
@@ -72,20 +81,27 @@ class UserJsonController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param UserJsonCreateRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(UserJsonCreateRequest $request)
     {
-        if (!$request->user()->can('users.create')) {
+        if (!$this->permissionService->can(auth()->id(), 'create-users')) {
             throw new NotFoundHttpException();
         }
 
         $user = $this->userRepository->create(
-            $request->only(
+            array_merge(
+                $request->only(
+                    [
+                        'email',
+                        'display_name',
+                    ]
+                ),
                 [
-                    'id',
-                    'email',
+                    'password' => $this->hasher->make($request->get('password')),
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
                 ]
             )
         );
@@ -94,12 +110,15 @@ class UserJsonController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param UserJsonUpdateRequest $request
      * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(UserJsonUpdateRequest $request, $id)
     {
-        if (!$request->user()->can('users.update')) {
+        if (
+            !$this->permissionService->can(auth()->id(), 'update-users')
+            && auth()->id() != $id
+        ) {
             throw new NotFoundHttpException();
         }
 
@@ -115,5 +134,17 @@ class UserJsonController extends Controller
         return response()->json($user);
     }
 
-    // todo: delete
+    /**
+     * @return RedirectResponse
+     */
+    public function delete($id)
+    {
+        if (!$this->permissionService->can(auth()->id(), 'delete-users')) {
+            throw new NotFoundHttpException();
+        }
+
+        $this->userRepository->destroy($id);
+
+        return new JsonResponse(null, 204);
+    }
 }

@@ -87,7 +87,7 @@ class UserController extends Controller
     {
         if (
             !$this->permissionService->can(auth()->id(), 'update-users')
-            && auth()->id() !== $id
+            && auth()->id() != $id
         ) {
             throw new NotFoundHttpException();
         }
