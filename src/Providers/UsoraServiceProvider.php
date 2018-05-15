@@ -64,7 +64,6 @@ class UsoraServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
         // configure permissions
-        config()->set('permissions.role_abilities', ConfigService::$databaseConnectionName);
         config()->set(
             'resora.decorators.users',
             [UserFieldDecorator::class, UserEntityDecorator::class]
