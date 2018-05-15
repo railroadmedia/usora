@@ -391,7 +391,7 @@ class UserJsonControllerTest extends UsoraTestCase
             '/api/user/delete/' . $userId
         );
 
-        // assert the response code is not found
+        // assert the response code is no content
         $this->assertEquals(204, $response->getStatusCode());
 
         // assert the user was removed from the db
@@ -411,9 +411,6 @@ class UserJsonControllerTest extends UsoraTestCase
             'DELETE',
             '/user/delete/' . $userId
         );
-
-        // echo "response code: " . $response->getStatusCode() . "\n";
-        // echo "response: " . var_export($response->baseResponse->getContent(), true) . "\n";
 
         // assert the response code is not found
         $this->assertEquals(404, $response->getStatusCode());

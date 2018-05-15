@@ -81,6 +81,7 @@ class UserController extends Controller
 
     /**
      * @param UserUpdateRequest $request
+     * @param integer $id
      * @return RedirectResponse
      */
     public function update(UserUpdateRequest $request, $id)
@@ -109,12 +110,13 @@ class UserController extends Controller
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->has('redirect'))->with($message) :
+            redirect()->away($request->get('redirect'))->with($message) :
             redirect()->back()->with($message);
     }
 
     /**
      * @param Request $request
+     * @param integer $id
      * @return RedirectResponse
      */
     public function delete(Request $request, $id)
@@ -128,7 +130,7 @@ class UserController extends Controller
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->has('redirect'))->with($message) :
+            redirect()->away($request->get('redirect'))->with($message) :
             redirect()->back()->with($message);
     }
 }

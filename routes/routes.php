@@ -43,12 +43,12 @@ Route::post(
 )->name('usora.password.reset');
 
 // -----------------------
-// user form api
 Route::group(
     [
         'prefix' => 'api',
     ],
     function () {
+        // user api
         Route::get(
             'user/index',
             \Railroad\Usora\Controllers\UserJsonController::class . '@index'
@@ -73,6 +73,32 @@ Route::group(
             'user/delete/{id}',
             \Railroad\Usora\Controllers\UserJsonController::class . '@delete'
         )->name('usora.api.user.delete');
+
+        // user field api
+        Route::get(
+            'user-field/index/{id}',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@index'
+        )->name('usora.api.user-field.index');
+
+        Route::get(
+            'user-field/show/{id}',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@show'
+        )->name('usora.api.user-field.show');
+
+        Route::put(
+            'user-field/store',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@store'
+        )->name('usora.api.user-field.store');
+
+        Route::patch(
+            'user-field/update/{id}',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@update'
+        )->name('usora.api.user-field.update');
+
+        Route::delete(
+            'user-field/delete/{id}',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@delete'
+        )->name('usora.api.user-field.delete');
     });
 
 // user

@@ -35,6 +35,7 @@ class UserJsonController extends Controller
      * UserController constructor.
      *
      * @param UserRepository $userRepository
+     * @param PermissionService $permissionService
      * @param Hasher $hasher
      */
     public function __construct(UserRepository $userRepository, PermissionService $permissionService, Hasher $hasher)
@@ -111,6 +112,7 @@ class UserJsonController extends Controller
 
     /**
      * @param UserJsonUpdateRequest $request
+     * @param integer $id
      * @return JsonResponse
      */
     public function update(UserJsonUpdateRequest $request, $id)
@@ -135,7 +137,8 @@ class UserJsonController extends Controller
     }
 
     /**
-     * @return RedirectResponse
+     * @param integer $id
+     * @return JsonResponse
      */
     public function delete($id)
     {

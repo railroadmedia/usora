@@ -3,17 +3,17 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
-use Railroad\Usora\Requests\UserFieldCreateRequest;
-use Railroad\Usora\Requests\UserFieldUpdateRequest;
+use Railroad\Usora\Requests\UserFieldJsonCreateRequest;
+use Railroad\Usora\Requests\UserFieldJsonUpdateRequest;
 use Railroad\Usora\Repositories\UserFieldRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UserFieldController extends Controller
+class UserFieldJsonController extends Controller
 {
     /**
      * @var UserFieldRepository
@@ -26,7 +26,7 @@ class UserFieldController extends Controller
     private $permissionService;
 
     /**
-     * UserFieldController constructor.
+     * UserFieldJsonController constructor.
      *
      * @param UserFieldRepository $userFieldRepository
      * @param PermissionService $permissionService
@@ -40,10 +40,43 @@ class UserFieldController extends Controller
     }
 
     /**
-     * @param UserFieldCreateRequest $request
-     * @return RedirectResponse
+     * @param Request $request
+     * @param integer $id
+     * @return JsonResponse
      */
-    public function store(UserFieldCreateRequest $request)
+    public function index(Request $request, $id)
+    {
+        if (!$this->permissionService->can(auth()->id(), 'show-users')) {
+            throw new NotFoundHttpException();
+        }
+
+        $users = $this->userFieldRepository->query()
+            ->where('user_id', $id)
+            ->get();
+
+        return response()->json($users);
+    }
+
+    /**
+     * @param integer $id
+     * @return JsonResponse
+     */
+    public function show($id)
+    {
+        if (!$this->permissionService->can(auth()->id(), 'show-users')) {
+            throw new NotFoundHttpException();
+        }
+
+        $userField = $this->userFieldRepository->read($id);
+
+        return response()->json($userField);
+    }
+
+    /**
+     * @param UserFieldJsonCreateRequest $request
+     * @return JsonResponse
+     */
+    public function store(UserFieldJsonCreateRequest $request)
     {
         if (
             !$this->permissionService->can(auth()->id(), 'create-users')
@@ -72,19 +105,15 @@ class UserFieldController extends Controller
             )
         );
 
-        $message = ['success' => true];
-
-        return $request->has('redirect') ?
-            redirect()->away($request->has('redirect'))->with($message) :
-            redirect()->back()->with($message);
+        return response()->json($userField);
     }
 
-    /**
-     * @param UserFieldUpdateRequest $request
+    /*
+     * @param UserFieldJsonUpdateRequest $request
      * @param integer $id
-     * @return RedirectResponse
+     * @return JsonResponse
      */
-    public function update(UserFieldUpdateRequest $request, $id)
+    public function update(UserFieldJsonUpdateRequest $request, $id)
     {
         $userField = $this->userFieldRepository->read($id);
 
@@ -112,18 +141,14 @@ class UserFieldController extends Controller
             )
         );
 
-        $message = ['success' => true];
-
-        return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+        return response()->json($userField);
     }
 
     /**
-     * @param Request $request
-     * @return RedirectResponse
+     * @param integer $id
+     * @return JsonResponse
      */
-    public function delete(Request $request, $id)
+    public function delete($id)
     {
         if (!$this->permissionService->can(auth()->id(), 'delete-users')) {
             throw new NotFoundHttpException();
@@ -131,10 +156,6 @@ class UserFieldController extends Controller
 
         $this->userFieldRepository->destroy($id);
 
-        $message = ['success' => true];
-
-        return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+        return new JsonResponse(null, 204);
     }
 }
