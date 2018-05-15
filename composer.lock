@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "20d4d9a561d2eb83684a7203675b71be",
+    "content-hash": "386e65be1fad131eca8323cdc5bc8d71",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.55.12",
+            "version": "3.56.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "5177cbe73c96d25ff759e406ac81b8e25557482c"
+                "reference": "933bc65b9f8e4d88e0bf4635d9476c2766eee743"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5177cbe73c96d25ff759e406ac81b8e25557482c",
-                "reference": "5177cbe73c96d25ff759e406ac81b8e25557482c",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/933bc65b9f8e4d88e0bf4635d9476c2766eee743",
+                "reference": "933bc65b9f8e4d88e0bf4635d9476c2766eee743",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +84,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2018-05-10T23:23:00+00:00"
+            "time": "2018-05-15T18:32:36+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -910,16 +910,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.58",
+            "version": "v0.59",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client-services.git",
-                "reference": "e21760a34daea7bc29e2866b62f8c8db4e91228d"
+                "reference": "1dbfb1e7ff596c9fe17f4ba8e6a74bb073adbe0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/e21760a34daea7bc29e2866b62f8c8db4e91228d",
-                "reference": "e21760a34daea7bc29e2866b62f8c8db4e91228d",
+                "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/1dbfb1e7ff596c9fe17f4ba8e6a74bb073adbe0f",
+                "reference": "1dbfb1e7ff596c9fe17f4ba8e6a74bb073adbe0f",
                 "shasum": ""
             },
             "require": {
@@ -943,7 +943,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2018-05-06T00:22:52+00:00"
+            "time": "2018-05-14T00:23:02+00:00"
         },
         {
             "name": "google/auth",
@@ -1262,16 +1262,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.6.21",
+            "version": "v5.6.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "458a89b1c5ff73072c27308566f444c790f76f28"
+                "reference": "637fd797a6dde8d24a9f07da77e375ec251c5d24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/458a89b1c5ff73072c27308566f444c790f76f28",
-                "reference": "458a89b1c5ff73072c27308566f444c790f76f28",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/637fd797a6dde8d24a9f07da77e375ec251c5d24",
+                "reference": "637fd797a6dde8d24a9f07da77e375ec251c5d24",
                 "shasum": ""
             },
             "require": {
@@ -1397,7 +1397,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2018-05-08T13:30:15+00:00"
+            "time": "2018-05-15T13:34:20+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -2334,23 +2334,23 @@
         },
         {
             "name": "railroad/permissions",
-            "version": "v5.61.01",
+            "version": "v5.61.03",
             "source": {
                 "type": "git",
                 "url": "https://github.com/railroadmedia/permissions.git",
-                "reference": "ad859c332a94d760fc3463a6dd0cde4afa3d507d"
+                "reference": "d65cc852512f43236a9cf38087e282861a99c3bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/railroadmedia/permissions/zipball/ad859c332a94d760fc3463a6dd0cde4afa3d507d",
-                "reference": "ad859c332a94d760fc3463a6dd0cde4afa3d507d",
+                "url": "https://api.github.com/repos/railroadmedia/permissions/zipball/d65cc852512f43236a9cf38087e282861a99c3bc",
+                "reference": "d65cc852512f43236a9cf38087e282861a99c3bc",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "~6.0",
                 "laravel/framework": "5.6.*",
                 "php": "~7",
-                "railroad/resora": "0.0.02"
+                "railroad/resora": "0.0.03"
             },
             "require-dev": {
                 "filp/whoops": "~2.1",
@@ -2376,20 +2376,20 @@
                 "MIT"
             ],
             "description": "Permissions service",
-            "time": "2018-05-10T22:43:18+00:00"
+            "time": "2018-05-15T20:19:10+00:00"
         },
         {
             "name": "railroad/resora",
-            "version": "v0.0.02",
+            "version": "v0.0.03",
             "source": {
                 "type": "git",
                 "url": "https://github.com/railroadmedia/resora.git",
-                "reference": "53dbf86e9bacb9efa237e641cf7baec8d2547a35"
+                "reference": "2c210b86a43c21f88d499362902200c303daae6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/railroadmedia/resora/zipball/53dbf86e9bacb9efa237e641cf7baec8d2547a35",
-                "reference": "53dbf86e9bacb9efa237e641cf7baec8d2547a35",
+                "url": "https://api.github.com/repos/railroadmedia/resora/zipball/2c210b86a43c21f88d499362902200c303daae6c",
+                "reference": "2c210b86a43c21f88d499362902200c303daae6c",
                 "shasum": ""
             },
             "require": {
@@ -2433,7 +2433,7 @@
                 "database",
                 "resora"
             ],
-            "time": "2018-05-09T20:53:58+00:00"
+            "time": "2018-05-15T20:15:14+00:00"
         },
         {
             "name": "ramsey/uuid",
