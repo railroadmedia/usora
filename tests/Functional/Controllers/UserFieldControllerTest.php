@@ -106,7 +106,7 @@ class UserFieldControllerTest extends UsoraTestCase
         $this->assertEquals(302, $response->getStatusCode());
 
         // assert validation fail
-        $response->assertSessionHasErrors(['user_id', 'key']);
+        $response->assertSessionHasErrors(['key']);
     }
 
     public function test_users_field_update_with_permission()

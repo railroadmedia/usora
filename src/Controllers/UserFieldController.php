@@ -121,6 +121,7 @@ class UserFieldController extends Controller
 
     /**
      * @param Request $request
+     * @param int $id
      * @return RedirectResponse
      */
     public function delete(Request $request, $id)

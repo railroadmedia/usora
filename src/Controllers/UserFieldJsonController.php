@@ -40,11 +40,10 @@ class UserFieldJsonController extends Controller
     }
 
     /**
-     * @param Request $request
      * @param integer $id
      * @return JsonResponse
      */
-    public function index(Request $request, $id)
+    public function index($id)
     {
         if (!$this->permissionService->can(auth()->id(), 'show-users')) {
             throw new NotFoundHttpException();
@@ -130,7 +129,6 @@ class UserFieldJsonController extends Controller
             array_merge(
                 $request->only(
                     [
-                        'user_id',
                         'key',
                         'value',
                     ]

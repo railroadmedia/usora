@@ -45,7 +45,7 @@ Route::post(
 // -----------------------
 Route::group(
     [
-        'prefix' => 'api',
+        'prefix' => 'usora',
     ],
     function () {
         // user api
