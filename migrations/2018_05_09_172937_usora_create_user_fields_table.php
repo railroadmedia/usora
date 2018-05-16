@@ -22,7 +22,7 @@ class UsoraCreateUserFieldsTable extends Migration
 
                 $table->integer('user_id')->index();
 
-                $table->string('key', 255)->index();
+                $table->string('key', 191)->index();
                 $table->text('value')->nullable();
                 $table->string('index', 191)->index()->nullable();
 

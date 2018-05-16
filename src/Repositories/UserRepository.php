@@ -21,4 +21,9 @@ class UserRepository extends RepositoryBase
     {
         return Decorator::decorate($results, 'users');
     }
+
+    protected function connection()
+    {
+        return app('db')->connection(ConfigService::$databaseConnectionName);
+    }
 }
