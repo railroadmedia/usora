@@ -4,7 +4,7 @@ namespace Railroad\Usora\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserFieldUpdateRequest extends FormRequest
+class UserFieldUpdateByKeyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class UserFieldUpdateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'string|max:255|min:1',
+            'key' =>'required|string|max:255|min:1',
             'value' => 'nullable|string'
         ];
     }

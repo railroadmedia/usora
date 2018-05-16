@@ -26,6 +26,20 @@ class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassw
         return false;
     }
 
+    public function dot()
+    {
+        $original = $this->getArrayCopy();
+        $dotArray = [];
+
+        foreach ($this['fields'] ?? [] as $field) {
+            $dotArray['fields.' . $field['key']] = $field['value'];
+        }
+
+        unset($original['fields']);
+
+        return array_merge(array_dot($original), $dotArray);
+    }
+
     /**
      * @return string
      */

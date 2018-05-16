@@ -112,6 +112,8 @@ Route::patch(
     \Railroad\Usora\Controllers\UserController::class . '@update'
 )->name('usora.user.update');
 
+
+
 Route::delete(
     'user/delete/{id}',
     \Railroad\Usora\Controllers\UserController::class . '@delete'
@@ -127,6 +129,16 @@ Route::patch(
     'user-field/update/{id}',
     \Railroad\Usora\Controllers\UserFieldController::class . '@update'
 )->name('usora.user-field.update');
+
+Route::patch(
+    'user-field/update-or-create-by-key',
+    \Railroad\Usora\Controllers\UserFieldController::class . '@updateOrCreateByKey'
+)->name('usora.user-field.update-or-create-by-key');
+
+Route::patch(
+    'user-field/update-or-create-multiple-by-key',
+    \Railroad\Usora\Controllers\UserFieldController::class . '@updateOrCreateMultipleByKey'
+)->name('usora.user-field.update-or-create-multiple-by-key');
 
 Route::delete(
     'user-field/delete/{id}',

@@ -2,13 +2,9 @@
 
 namespace Railroad\Usora\Providers;
 
-use Illuminate\Database\Events\StatementPrepared;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use PDO;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
-use Railroad\Usora\Decorators\UserAccessDecorator;
 use Railroad\Usora\Services\ConfigService;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -66,7 +62,10 @@ class UsoraServiceProvider extends ServiceProvider
         // configure resora
         config()->set(
             'resora.decorators.users',
-            [UserFieldDecorator::class, UserEntityDecorator::class]
+            array_merge(
+                config()->get('resora.decorators.users', []),
+                [UserFieldDecorator::class, UserEntityDecorator::class]
+            )
         );
     }
 

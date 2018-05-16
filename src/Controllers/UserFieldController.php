@@ -7,9 +7,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
-use Railroad\Usora\Requests\UserFieldCreateRequest;
-use Railroad\Usora\Requests\UserFieldUpdateRequest;
 use Railroad\Usora\Repositories\UserFieldRepository;
+use Railroad\Usora\Requests\UserFieldCreateRequest;
+use Railroad\Usora\Requests\UserFieldUpdateByKeyRequest;
+use Railroad\Usora\Requests\UserFieldUpdateRequest;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -111,6 +112,115 @@ class UserFieldController extends Controller
                 ]
             )
         );
+
+        $message = ['success' => true];
+
+        return $request->has('redirect') ?
+            redirect()->away($request->get('redirect'))->with($message) :
+            redirect()->back()->with($message);
+    }
+
+    /**
+     * @return RedirectResponse
+     */
+    public function updateOrCreateByKey(UserFieldUpdateByKeyRequest $request)
+    {
+        $userId = auth()->id();
+
+        if ($this->permissionService->can(auth()->id(), 'update-users')) {
+            $userId = $request->get('user_id', auth()->id());
+        }
+
+        // update or create
+        $updateCount = $this->userFieldRepository->query()
+            ->where(
+                [
+                    'key' => $request->get('key'),
+                    'user_id' => $userId,
+                ]
+            )
+            ->update(
+                [
+                    'value' => $request->get('value'),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
+                ]
+            );
+
+        if ($updateCount == 0) {
+            $this->userFieldRepository->create(
+                [
+                    'key' => $request->get('key'),
+                    'user_id' => $userId,
+                    'value' => $request->get('value'),
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                ]
+            );
+        }
+
+        $message = ['success' => true];
+
+        return $request->has('redirect') ?
+            redirect()->away($request->get('redirect'))->with($message) :
+            redirect()->back()->with($message);
+    }
+
+    /**
+     * @return RedirectResponse
+     */
+    public function updateOrCreateMultipleByKey(Request $request)
+    {
+        $fields = $request->get('fields', []);
+        $userId = auth()->id();
+
+        if ($this->permissionService->can(auth()->id(), 'update-users')) {
+            $userId = $request->get('user_id', auth()->id());
+        }
+
+        // validate
+        foreach ($fields as $key => $value) {
+            $validator = validator(
+                ['key' => $key, 'value' => $value, 'user_id' => $userId],
+                [
+                    'user_id' => 'required|numeric',
+                    'key' => 'required|string|max:255|min:1',
+                    'value' => 'nullable|string',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return $request->has('redirect') ?
+                    redirect()->away($request->get('redirect'))->withErrors($validator) :
+                    redirect()->back()->withErrors($validator);
+            }
+        }
+
+        // update or create
+        foreach ($fields as $key => $value) {
+            $updateCount = $this->userFieldRepository->query()
+                ->where(
+                    [
+                        'key' => $key,
+                        'user_id' => $userId,
+                    ]
+                )
+                ->update(
+                    [
+                        'value' => $value,
+                        'updated_at' => Carbon::now()->toDateTimeString(),
+                    ]
+                );
+
+            if ($updateCount == 0) {
+                $this->userFieldRepository->create(
+                    [
+                        'key' => $key,
+                        'user_id' => $userId,
+                        'value' => $value,
+                        'created_at' => Carbon::now()->toDateTimeString(),
+                    ]
+                );
+            }
+        }
 
         $message = ['success' => true];
 

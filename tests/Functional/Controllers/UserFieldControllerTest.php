@@ -18,7 +18,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userFieldData = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
         ];
 
@@ -46,7 +46,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userFieldData = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
         ];
 
@@ -74,7 +74,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userFieldData = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
         ];
 
@@ -115,7 +115,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userField = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
             'created_at' => time(),
             'updated_at' => time(),
@@ -126,8 +126,8 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userFieldData = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
-            'value' => $this->faker->words(4, true)
+            'key' => $this->faker->word,
+            'value' => $this->faker->words(4, true),
         ];
 
         // assert new key/value generated
@@ -136,7 +136,7 @@ class UserFieldControllerTest extends UsoraTestCase
             [
                 'id' => $userFieldId,
                 'key' => $userFieldData['key'],
-                'value' => $userFieldData['value']
+                'value' => $userFieldData['value'],
             ]
         );
 
@@ -164,7 +164,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userField = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
             'created_at' => time(),
             'updated_at' => time(),
@@ -175,8 +175,8 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userFieldData = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
-            'value' => $this->faker->words(4, true)
+            'key' => $this->faker->word,
+            'value' => $this->faker->words(4, true),
         ];
 
         // assert new key/value generated
@@ -209,7 +209,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userField = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
             'created_at' => time(),
             'updated_at' => time(),
@@ -220,8 +220,8 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userFieldData = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
-            'value' => $this->faker->words(4, true)
+            'key' => $this->faker->word,
+            'value' => $this->faker->words(4, true),
         ];
 
         // assert new key/value generated
@@ -246,13 +246,186 @@ class UserFieldControllerTest extends UsoraTestCase
         );
     }
 
+    public function test_users_field_update_multiple_by_key_create_validation_fails()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsData = [
+            [
+                'key' => '',
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+        ];
+
+        $userFieldsInputData = [];
+
+        foreach ($userFieldsData as $userField) {
+            $userFieldsInputData['fields'][$userField['key']] = $userField['value'];
+        }
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+            '/user-field/update-or-create-multiple-by-key',
+            $userFieldsInputData
+        );
+
+        // assert the users data was saved in the db
+        foreach ($userFieldsData as $userField) {
+            $this->assertDatabaseMissing(
+                ConfigService::$tableUserFields,
+                $userField
+            );
+        }
+
+        // assert the session has the success message
+        $response->assertSessionHasErrors(
+            ["key",]
+        );
+    }
+
+    public function test_users_field_update_multiple_by_key_create()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsData = [
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+        ];
+
+        $userFieldsInputData = [];
+
+        foreach ($userFieldsData as $userField) {
+            $userFieldsInputData['fields'][$userField['key']] = $userField['value'];
+        }
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+            '/user-field/update-or-create-multiple-by-key',
+            $userFieldsInputData
+        );
+
+        // assert the users data was saved in the db
+        foreach ($userFieldsData as $userField) {
+
+            $this->assertDatabaseHas(
+                ConfigService::$tableUserFields,
+                $userField
+            );
+        }
+
+        // assert the session has the success message
+        $response->assertSessionHas('success', true);
+    }
+
+    public function test_users_field_update_by_key_create()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsInputData = [
+            'key' => $this->faker->word,
+            'value' => $this->faker->words(4, true),
+        ];
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+            '/user-field/update-or-create-by-key',
+            $userFieldsInputData
+        );
+
+        // assert the users data was saved in the db
+        $this->assertDatabaseHas(
+            ConfigService::$tableUserFields,
+            $userFieldsInputData
+        );
+
+        // assert the session has the success message
+        $response->assertSessionHas('success', true);
+    }
+
+    public function test_users_field_update_multiple_by_key_update()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsData = [
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+        ];
+
+        foreach ($userFieldsData as $userField) {
+            $this->databaseManager->table(ConfigService::$tableUserFields)
+                ->insertGetId(array_merge($userField, ['user_id' => $userId]));
+        }
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $userFieldsInputData = [];
+
+        foreach ($userFieldsData as $userFieldIndex => $userField) {
+            $userFieldsData[$userFieldIndex]['value'] = $this->faker->word;
+            $userField['value'] = $userFieldsData[$userFieldIndex]['value'];
+
+            $userFieldsInputData['fields'][$userField['key']] = $userField['value'];
+        }
+
+        $response = $this->call(
+            'PATCH',
+            '/user-field/update-or-create-multiple-by-key',
+            $userFieldsInputData
+        );
+
+        // assert the users data was saved in the db
+        foreach ($userFieldsData as $userField) {
+            $this->assertDatabaseHas(
+                ConfigService::$tableUserFields,
+                $userField
+            );
+        }
+
+        // assert the session has the success message
+        $response->assertSessionHas('success', true);
+    }
+
     public function test_users_field_delete_with_permission()
     {
         $userId = $this->createNewUser();
 
         $userField = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
             'created_at' => time(),
             'updated_at' => time(),
@@ -272,7 +445,7 @@ class UserFieldControllerTest extends UsoraTestCase
         $this->assertDatabaseMissing(
             ConfigService::$tableUserFields,
             [
-                'id' => $userFieldId
+                'id' => $userFieldId,
             ]
         );
 
@@ -286,7 +459,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $userField = [
             'user_id' => $userId,
-            'key' => $this->faker->word(),
+            'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
             'created_at' => time(),
             'updated_at' => time(),
@@ -307,7 +480,7 @@ class UserFieldControllerTest extends UsoraTestCase
         $this->assertDatabaseHas(
             ConfigService::$tableUserFields,
             [
-                'id' => $userFieldId
+                'id' => $userFieldId,
             ]
         );
     }
