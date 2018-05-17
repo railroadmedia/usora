@@ -122,13 +122,16 @@ Route::patch(
     'user/update/{id}',
     \Railroad\Usora\Controllers\UserController::class . '@update'
 )->name('usora.user.update');
-
-
-
 Route::delete(
     'user/delete/{id}',
     \Railroad\Usora\Controllers\UserController::class . '@delete'
 )->name('usora.user.delete');
+
+// user password
+Route::patch(
+    'user/update-password',
+    \Railroad\Usora\Controllers\PasswordController::class . '@update'
+)->name('usora.user-password.update');
 
 // user fields
 Route::put(
