@@ -42,6 +42,17 @@ Route::post(
     \Railroad\Usora\Controllers\ResetPasswordController::class . '@reset'
 )->name('usora.password.reset');
 
+// change email
+Route::post(
+    'email-change/request',
+    \Railroad\Usora\Controllers\EmailChangeController::class . '@request'
+)->name('usora.email-change.request');
+
+Route::get(
+    'email-change/confirm/{token}',
+    \Railroad\Usora\Controllers\EmailChangeController::class . '@confirm'
+)->name('usora.email-change.confirm');
+
 // -----------------------
 Route::group(
     [

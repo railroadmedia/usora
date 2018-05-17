@@ -50,6 +50,11 @@ class ConfigService
     public static $tablePasswordResets;
 
     /**
+     * @var string
+     */
+    public static $tableEmailChanges;
+
+    /**
      * @var array
      */
     public static $domainsToAuthenticateOn;
@@ -83,6 +88,16 @@ class ConfigService
      * @var string
      */
     public static $passwordResetNotificationChannel;
+
+    /**
+     * @var string
+     */
+    public static $emailChangeNotificationClass;
+
+    /**
+     * @var string
+     */
+    public static $emailChangeNotificationChannel;
 
     /**
      * @var array
