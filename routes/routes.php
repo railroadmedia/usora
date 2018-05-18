@@ -49,7 +49,7 @@ Route::post(
 )->name('usora.email-change.request');
 
 Route::get(
-    'email-change/confirm/{token}',
+    'email-change/confirm',
     \Railroad\Usora\Controllers\EmailChangeController::class . '@confirm'
 )->name('usora.email-change.confirm');
 

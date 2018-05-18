@@ -52,6 +52,7 @@ class UsoraServiceProvider extends ServiceProvider
         // email change
         ConfigService::$emailChangeNotificationClass = config('usora.email_change_notification_class');
         ConfigService::$emailChangeNotificationChannel = config('usora.email_change_notification_channel');
+        ConfigService::$emailChangeTtl = config('usora.email_change_token_ttl');
 
         // middleware
         ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');

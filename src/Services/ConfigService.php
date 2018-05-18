@@ -100,6 +100,11 @@ class ConfigService
     public static $emailChangeNotificationChannel;
 
     /**
+     * @var int
+     */
+    public static $emailChangeTtl;
+
+    /**
      * @var array
      */
     public static $authenticationControllerMiddleware;

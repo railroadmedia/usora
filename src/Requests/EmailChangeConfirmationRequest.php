@@ -2,7 +2,10 @@
 
 namespace Railroad\Usora\Requests;
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeConfirmationRequest extends FormRequest
 {
@@ -24,10 +27,19 @@ class EmailChangeConfirmationRequest extends FormRequest
     public function rules()
     {
         return [
-            'token' => 'required|string|exists:' .
+            'token' => [
+                'bail',
+                'required',
+                'string',
+                Rule::exists(
                     ConfigService::$databaseConnectionName .
                     '.' .
-                    ConfigService::$tableEmailChanges . ',token',
+                    ConfigService::$tableEmailChanges,
+                    'token'
+                )->where(function (Builder $query) {
+                    $query->whereRaw('created_at + INTERVAL ? HOUR >= CURRENT_TIMESTAMP', ConfigService::$emailChangeTtl);
+                }),
+            ]
         ];
     }
 }

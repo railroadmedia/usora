@@ -3,14 +3,15 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
+use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
 use Railroad\Usora\Requests\EmailChangeRequest;
 use Railroad\Usora\Requests\EmailChangeConfirmationRequest;
 use Railroad\Usora\Repositories\EmailChangeRepository;
+use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeController extends Controller
@@ -21,13 +22,22 @@ class EmailChangeController extends Controller
     private $emailChangeRepository;
 
     /**
+     * @var UserRepository
+     */
+    private $userRepository;
+
+    /**
      * ChangeEmailController constructor.
      *
      * @param EmailChangeRepository $emailChangeRepository
+     * @param UserRepository $userRepository
      */
-    public function __construct(EmailChangeRepository $emailChangeRepository)
-    {
+    public function __construct(
+        EmailChangeRepository $emailChangeRepository,
+        UserRepository $userRepository
+    ) {
         $this->emailChangeRepository = $emailChangeRepository;
+        $this->userRepository = $userRepository;
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
@@ -56,12 +66,14 @@ class EmailChangeController extends Controller
             $this->emailChangeRepository->create($payload);
         }
 
+        event(new EmailChangeRequestEvent($payload['token'], $payload['email']));
+
         $this->sendEmailChangeNotification($payload['token'], $payload['email']);
 
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->has('redirect'))->with($message) :
+            redirect()->away($request->get('redirect'))->with($message) :
             redirect()->back()->with($message);
     }
 
@@ -73,12 +85,22 @@ class EmailChangeController extends Controller
      */
     public function confirm(EmailChangeConfirmationRequest $request)
     {
-        // confirmation logic to be implemented
+        $emailChangeData = $this->emailChangeRepository->query()
+            ->where('token', $request->get('token'))
+            ->first();
+
+        $this->userRepository
+            ->update(
+                $emailChangeData->user_id,
+                ['email' => $emailChangeData->email]
+            );
+
+        $this->emailChangeRepository->destroy($emailChangeData->id);
 
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->has('redirect'))->with($message) :
+            redirect()->away($request->get('redirect'))->with($message) :
             redirect()->back()->with($message);
     }
 

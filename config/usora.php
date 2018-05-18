@@ -39,6 +39,7 @@ return [
 
     'email_change_notification_class' => \Railroad\Usora\Notifications\EmailChange::class,
     'email_change_notification_channel' => 'mail',
+    'email_change_token_ttl' => 24, // hours unit
 
     // if you have any of these middleware classes in your global http kernel, they must be removed from this array
     'authentication_controller_middleware' => [
