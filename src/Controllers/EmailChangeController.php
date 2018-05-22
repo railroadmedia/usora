@@ -6,12 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
-use Railroad\Usora\Requests\EmailChangeRequest;
-use Railroad\Usora\Requests\EmailChangeConfirmationRequest;
 use Railroad\Usora\Repositories\EmailChangeRepository;
 use Railroad\Usora\Repositories\UserRepository;
+use Railroad\Usora\Requests\EmailChangeConfirmationRequest;
+use Railroad\Usora\Requests\EmailChangeRequest;
 use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeController extends Controller
@@ -52,7 +53,7 @@ class EmailChangeController extends Controller
         $payload = [
             'email' => $request->get('email'),
             'token' => $this->createNewToken($request->get('email')),
-            'created_at' => Carbon::now()->toDateTimeString()
+            'created_at' => Carbon::now()->toDateTimeString(),
         ];
 
         $updateCount = $this->emailChangeRepository->query()
@@ -70,7 +71,12 @@ class EmailChangeController extends Controller
 
         $this->sendEmailChangeNotification($payload['token'], $payload['email']);
 
-        $message = ['success' => true];
+        $message =
+            [
+                'successes' => new MessageBag(
+                    ['password' => 'An email confirmation link has been sent to your new email address.']
+                ),
+            ];
 
         return $request->has('redirect') ?
             redirect()->away($request->get('redirect'))->with($message) :
@@ -97,7 +103,12 @@ class EmailChangeController extends Controller
 
         $this->emailChangeRepository->destroy($emailChangeData->id);
 
-        $message = ['success' => true];
+        $message =
+            [
+                'successes' => new MessageBag(
+                    ['password' => 'Your email has been updated successfully.']
+                ),
+            ];
 
         return $request->has('redirect') ?
             redirect()->away($request->get('redirect'))->with($message) :
