@@ -64,7 +64,7 @@ class EmailChangeController extends Controller
 
             $payload['user_id'] = auth()->id();
 
-            $this->emailChangeRepository->create($payload);
+            $this->emailChangeRepository->updateOrCreate($payload);
         }
 
         event(new EmailChangeRequestEvent($payload['token'], $payload['email']));
