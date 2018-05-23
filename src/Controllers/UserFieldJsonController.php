@@ -3,12 +3,14 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Requests\UserFieldJsonCreateRequest;
 use Railroad\Usora\Requests\UserFieldJsonUpdateRequest;
+use Railroad\Usora\Requests\UserFieldJsonUpdateByKeyRequest;
 use Railroad\Usora\Repositories\UserFieldRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -140,6 +142,158 @@ class UserFieldJsonController extends Controller
         );
 
         return response()->json($userField);
+    }
+
+    /**
+     * @param UserFieldJsonUpdateByKeyRequest $request
+     * @return JsonResponse
+     */
+    public function updateOrCreateByKey(UserFieldJsonUpdateByKeyRequest $request)
+    {
+        $userId = auth()->id();
+
+        if ($this->permissionService->can(auth()->id(), 'update-users')) {
+
+            $userId = $request->get('user_id', auth()->id());
+
+        } else if ($request->get('user_id') != auth()->id()) {
+
+            throw new NotFoundHttpException();
+        }
+
+        // update or create
+        $updateCount = $this->userFieldRepository->query()
+            ->where(
+                [
+                    'key' => $request->get('key'),
+                    'user_id' => $userId,
+                ]
+            )
+            ->update(
+                [
+                    'value' => $request->get('value'),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
+                ]
+            );
+
+        if ($updateCount == 0) {
+
+            $userField = $this->userFieldRepository->create(
+                [
+                    'key' => $request->get('key'),
+                    'user_id' => $userId,
+                    'value' => $request->get('value'),
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                ]
+            );
+
+        } else {
+
+            $userField = $this->userFieldRepository->query()
+                ->where(
+                    [
+                        'key' => $request->get('key'),
+                        'user_id' => $userId,
+                    ]
+                )
+                ->get()
+                ->first();
+        }
+
+        return response()->json($userField);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateOrCreateMultipleByKey(Request $request)
+    {
+        $fields = $request->get('fields', []);
+        $userId = auth()->id();
+
+        if ($this->permissionService->can(auth()->id(), 'update-users')) {
+
+            $userId = $request->get('user_id', auth()->id());
+
+        } else if (!auth()->id() || $request->get('user_id') != auth()->id()) {
+
+            throw new NotFoundHttpException();
+        }
+
+        // validate
+        foreach ($fields as $key => $value) {
+            $validator = validator(
+                ['key' => $key, 'value' => $value, 'user_id' => $userId],
+                [
+                    'user_id' => 'required|numeric',
+                    'key' => 'required|string|max:255|min:1',
+                    'value' => 'nullable|string',
+                ]
+            );
+
+            if ($validator->fails()) {
+                $errors = [];
+
+                foreach ($validator->errors()->getMessages() as $key => $value) {
+                    $errors[] = [
+                        "source" => $key,
+                        "detail" => $value[0]
+                    ];
+                }
+
+                throw new HttpResponseException(response()->json(['status' => 'error',
+                        'code' => 422,
+                        'total_results' => 0,
+                        'results' => [],
+                        'errors' => $errors], 422));
+            }
+        }
+
+        $userFields = [];
+
+        // update or create
+        foreach ($fields as $key => $value) {
+            $updateCount = $this->userFieldRepository->query()
+                ->where(
+                    [
+                        'key' => $key,
+                        'user_id' => $userId,
+                    ]
+                )
+                ->update(
+                    [
+                        'value' => $value,
+                        'updated_at' => Carbon::now()->toDateTimeString(),
+                    ]
+                );
+
+            if ($updateCount == 0) {
+                $userField = $this->userFieldRepository->create(
+                    [
+                        'key' => $key,
+                        'user_id' => $userId,
+                        'value' => $value,
+                        'created_at' => Carbon::now()->toDateTimeString(),
+                    ]
+                );
+            } else {
+
+                $userField = $this->userFieldRepository->query()
+                ->where(
+                    [
+                        'key' => $key,
+                        'user_id' => $userId,
+                    ]
+                )
+                ->get()
+                ->first();
+            }
+
+            $userFields[] = $userField;
+        }
+
+        return response()->json($userFields);
     }
 
     /**

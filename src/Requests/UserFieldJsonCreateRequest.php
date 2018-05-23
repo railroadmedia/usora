@@ -25,7 +25,7 @@ class UserFieldJsonCreateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'required|string|max:255',
+            'key' =>'required|string|max:255|min:1',
             'value' => 'nullable|string'
         ];
     }

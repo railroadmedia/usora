@@ -106,6 +106,16 @@ Route::group(
             \Railroad\Usora\Controllers\UserFieldJsonController::class . '@update'
         )->name('usora.api.user-field.update');
 
+        Route::patch(
+            'user-field/update-or-create-by-key',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@updateOrCreateByKey'
+        )->name('usora.api.user-field.update-or-create-by-key');
+
+        Route::patch(
+            'user-field/update-or-create-multiple-by-key',
+            \Railroad\Usora\Controllers\UserFieldJsonController::class . '@updateOrCreateMultipleByKey'
+        )->name('usora.api.user-field.update-or-create-multiple-by-key');
+
         Route::delete(
             'user-field/delete/{id}',
             \Railroad\Usora\Controllers\UserFieldJsonController::class . '@delete'

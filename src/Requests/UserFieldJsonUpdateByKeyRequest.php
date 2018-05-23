@@ -4,7 +4,7 @@ namespace Railroad\Usora\Requests;
 
 use Railroad\Usora\Requests\FormRequest;
 
-class UserFieldJsonUpdateRequest extends FormRequest
+class UserFieldJsonUpdateByKeyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class UserFieldJsonUpdateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'string|max:255|min:1',
+            'key' =>'required|string|max:255|min:1',
             'value' => 'nullable|string'
         ];
     }

@@ -15,6 +15,285 @@ class UserFieldJsonControllerTest extends UsoraTestCase
         parent::setUp();
     }
 
+    public function test_users_field_update_by_key_create_with_permission()
+    {
+
+        $userId = $this->createNewUser();
+
+        $userFieldsInputData = [
+            'user_id' => $userId,
+            'key' => $this->faker->word(),
+            'value' => $this->faker->words(4, true),
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+        ];
+
+        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
+            ->insertGetId($userFieldsInputData);
+
+        $userFieldsInputData['value'] = $this->faker->words(4, true);
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+           self::API_PREFIX . '/user-field/update-or-create-by-key',
+            $userFieldsInputData
+        );
+
+        // assert response status code
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // assert the users data was saved in the db
+        $this->assertDatabaseHas(
+            ConfigService::$tableUserFields,
+            $userFieldsInputData
+        );
+    }
+
+    public function test_users_field_update_multiple_by_key_create_with_permission()
+    {
+        $this->assertTrue(true);
+        $userId = $this->createNewUser();
+
+        $userFieldData = [
+            'user_id' => $userId,
+            'key' => $this->faker->word(),
+            'value' => $this->faker->words(4, true),
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+        ];
+
+        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
+            ->insertGetId($userFieldData);
+
+        $userFieldsData = [
+            [
+                'key' => $userFieldData['key'],
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+        ];
+
+        $userFieldsInputData = ['user_id' => $userId, 'fields' => []];
+
+        foreach ($userFieldsData as $userField) {
+            $userFieldsInputData['fields'][$userField['key']] = $userField['value'];
+        }
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+            self::API_PREFIX . '/user-field/update-or-create-multiple-by-key',
+            $userFieldsInputData
+        );
+
+        // assert response status code
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // assert the users data was saved in the db
+        foreach ($userFieldsData as $userField) {
+
+            $this->assertDatabaseHas(
+                ConfigService::$tableUserFields,
+                $userField
+            );
+        }
+    }
+
+    public function test_users_field_update_multiple_by_key_create_without_permission()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsData = [
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+        ];
+
+        $userFieldsInputData = ['user_id' => $userId, 'fields' => []];
+
+        foreach ($userFieldsData as $userField) {
+            $userFieldsInputData['fields'][$userField['key']] = $userField['value'];
+        }
+
+        $response = $this->call(
+            'PATCH',
+            self::API_PREFIX . '/user-field/update-or-create-multiple-by-key',
+            $userFieldsInputData
+        );
+
+        // assert the response code is not found
+        $this->assertEquals(404, $response->getStatusCode());
+
+        // assert the users data was saved in the db
+        foreach ($userFieldsData as $userField) {
+
+            $this->assertDatabaseMissing(
+                ConfigService::$tableUserFields,
+                $userField
+            );
+        }
+    }
+
+    public function test_users_field_update_multiple_by_key_create_validation_fail()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsData = [
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => '',
+                'value' => $this->faker->words(4, true),
+            ],
+            [
+                'key' => $this->faker->word,
+                'value' => $this->faker->words(4, true),
+            ],
+        ];
+
+        $userFieldsInputData = ['user_id' => $userId, 'fields' => []];
+
+        foreach ($userFieldsData as $userField) {
+            $userFieldsInputData['fields'][$userField['key']] = $userField['value'];
+        }
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+            self::API_PREFIX . '/user-field/update-or-create-multiple-by-key',
+            $userFieldsInputData
+        );
+
+        // assert response status code
+        $this->assertEquals(422, $response->getStatusCode());
+
+        // assert response validation error messages
+        $this->assertEquals([
+            [
+                "source" => "key",
+                "detail" => "The key field is required.",
+            ]
+        ], $response->decodeResponseJson()['errors']);
+
+        // assert the users field data was not saved in the db
+        foreach ($userFieldsData as $userField) {
+
+            $this->assertDatabaseMissing(
+                ConfigService::$tableUserFields,
+                $userField
+            );
+        }
+    }
+
+    public function test_users_field_update_by_key_create_without_permission()
+    {
+        $userId = $this->createNewUser();
+
+        $userFieldsInputData = [
+            'user_id' => $userId,
+            'key' => $this->faker->word(),
+            'value' => $this->faker->words(4, true),
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+        ];
+
+        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
+            ->insertGetId($userFieldsInputData);
+
+        $userFieldsInputData['value'] = $this->faker->words(4, true);
+
+        $response = $this->call(
+            'PATCH',
+            self::API_PREFIX . '/user-field/update-or-create-by-key',
+            $userFieldsInputData
+        );
+
+        // assert the response code is not found
+        $this->assertEquals(404, $response->getStatusCode());
+
+        // assert the users field data was not saved in the db
+        $this->assertDatabaseMissing(
+            ConfigService::$tableUserFields,
+            [
+                'user_id' => $userId,
+                'key' => $userFieldsInputData['key'],
+                'value' => $userFieldsInputData['value']
+            ]
+        );
+    }
+
+    public function test_users_field_update_by_key_create_validation_fail()
+    {
+        $this->assertTrue(true);
+
+        $userId = $this->createNewUser();
+
+        $userFieldsInputData = [
+            'user_id' => $userId,
+            'key' => $this->faker->words(4, true),
+            'value' => $this->faker->words(4, true),
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString(),
+        ];
+
+        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
+            ->insertGetId($userFieldsInputData);
+
+        $userFieldsInputData['key'] = '';
+
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        $response = $this->call(
+            'PATCH',
+            self::API_PREFIX . '/user-field/update-or-create-by-key',
+            $userFieldsInputData
+        );
+
+        // assert response status code
+        $this->assertEquals(422, $response->getStatusCode());
+
+        // assert response validation error messages
+        $this->assertEquals([
+            [
+                "source" => "key",
+                "detail" => "The key field is required.",
+            ]
+        ], $response->decodeResponseJson()['errors']);
+
+        // assert the users field data was not saved in the db
+        $this->assertDatabaseMissing(
+            ConfigService::$tableUserFields,
+            [
+                'user_id' => $userId,
+                'key' => $userFieldsInputData['key'],
+                'value' => $userFieldsInputData['value']
+            ]
+        );
+    }
+
     public function test_users_field_index_with_permission()
     {
         $userId = $this->createNewUser();
