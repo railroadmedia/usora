@@ -153,12 +153,7 @@ class UserFieldJsonController extends Controller
         $userId = auth()->id();
 
         if ($this->permissionService->can(auth()->id(), 'update-users')) {
-
             $userId = $request->get('user_id', auth()->id());
-
-        } else if ($request->get('user_id') != auth()->id()) {
-
-            throw new NotFoundHttpException();
         }
 
         // update or create
@@ -213,12 +208,7 @@ class UserFieldJsonController extends Controller
         $userId = auth()->id();
 
         if ($this->permissionService->can(auth()->id(), 'update-users')) {
-
             $userId = $request->get('user_id', auth()->id());
-
-        } else if (!auth()->id() || $request->get('user_id') != auth()->id()) {
-
-            throw new NotFoundHttpException();
         }
 
         // validate
