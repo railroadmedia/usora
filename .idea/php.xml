@@ -99,6 +99,8 @@
       <path value="$PROJECT_DIR$/../resora" />
       <path value="$PROJECT_DIR$/vendor/railroad/permissions" />
       <path value="$PROJECT_DIR$/../permissions" />
+      <path value="$PROJECT_DIR$/vendor/railroad/railcontent" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
