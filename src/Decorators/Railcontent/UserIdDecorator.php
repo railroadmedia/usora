@@ -35,10 +35,16 @@ class UserIdDecorator implements DecoratorInterface
             $userIds[] = $result['user_id'];
         }
 
-        $users = $this->userRepository->query()->whereIn('id', $userIds)->get()->keyBy('id');
+        $users = $this->userRepository->query()
+            ->select(['id', 'display_name', 'created_at'])
+            ->whereIn('id', $userIds)
+            ->get()
+            ->keyBy('id');
 
         foreach ($results as $resultIndex => $result) {
-            $results[$resultIndex]['user'] = $users[$result['user_id']]->dot();
+            if (!empty($users[$result['user_id']])) {
+                $results[$resultIndex]['user'] = $users[$result['user_id']]->dot();
+            }
         }
 
         return $results;
