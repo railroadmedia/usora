@@ -34,7 +34,7 @@ return [
     'remember_me' => true,
 
     // password reset
-    'password_reset_notification_class' => \Illuminate\Auth\Notifications\ResetPassword::class,
+    'password_reset_notification_class' => \Railroad\Usora\Notifications\ResetPassword::class,
     'password_reset_notification_channel' => 'mail',
 
     'email_change_notification_class' => \Railroad\Usora\Notifications\EmailChange::class,
