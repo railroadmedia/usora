@@ -5,16 +5,17 @@ namespace Railroad\Usora\Repositories;
 use Railroad\Resora\Decorators\Decorator;
 use Railroad\Resora\Queries\CachedQuery;
 use Railroad\Resora\Repositories\RepositoryBase;
+use Railroad\Usora\Repositories\Queries\UserQuery;
 use Railroad\Usora\Services\ConfigService;
 
 class UserRepository extends RepositoryBase
 {
     /**
-     * @return CachedQuery|$this
+     * @return UserQuery|$this
      */
     protected function newQuery()
     {
-        return (new CachedQuery($this->connection()))->from(ConfigService::$tableUsers);
+        return (new UserQuery($this->connection()))->from(ConfigService::$tableUsers);
     }
 
     protected function decorate($results)
