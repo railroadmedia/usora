@@ -25,7 +25,7 @@
     "guzzlehttp/guzzle": "~6.0",
     "doctrine/dbal": "^2.5",
     "railroad/resora": "0.0.04",
-    "railroad/railcontent": "5.61.09",
+    "railroad/railcontent": "5.61.10",
     "railroad/permissions": "5.61.06"
   },
   "require-dev": {
