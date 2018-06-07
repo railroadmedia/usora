@@ -39,7 +39,7 @@ class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassw
 
         if (empty($dotArray['fields.profile_picture_image_url'])) {
             $dotArray['fields.profile_picture_image_url'] =
-                'https://dmmior4id2ysr.cloudfront.net/assets/images/avatar.svg';
+                'https://dmmior4id2ysr.cloudfront.net/assets/images/avatar.jpg';
         }
 
         return array_merge(array_dot($original), $dotArray);
