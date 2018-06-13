@@ -18,7 +18,7 @@ class UserFieldQuery extends CachedQuery
     {
         $id = parent::insertGetId($values, $sequence);
 
-        event(new UserEvent($id, 'updated'));
+        event(new UserEvent($id, 'field-updated'));
 
         return $id;
     }
@@ -32,7 +32,7 @@ class UserFieldQuery extends CachedQuery
         $return = parent::update($values);
 
         foreach ($idsToBeUpdated as $idToBeUpdated) {
-            event(new UserEvent($idToBeUpdated, 'updated'));
+            event(new UserEvent($idToBeUpdated, 'field-updated'));
         }
 
         return $return;
@@ -45,7 +45,7 @@ class UserFieldQuery extends CachedQuery
         $deleted = parent::delete($id);
 
         if ($deleted > 0) {
-            event(new UserEvent($user['user_id'], 'updated'));
+            event(new UserEvent($user['user_id'], 'field-updated'));
         }
 
         return $deleted;
