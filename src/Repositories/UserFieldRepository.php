@@ -4,6 +4,7 @@ namespace Railroad\Usora\Repositories;
 
 use Railroad\Resora\Queries\CachedQuery;
 use Railroad\Resora\Repositories\RepositoryBase;
+use Railroad\Usora\Repositories\Queries\UserFieldQuery;
 use Railroad\Usora\Services\ConfigService;
 
 class UserFieldRepository extends RepositoryBase
@@ -13,7 +14,7 @@ class UserFieldRepository extends RepositoryBase
      */
     protected function newQuery()
     {
-        return (new CachedQuery($this->connection()))->from(ConfigService::$tableUserFields);
+        return (new UserFieldQuery($this->connection()))->from(ConfigService::$tableUserFields);
     }
 
     protected function connection()
