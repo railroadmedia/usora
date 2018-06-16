@@ -1,16 +1,48 @@
-# Usora
+Usora
+====================
+
 Usora is a user management system including auth, user settings, user information, and single sign on.
 
-## Single Sign On
+- [Usora](#usora)
+  * [Single Sign On](#single-sign-on)
+    + [How it Works](#how-it-works)
+  * [API Reference](#api-reference)
+    + [Get Index of Users](#get-index-of-users)
+      - [Request Example](#request-example)
+      - [Request Parameters](#request-parameters)
+      - [Response Examples](#response-examples)
+        * [`200 OK`](#-200-ok-)
+    + [Get Single User by ID](#get-single-user-by-id)
+      - [Request Example](#request-example-1)
+      - [Request Parameters](#request-parameters-1)
+      - [Response Examples](#response-examples-1)
+        * [`200 OK`](#-200-ok--1)
+    + [Update User's Display Name](#update-user-s-display-name)
+      - [Request Example](#request-example-2)
+      - [Request Parameters](#request-parameters-2)
+      - [Response Examples](#response-examples-2)
+        * [`200 OK`](#-200-ok--2)
+    + [(todo: the rest of the endpoints)](#-todo--the-rest-of-the-endpoints-)
+
+<!-- ecotrust-canada.github.io/markdown-toc -->
+
+
+Single Sign On
+-----------------------------------------
+
 ### How it Works
+
 Users can be signed in on any domain running this package with a single login attempt from any of the domains as long as they are all connected to the same usora database. This is possible by setting authentication cookies on all participating domains after the login succeeds using html img tags.
 
-API Reference
-=============
 
-### Get Users
+
+API Reference
+-----------------------------------------
+
+### Get Index of Users
 
 `GET user/index`
+
 
 #### Request Example
 
@@ -33,53 +65,178 @@ $.ajax({
 });
 ```
 
-#### Response Data Example
+#### Request Parameters
+
+| path\|query\|body |  key                  |  required |  default        |  description\|notes | 
+|-------------------|-----------------------|-----------|-----------------|---------------------| 
+| query             |  `limit`              |           | `25`            |                     | 
+| query             |  `page`               |           |  `1`            |                     | 
+| query             |  `order_by_column`    |           |  `'created_at'` |                     | 
+| query             |  `order_by_direction` |           |  `'desc'`       |                     | 
+  
+<!--
+path\|query\|body, key, required, default, description\|notes
+query, `limit`, ,`25`,
+query, `page`,  , `1`, 
+query, `order_by_column`,  , `'created_at'`,
+query, `order_by_direction`,  , `'desc'`,
+-->
+
+
+#### Response Examples
+
+##### `200 OK`
 
 ```json
-[
-   {
-      "id":"6",
-      "email":"brooks.kshlerin@reinger.net",
-      "password":"$2y$10$nqNvTklmxrt6.I2qTQvv9OfInEz6SXUaFgUmQvbubpnqBOT.wqkzi",
-      "remember_token":"3ti1JYMTmXdXjQ0MpCIljdUfxnANgeZry4xDYjwxcdHshPWCoR1TY7O0663Z",
-      "session_salt":"plhIzS9NLmoIHxZNNae1HjmjY7OiNuuFufddlIjdF5Xp2oRm72wn4L5DH7f0",
-      "display_name":"necessitatibus consectetur voluptas consequatur",
-      "created_at":"1526460569",
-      "updated_at":"1526460569",
-      "fields":[]
-   },
-   {
-      "id":"1",
-      "email":"concepcion.lindgren@hotmail.com",
-      "password":"$2y$10$c36zFJtbV1bvG.2EYLel1.aLRHpJtG91p4AHJXicetsRGLhRdZnka",
-      "remember_token":"CTfeT1Rm3iZkJM7JfwU0PxKvztFYcmbRtXQZ0xkIhZ3EqpxN0ArMAyCFEylQ",
-      "session_salt":"isapVqlC17PatmckIlunIVKRLsfEhKfV6AoU2ftIfBmuyg2DXz6scmoao9Ol",
-      "display_name":"temporibus id voluptates cupiditate",
-      "created_at":"1526460569",
-      "updated_at":"1526460569",
-      "fields":[]
+{
+   "status":"ok",
+   "code":201,
+   "results":{
+      "id":217988,
+      "content_id":202313,
+      "key":"difficulty",
+      "value":"1",
+      "type":"integer",
+      "position":1
    }
-]
+}
 ```
 
 
-#### Parameters
+------------------------------------------------------------------------------------------------------------------------
 
-************ <!-- replace *this line* with markdown table generated using donatstudios.com/CsvToMarkdownTable -->
-************ 
-************ <!--
-************ #, name, required, default, type, description
-************  ,  ,  ,  ,  , 
-************  ,  ,  ,  ,  , 
-************ -->
 
-#### Responses
+### Get Single User by ID
 
-************ <!-- replace *this line* with markdown table generated using donatstudios.com/CsvToMarkdownTable -->
-************ 
-************ <!--
-************ outcome, return data type, return data value (example), notes about return data
-************ ,  ,  , 
-************ -->
+`GET user/show/{id}`
 
+
+#### Request Example
+
+```js
+var userId = 1;
+
+$.ajax({
+    url: 'https://www.musora.com' +
+        '/usora/user/show/' . userId,
+    type: 'get',
+    dataType: 'json',
+    success: function(response) {
+        // handle success
+    },
+    error: function(response) {
+        // handle error
+    }
+});
+```
+
+#### Request Parameters
+
+| path\|query\|body |  key |  required |  default |  description\|notes            | 
+|-------------------|------|-----------|----------|--------------------------------| 
+| path              |      |  yes      |          |  Id of the user to be returned | 
+  
+<!--
+path\|query\|body, key, required, default, description\|notes
+path, , yes ,  , Id of the user to be returned
+-->
+
+
+#### Response Examples
+
+##### `200 OK`
+
+```json
+{
+   "id":"1",
+   "email":"pascale84@schimmel.com",
+   "password":"$2y$10$hh5cU.fo.Jq48A267zkjiun\\/W.TwbRs4Pg02Nm.X7k.s5yKQxVMj2",
+   "remember_token":"D5mpp6aZhvi5vOD7Fs4EDMw8782Be3hXcrRa7cUEaqt6eXlmQPmKbaU1RKdy",
+   "session_salt":"0bPpeEbf13tpNi5zkN6bHSQ5Oq72s7YVrCkh2rkRA65Jttd16d0RGQNJbc1R",
+   "display_name":"sed accusamus dolorem ut",
+   "created_at":"1526460917",
+   "updated_at":"1526460917",
+   "fields":[]
+}
+```
+
+### Update User's Display Name
+
+`PUT user/update/{id}`
+
+
+#### Request Example
+
+```js
+var userId = 1;
+var displayNameToSet = 'sed accusamus dolorem ut';
+
+$.ajax({
+    url: 'https://www.musora.com' +
+        '/usora/user/update/' . userId,
+    type: 'patch',
+    data: {display_name: displayNameToSet},
+    dataType: 'json',
+    success: function(response) {
+        // handle success
+    },
+    error: function(response) {
+        // handle error
+    }
+});
+```
+
+#### Request Parameters
+
+| path\|query\|body |  key             |  required |  default |  description\|notes      | 
+|-------------------|------------------|-----------|----------|--------------------------| 
+| path              |                  |  yes      |          |  user id                 | 
+| body              |  `display_name`  |  yes      |          |  new display name to set | 
+ 
+<!--
+path\|query\|body, key, required, default, description\|notes
+path ,  , yes ,  , user id
+body , `display_name` , yes ,  , new display name to set 
+-->
+
+
+#### Response Examples
+
+##### `200 OK`
+
+```json
+{
+   "id":"1",
+   "email":"pascale84@schimmel.com",
+   "password":"$2y$10$hh5cU.fo.Jq48A267zkjiun\\/W.TwbRs4Pg02Nm.X7k.s5yKQxVMj2",
+   "remember_token":"D5mpp6aZhvi5vOD7Fs4EDMw8782Be3hXcrRa7cUEaqt6eXlmQPmKbaU1RKdy",
+   "session_salt":"0bPpeEbf13tpNi5zkN6bHSQ5Oq72s7YVrCkh2rkRA65Jttd16d0RGQNJbc1R",
+   "display_name":"sed accusamus dolorem ut",
+   "created_at":"1526460917",
+   "updated_at":"1526460917",
+   "fields":[
+
+   ]
+}
+```
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+### (todo: the rest of the endpoints)
+
+
+Get details from "USORA USER MANAGEMENT SYSTEM - JSON API" section of https://musora.readme.io/v1.0.0/reference
+
+* put, user/store 
+* patch, user/update/:id 
+* delete, user/delete/:id 
+* get, user-field/index/:id 
+* get, user-field/show/:id 
+* put, user-field/store 
+* patch, user-field/update/:id 
+* patch, user-field/update-or-create-by-key 
+* delete, user-field/delete/:id 
+* patch, user-field/update-or-create-multiple-by-key 
 
