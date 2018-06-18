@@ -44,7 +44,7 @@ API Reference
 `GET user/index`
 
 
-#### Request Example
+#### Request Example(s)
 
 ```js
 $.ajax({
@@ -83,7 +83,7 @@ query, `order_by_direction`,  , `'desc'`,
 -->
 
 
-#### Response Examples
+#### Response Example(s)
 
 ##### `200 OK`
 
@@ -111,7 +111,7 @@ query, `order_by_direction`,  , `'desc'`,
 `GET user/show/{id}`
 
 
-#### Request Example
+#### Request Example(s)
 
 ```js
 var userId = 1;
@@ -142,7 +142,7 @@ path, , yes ,  , Id of the user to be returned
 -->
 
 
-#### Response Examples
+#### Response Example(s)
 
 ##### `200 OK`
 
@@ -165,7 +165,7 @@ path, , yes ,  , Id of the user to be returned
 `PUT user/update/{id}`
 
 
-#### Request Example
+#### Request Example(s)
 
 ```js
 var userId = 1;
@@ -200,7 +200,7 @@ body , `display_name` , yes ,  , new display name to set
 -->
 
 
-#### Response Examples
+#### Response Example(s)
 
 ##### `200 OK`
 
