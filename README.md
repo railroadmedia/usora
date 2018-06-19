@@ -8,21 +8,24 @@ Usora is a user management system including auth, user settings, user informatio
     + [How it Works](#how-it-works)
   * [API Reference](#api-reference)
     + [Get Index of Users](#get-index-of-users)
-      - [Request Example](#request-example)
+      - [Request Example(s)](#request-example-s-)
       - [Request Parameters](#request-parameters)
-      - [Response Examples](#response-examples)
+      - [Response Example(s)](#response-example-s-)
         * [`200 OK`](#-200-ok-)
     + [Get Single User by ID](#get-single-user-by-id)
-      - [Request Example](#request-example-1)
+      - [Request Example(s)](#request-example-s--1)
       - [Request Parameters](#request-parameters-1)
-      - [Response Examples](#response-examples-1)
+      - [Response Example(s)](#response-example-s--1)
         * [`200 OK`](#-200-ok--1)
     + [Update User's Display Name](#update-user-s-display-name)
-      - [Request Example](#request-example-2)
+      - [Request Example(s)](#request-example-s--2)
       - [Request Parameters](#request-parameters-2)
-      - [Response Examples](#response-examples-2)
+      - [Response Example(s)](#response-example-s--2)
         * [`200 OK`](#-200-ok--2)
     + [(todo: the rest of the endpoints)](#-todo--the-rest-of-the-endpoints-)
+  * [Events](#events)
+    + [`EmailChangeRequest`](#-emailchangerequest-)
+    + [`UserEvent`](#-userevent-)
 
 <!-- ecotrust-canada.github.io/markdown-toc -->
 
@@ -33,8 +36,6 @@ Single Sign On
 ### How it Works
 
 Users can be signed in on any domain running this package with a single login attempt from any of the domains as long as they are all connected to the same usora database. This is possible by setting authentication cookies on all participating domains after the login succeeds using html img tags.
-
-
 
 API Reference
 -----------------------------------------
@@ -73,7 +74,7 @@ $.ajax({
 | query             |  `page`               |           |  `1`            |                     | 
 | query             |  `order_by_column`    |           |  `'created_at'` |                     | 
 | query             |  `order_by_direction` |           |  `'desc'`       |                     | 
-  
+
 <!--
 path\|query\|body, key, required, default, description\|notes
 query, `limit`, ,`25`,
@@ -220,8 +221,6 @@ body , `display_name` , yes ,  , new display name to set
 }
 ```
 
-
-
 ------------------------------------------------------------------------------------------------------------------------
 
 ### (todo: the rest of the endpoints)
@@ -240,3 +239,48 @@ Get details from "USORA USER MANAGEMENT SYSTEM - JSON API" section of https://mu
 * delete, user-field/delete/:id 
 * patch, user-field/update-or-create-multiple-by-key 
 
+
+Events
+----------------------------------------
+
+| Name               |  Parameters    |  Listener exists |  Resultant action(s) | 
+|--------------------|----------------|------------------|----------------------| 
+| UserEvent          |  id, eventType |  no              |  n/a                 | 
+| EmailChangeRequest |  token, email  |  no              |  n/a                 | 
+
+<!-- select "Semicolon Separated" from menu at donatstudios.com/CsvToMarkdownTable - so that we can use commas here 
+Name; Parameters; Listener exists; Resultant action(s)
+EmailChangeRequest; token, email; no; n/a  
+UserEvent; id, eventType; no; n/a 
+-->
+
+### `EmailChangeRequest`
+
+Captures that an EmailChangeRequest was made.
+
+Trigger exists in `request` method of `EmailChangeController`
+
+No Listener exists.
+    
+    
+### `UserEvent`
+
+Capture any user-account change.
+ 
+Trigger exists in:...
+
+1. Both `UserQuery`\* methods
+    1. `insertGetId` (eventType param value: "created")
+    1. `update` (eventType param value: "updated")
+1. All three `UserFieldQuery`\* methods (eventType param value: "field-updated" in each)
+    1. `insertGetId`
+    1. `update`
+    1. `delete`
+    
+\*namespace for each is `Railroad\Usora\Repositories\Queries`
+
+No listener exists.
+
+------------------------------------------------------------------------------------------------------------------------
+
+<div style="text-align:center">The End.</div>
