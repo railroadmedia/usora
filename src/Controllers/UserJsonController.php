@@ -57,11 +57,19 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $users = $this->userRepository->query()
+        $query = $this->userRepository->query()
             ->limit($request->get('limit', 25))
             ->skip(($request->get('page', 1) - 1) * $request->get('limit', 25))
-            ->orderBy($request->get('order_by_column', 'created_at'), $request->get('order_by_direction', 'desc'))
-            ->get();
+            ->orderBy($request->get('order_by_column', 'created_at'), $request->get('order_by_direction', 'desc'));
+
+        $searchTerm = $request->get('search_term', '');
+
+        if (!empty($searchTerm)) {
+            $query = $query->where('email', 'LIKE', '%' . $searchTerm . '%')
+                ->where('display_name', 'LIKE', '%' . $searchTerm . '%', 'OR');
+        }
+
+        $users = $query->get();
 
         return response()->json($users);
     }
@@ -124,14 +132,21 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user = $this->userRepository->update(
-            $id,
-            $request->only(
-                [
-                    'display_name'
-                ]
-            )
-        );
+        $only = [
+            'display_name',
+        ];
+
+        if ($this->permissionService->can(auth()->id(), 'update-users')) {
+            $only[] = 'email';
+        }
+
+        $attributes = $request->only($only);
+
+        if ($this->permissionService->can(auth()->id(), 'update-users') && !empty($request->get('password'))) {
+            $attributes['password'] = $this->hasher->make($request->get('password'));
+        }
+
+        $user = $this->userRepository->update($id, $attributes);
 
         return response()->json($user);
     }

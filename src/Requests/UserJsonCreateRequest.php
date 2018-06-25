@@ -25,7 +25,7 @@ class UserJsonCreateRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'display_name' =>'required|string|max:255',
+            'display_name' =>'required|string|max:255|min:2',
             'password' => 'required|string'
         ];
     }

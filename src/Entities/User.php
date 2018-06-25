@@ -8,29 +8,16 @@ use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Railroad\Resora\Entities\Entity;
 use Railroad\Usora\Services\ConfigService;
+use Railroad\Permissions\Services\ConfigService as PermissionConfigService;
 
 class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassword
 {
-    /**
-     * @param $accessSlug
-     * @return bool
-     */
-    public function can($accessSlug)
-    {
-        foreach (array_column($this['access'], 'slug') as $userAccessSlug) {
-            if ($userAccessSlug === $accessSlug) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function dot()
     {
         $original = $this->getArrayCopy();
         $dotArray = [];
 
+        // fields
         foreach ($this['fields'] ?? [] as $field) {
             $dotArray['fields.' . $field['key']] = $field['value'];
         }
@@ -106,5 +93,36 @@ class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassw
         (new AnonymousNotifiable)
             ->route(ConfigService::$passwordResetNotificationChannel, $this->getEmailForPasswordReset())
             ->notify(new ConfigService::$passwordResetNotificationClass($token));
+    }
+
+    public function is($role)
+    {
+        foreach ($this['permissions']['roles'] as $userRole) {
+            if ($userRole == $role) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function can($ability)
+    {
+        foreach ($this['permissions']['roles'] as $userRole) {
+            foreach(PermissionConfigService::$roleAbilities[$userRole] ?? [] as $roleAbility)
+            {
+                if ($roleAbility == $ability) {
+                    return true;
+                }
+            }
+        }
+
+        foreach ($this['permissions']['abilities'] as $userAbility) {
+            if ($userAbility == $ability) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
