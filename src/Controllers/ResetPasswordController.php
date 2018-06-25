@@ -8,16 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
+use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
-use Railroad\Usora\Services\UserService;
 
 class ResetPasswordController extends Controller
 {
-
     /**
-     * @var UserService
+     * @var UserRepository
      */
-    private $userService;
+    private $userRepository;
 
     /**
      * @var Hasher
@@ -27,12 +26,12 @@ class ResetPasswordController extends Controller
     /**
      * CookieController constructor.
      *
-     * @param UserService $userService
+     * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(UserService $userService, Hasher $hasher)
+    public function __construct(UserRepository $userRepository, Hasher $hasher)
     {
-        $this->userService = $userService;
+        $this->userRepository = $userRepository;
         $this->hasher = $hasher;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
@@ -64,7 +63,7 @@ class ResetPasswordController extends Controller
             function ($user, $password) {
                 $hashedPassword = $this->hasher->make($password);
 
-                $this->userService->updateOrCreate(['id' => $user['id']], ['password' => $hashedPassword]);
+                $this->userRepository->updateOrCreate(['id' => $user['id']], ['password' => $hashedPassword]);
 
                 $user['password'] = $hashedPassword;
 

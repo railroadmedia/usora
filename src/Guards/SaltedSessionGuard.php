@@ -21,16 +21,23 @@ class SaltedSessionGuard extends SessionGuard
      */
     public static $updateSalt = true;
 
+    protected $user;
+
     /**
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function user()
     {
+        if (!is_null($this->user)) {
+            return $this->user;
+        }
+
         $id = $this->session->get($this->getName());
         $salt = $this->session->get($this->getSaltName());
 
         if (!is_null($id)) {
             $user = $this->provider->retrieveById($id);
+            $this->user = $user;
 
             if ($user['session_salt'] === $salt) {
                 return parent::user();

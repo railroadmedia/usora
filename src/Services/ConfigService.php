@@ -37,7 +37,22 @@ class ConfigService
     /**
      * @var string
      */
+    public static $tableUserFields;
+
+    /**
+     * @var string
+     */
+    public static $tableUserData;
+
+    /**
+     * @var string
+     */
     public static $tablePasswordResets;
+
+    /**
+     * @var string
+     */
+    public static $tableEmailChanges;
 
     /**
      * @var array
@@ -73,6 +88,21 @@ class ConfigService
      * @var string
      */
     public static $passwordResetNotificationChannel;
+
+    /**
+     * @var string
+     */
+    public static $emailChangeNotificationClass;
+
+    /**
+     * @var string
+     */
+    public static $emailChangeNotificationChannel;
+
+    /**
+     * @var int
+     */
+    public static $emailChangeTtl;
 
     /**
      * @var array

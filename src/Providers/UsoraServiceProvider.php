@@ -2,10 +2,9 @@
 
 namespace Railroad\Usora\Providers;
 
-use Illuminate\Database\Events\StatementPrepared;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use PDO;
+use Railroad\Usora\Decorators\UserEntityDecorator;
+use Railroad\Usora\Decorators\UserFieldDecorator;
 use Railroad\Usora\Services\ConfigService;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -41,11 +40,19 @@ class UsoraServiceProvider extends ServiceProvider
         // tables
         ConfigService::$tablePrefix = config('usora.table_prefix');
         ConfigService::$tableUsers = ConfigService::$tablePrefix . config('usora.tables.users');
+        ConfigService::$tableUserFields = ConfigService::$tablePrefix . config('usora.tables.user_fields');
+        ConfigService::$tableUserData = ConfigService::$tablePrefix . config('usora.tables.user_data');
         ConfigService::$tablePasswordResets = ConfigService::$tablePrefix . config('usora.tables.password_resets');
+        ConfigService::$tableEmailChanges = ConfigService::$tablePrefix . config('usora.tables.email_changes');
 
         // password reset
         ConfigService::$passwordResetNotificationClass = config('usora.password_reset_notification_class');
         ConfigService::$passwordResetNotificationChannel = config('usora.password_reset_notification_channel');
+
+        // email change
+        ConfigService::$emailChangeNotificationClass = config('usora.email_change_notification_class');
+        ConfigService::$emailChangeNotificationChannel = config('usora.email_change_notification_channel');
+        ConfigService::$emailChangeTtl = config('usora.email_change_token_ttl');
 
         // middleware
         ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');
@@ -58,25 +65,14 @@ class UsoraServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
 
-        // events
-        $listens = [
-
-            // always return associated arrays from database queries
-            StatementPrepared::class => [
-                function (StatementPrepared $event) {
-                    if ($event->connection->getName() ==
-                        ConfigService::$connectionMaskPrefix . ConfigService::$databaseConnectionName) {
-                        $event->statement->setFetchMode(PDO::FETCH_ASSOC);
-                    }
-                }
-            ],
-        ];
-
-        foreach ($listens as $event => $listeners) {
-            foreach ($listeners as $listener) {
-                Event::listen($event, $listener);
-            }
-        }
+        // configure resora
+        config()->set(
+            'resora.decorators.users',
+            array_merge(
+                config()->get('resora.decorators.users', []),
+                [UserFieldDecorator::class, UserEntityDecorator::class]
+            )
+        );
     }
 
     /**

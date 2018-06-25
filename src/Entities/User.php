@@ -6,11 +6,31 @@ use ArrayAccess;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Railroad\Resora\Entities\Entity;
 use Railroad\Usora\Services\ConfigService;
+use Railroad\Permissions\Services\ConfigService as PermissionConfigService;
 
-class User implements Authenticatable, ArrayAccess, CanResetPassword
+class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassword
 {
-    private $data = [];
+    public function dot()
+    {
+        $original = $this->getArrayCopy();
+        $dotArray = [];
+
+        // fields
+        foreach ($this['fields'] ?? [] as $field) {
+            $dotArray['fields.' . $field['key']] = $field['value'];
+        }
+
+        unset($original['fields']);
+
+        if (empty($dotArray['fields.profile_picture_image_url'])) {
+            $dotArray['fields.profile_picture_image_url'] =
+                'https://dmmior4id2ysr.cloudfront.net/assets/images/avatar.jpg';
+        }
+
+        return array_merge(array_dot($original), $dotArray);
+    }
 
     /**
      * @return string
@@ -75,51 +95,34 @@ class User implements Authenticatable, ArrayAccess, CanResetPassword
             ->notify(new ConfigService::$passwordResetNotificationClass($token));
     }
 
-    /**
-     * @param mixed $offset
-     * @param mixed $value
-     */
-    public function offsetSet($offset, $value)
+    public function is($role)
     {
-        if (is_null($offset)) {
-            $this->data[] = $value;
-        } else {
-            $this->data[$offset] = $value;
+        foreach ($this['permissions']['roles'] as $userRole) {
+            if ($userRole == $role) {
+                return true;
+            }
         }
+
+        return false;
     }
 
-    /**
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
+    public function can($ability)
     {
-        return isset($this->data[$offset]);
-    }
+        foreach ($this['permissions']['roles'] as $userRole) {
+            foreach(PermissionConfigService::$roleAbilities[$userRole] ?? [] as $roleAbility)
+            {
+                if ($roleAbility == $ability) {
+                    return true;
+                }
+            }
+        }
 
-    /**
-     * @param mixed $offset
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->data[$offset]);
-    }
+        foreach ($this['permissions']['abilities'] as $userAbility) {
+            if ($userAbility == $ability) {
+                return true;
+            }
+        }
 
-    /**
-     * @param mixed $offset
-     * @return mixed|null
-     */
-    public function offsetGet($offset)
-    {
-        return isset($this->data[$offset]) ? $this->data[$offset] : null;
-    }
-
-    /**
-     * @param $name
-     * @return mixed|null
-     */
-    public function __get($name)
-    {
-        return $this[$name] ?? null;
+        return false;
     }
 }
