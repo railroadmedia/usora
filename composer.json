@@ -24,9 +24,8 @@
     "laravel/tinker": "^1.0",
     "guzzlehttp/guzzle": "~6.0",
     "doctrine/dbal": "^2.5",
-    "railroad/resora": "5.60.*",
-    "railroad/railcontent": "5.61.*",
-    "railroad/permissions": "5.61.*"
+    "railroad/resora": "1.0.*",
+    "railroad/permissions": "1.0.*"
   },
   "require-dev": {
     "filp/whoops": "^2.0",

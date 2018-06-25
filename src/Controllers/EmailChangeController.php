@@ -95,6 +95,11 @@ class EmailChangeController extends Controller
             ->where('token', $request->get('token'))
             ->first();
 
+
+        if (Carbon::parse($emailChangeData['created_at']) < Carbon::now()->subHours(ConfigService::$emailChangeTtl)) {
+            return redirect()->back()->withErrors(['token' => 'Your email reset token has expired.']);
+        }
+
         $this->userRepository
             ->update(
                 $emailChangeData->user_id,

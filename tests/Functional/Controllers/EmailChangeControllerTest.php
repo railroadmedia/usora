@@ -66,7 +66,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         // assert session message
         $response->assertSessionHas(
-            ['success']
+            ['successes']
         );
 
         // assert the request data was saved in db
@@ -179,7 +179,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         // assert session message
         $response->assertSessionHas(
-            ['success']
+            ['successes']
         );
     }
 

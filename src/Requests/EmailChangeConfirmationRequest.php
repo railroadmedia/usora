@@ -2,7 +2,7 @@
 
 namespace Railroad\Usora\Requests;
 
-use Illuminate\Database\Query\Builder;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Railroad\Usora\Services\ConfigService;
@@ -36,10 +36,15 @@ class EmailChangeConfirmationRequest extends FormRequest
                     '.' .
                     ConfigService::$tableEmailChanges,
                     'token'
-                )->where(function (Builder $query) {
-                    $query->whereRaw('created_at + INTERVAL ? HOUR >= CURRENT_TIMESTAMP', ConfigService::$emailChangeTtl);
-                }),
-            ]
+                ),
+            ],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'token'  => 'Invalid token.',
         ];
     }
 }

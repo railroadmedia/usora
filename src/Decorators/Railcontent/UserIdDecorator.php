@@ -2,11 +2,9 @@
 
 namespace Railroad\Usora\Decorators\Railcontent;
 
-use Railroad\Railcontent\Decorators\DecoratorInterface;
-use Railroad\Resora\Decorators\Decorator;
 use Railroad\Usora\Repositories\UserRepository;
 
-class UserIdDecorator implements DecoratorInterface
+class UserIdDecorator
 {
     /**
      * @var UserRepository
