@@ -1,0 +1,25 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+
+matrix:
+  fast_finish: true
+
+before_script:
+  - travis_retry composer self-update
+  - travis_retry composer install --prefer-source --no-interaction
+
+env:
+  global:
+    - APP_ENV=staging
+    - APP_DEBUG=true
+    - APP_KEY=xxxx
+    - DB_CONNECTION=sqlite
+    - CACHE_DRIVER=file
+    - SESSION_DRIVER=file
+    - QUEUE_DRIVER=sync
+
+script:
+  - vendor/bin/phpunit
