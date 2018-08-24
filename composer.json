@@ -25,7 +25,8 @@
     "guzzlehttp/guzzle": "~6.0",
     "doctrine/dbal": "^2.5",
     "railroad/resora": "1.0.*",
-    "railroad/permissions": "1.0.*"
+    "railroad/permissions": "1.0.*",
+    "mikemclin/laravel-wp-password": "~2.0.1"
   },
   "require-dev": {
     "filp/whoops": "^2.0",

@@ -8,6 +8,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use MikeMcLin\WpPassword\WpPassword;
+use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Guards\SaltedSessionGuard;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ClientRelayService;
@@ -75,9 +77,41 @@ class AuthenticationController extends Controller
                     $domain
                 );
             }
+            event(new UserEvent($user, 'authenticated'));
 
             return redirect()->away(ConfigService::$loginSuccessRedirectPath);
+        } else {
+            $wp_hashed_password = '';
+            $userByEmail =
+                $this->userRepository->query()
+                    ->where('email', $request->get('email'))
+                    ->orderBy('id', 'desc')
+                    ->first();
+            foreach ($userByEmail->fields as $fied) {
+                if ($fied['key'] == 'wordpress_password') {
+                    $wp_hashed_password = ($fied['value']);
+                }
+            }
+
+            if (WpPassword::check(trim($request->get('password')), $wp_hashed_password)) {
+
+                SaltedSessionGuard::$updateSalt = false;
+                auth()->loginUsingId($userByEmail->id, ConfigService::$rememberMe);
+
+                foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
+                    ClientRelayService::authorizeUserOnDomain(
+                        $userByEmail->id,
+                        $this->hasher->make($userByEmail->id . $userByEmail->password . $userByEmail['session_salt']),
+                        $domain
+                    );
+                }
+
+                event(new UserEvent($userByEmail, 'authenticated'));
+
+                return redirect()->away(ConfigService::$loginSuccessRedirectPath);
+            }
         }
+
 
         $this->incrementLoginAttempts($request);
 
