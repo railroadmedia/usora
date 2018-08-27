@@ -3,6 +3,7 @@
 namespace Railroad\Usora\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use MikeMcLin\WpPassword\WpPasswordProvider;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
 use Railroad\Usora\Services\ConfigService;
@@ -83,5 +84,6 @@ class UsoraServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(AuthenticationServiceProvider::class);
+        $this->app->register(WpPasswordProvider::class);
     }
 }
