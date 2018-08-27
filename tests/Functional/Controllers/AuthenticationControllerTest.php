@@ -3,6 +3,7 @@
 namespace Railroad\Usora\Tests\Functional;
 
 use Illuminate\Contracts\Hashing\Hasher;
+use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
 
@@ -303,5 +304,31 @@ class AuthenticationControllerTest extends UsoraTestCase
         );
 
         $this->assertEmpty($this->app->make('auth')->guard()->id());
+    }
+
+    public function test_authentication_via_credentials_wordpress_hash()
+    {
+        $rawPassword = $this->faker->word;
+
+        $user = [
+            'email' => $this->faker->email,
+            'password' => WpPassword::make($rawPassword),
+            'remember_token' => str_random(60),
+            'display_name' => $this->faker->words(4, true),
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+
+        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
+            ->insertGetId($user);
+
+        $response = $this->call(
+            'POST',
+            '/authenticate/credentials',
+            ['email' => $user['email'], 'password' => $rawPassword]
+        );
+
+        $this->assertEquals($userId, $this->app->make('auth')->guard()->id());
+        $response->assertRedirect(ConfigService::$loginSuccessRedirectPath);
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
+use MikeMcLin\WpPassword\WpPasswordProvider;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -144,6 +145,7 @@ class UsoraTestCase extends TestCase
         config()->set('permissions.brand', 'drumeo');
 
         $app->register(PermissionsServiceProvider::class);
+        $app->register(WpPasswordProvider::class);
     }
 
     /**
