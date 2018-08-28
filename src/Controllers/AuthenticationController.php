@@ -87,22 +87,16 @@ class AuthenticationController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
             if($userByEmail) {
-                $wp_hashed_password = $userByEmail->password;
-                foreach ($userByEmail->fields as $fied) {
-                    if ($fied['key'] == 'wordpress_password') {
-                        $wp_hashed_password = $fied['value'];
-                    }
-                }
-                if (WpPassword::check(trim($request->get('password')), $wp_hashed_password)) {
+                if (WpPassword::check(trim($request->get('password')), $userByEmail['password'])) {
 
                     SaltedSessionGuard::$updateSalt = false;
-                    auth()->loginUsingId($userByEmail->id, ConfigService::$rememberMe);
+                    auth()->loginUsingId($userByEmail['id'], ConfigService::$rememberMe);
 
                     foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
                         ClientRelayService::authorizeUserOnDomain(
-                            $userByEmail->id,
-                            WpPassword::make(
-                                $userByEmail->id . $userByEmail->password . $userByEmail['session_salt']
+                            $userByEmail['id'],
+                            $this->hasher->make(
+                                $userByEmail['id'] . $userByEmail['password'] . $userByEmail['session_salt']
                             ),
                             $domain
                         );
