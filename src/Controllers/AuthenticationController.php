@@ -77,7 +77,7 @@ class AuthenticationController extends Controller
                     $domain
                 );
             }
-            event(new UserEvent($user, 'authenticated'));
+            event(new UserEvent($user->id, 'authenticated'));
 
             return redirect()->away(ConfigService::$loginSuccessRedirectPath);
         } else {
@@ -108,7 +108,7 @@ class AuthenticationController extends Controller
                         );
                     }
 
-                    event(new UserEvent($userByEmail, 'authenticated'));
+                    event(new UserEvent($userByEmail->id, 'authenticated'));
 
                     return redirect()->away(ConfigService::$loginSuccessRedirectPath);
                 }
