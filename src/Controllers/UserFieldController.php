@@ -76,7 +76,7 @@ class UserFieldController extends Controller
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->has('redirect'))->with($message) :
+            redirect()->away($request->get('redirect'))->with($message) :
             redirect()->back()->with($message);
     }
 
