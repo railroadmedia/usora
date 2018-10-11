@@ -63,8 +63,15 @@ class AuthenticationController extends Controller
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
-            return redirect()->to(ConfigService::$loginPagePath)
-                ->withErrors(['throttle' => 'Too many login attempts. Try again later.']);
+            $errors = ['throttle' => 'Too many login attempts. Try again later.'];
+
+            return $request->has('redirect') ?
+                redirect()
+                    ->away($request->get('redirect'))
+                    ->withErrors($errors) :
+                redirect()
+                    ->to(ConfigService::$loginPagePath)
+                    ->withErrors($errors);
         }
 
         if (auth()->attempt($request->only('email', 'password'), ConfigService::$rememberMe)) {
@@ -79,7 +86,11 @@ class AuthenticationController extends Controller
             }
             event(new UserEvent($user->id, 'authenticated'));
 
-            return redirect()->away(ConfigService::$loginSuccessRedirectPath);
+            $redirect = $request->has('redirect') ?
+                $request->get('redirect') :
+                ConfigService::$loginSuccessRedirectPath;
+
+            return redirect()->away($redirect);
         } else {
             $userByEmail =
                 $this->userRepository->query()
@@ -104,15 +115,26 @@ class AuthenticationController extends Controller
 
                     event(new UserEvent($userByEmail->id, 'authenticated'));
 
-                    return redirect()->away(ConfigService::$loginSuccessRedirectPath);
+                    $redirect = $request->has('redirect') ?
+                        $request->get('redirect') :
+                        ConfigService::$loginSuccessRedirectPath;
+
+                    return redirect()->away($redirect);
                 }
             }
         }
 
         $this->incrementLoginAttempts($request);
 
-        return redirect()->to(ConfigService::$loginPagePath)
-            ->withErrors(['invalid-credentials' => 'Invalid authentication credentials, please try again.']);
+        $errors = ['invalid-credentials' => 'Invalid authentication credentials, please try again.'];
+
+        return $request->has('redirect') ?
+            redirect()
+                ->away($request->get('redirect'))
+                ->withErrors($errors) :
+            redirect()
+                ->to(ConfigService::$loginPagePath)
+                ->withErrors($errors);
     }
 
     /**
@@ -256,7 +278,9 @@ class AuthenticationController extends Controller
 
         auth()->logout();
 
-        return redirect()->to(ConfigService::$loginPagePath);
+        return $request->has('redirect') ?
+            redirect()->away($request->get('redirect')) :
+            redirect()->to(ConfigService::$loginPagePath);
     }
 
     /**
