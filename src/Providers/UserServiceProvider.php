@@ -39,7 +39,7 @@ class UserServiceProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return $this->mapToEntity($this->userRepository->read($identifier));
+        return $this->userRepository->read($identifier);
     }
 
     /**
@@ -106,7 +106,7 @@ class UserServiceProvider implements UserProvider
             }
         }
 
-        return $this->mapToEntity($this->userRepository->query()->where($getByAttributes)->first());
+        return $this->userRepository->query()->where($getByAttributes)->first();
     }
 
     public function validateCredentials(Authenticatable $user, array $credentials)
@@ -114,24 +114,5 @@ class UserServiceProvider implements UserProvider
         $plain = $credentials['password'];
 
         return $this->hasher->check($plain, $user->getAuthPassword());
-    }
-
-    /**
-     * @param $data
-     * @return User|null
-     */
-    private function mapToEntity($data)
-    {
-        if (empty($data)) {
-            return null;
-        }
-
-        $user = new User();
-
-        foreach ($data as $name => $value) {
-            $user[$name] = $value;
-        }
-
-        return $user;
     }
 }
