@@ -167,6 +167,14 @@ class AuthenticationController extends Controller
             SaltedSessionGuard::$updateSalt = false;
 
             auth()->loginUsingId($user['id'], ConfigService::$rememberMe);
+
+            $request->setUserResolver(
+                function () use ($user) {
+                    return $user;
+                }
+            );
+
+            auth()->setUser($user);
         }
 
         return response('');
