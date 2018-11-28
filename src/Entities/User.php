@@ -2,14 +2,18 @@
 
 namespace Railroad\Usora\Entities;
 
-use DateTime;
-use LaravelDoctrine\Extensions\Timestamps\Timestamps;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
+use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 
 /**
- * @ORM\Entity ORM\@Table(name="users")
+ * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
+ * @ORM\Table(name="users", indexes={
+ *     @ORM\Index(name="email_index", columns={"email"}),
+ *     @ORM\Index(name="display_name_index", columns={"display_name"}),
+ *     @ORM\Index(name="created_at_index", columns={"created_at"}),
+ *     @ORM\Index(name="updated_at_index", columns={"updated_at"}),
+ * })
  */
 class User
 {
@@ -34,13 +38,13 @@ class User
     protected $password;
 
     /**
-     * @ORM\Column(type="string",nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      * @var string
      */
     protected $rememberToken;
 
     /**
-     * @ORM\Column(type="string",nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      * @var string
      */
     protected $sessionSalt;

@@ -152,6 +152,7 @@ class UsoraServiceProvider extends ServiceProvider
         $ormConfiguration->setProxyNamespace('DoctrineProxies');
         $ormConfiguration->setAutoGenerateProxyClasses(config('usora.development_mode'));
         $ormConfiguration->setMetadataDriverImpl($driverChain);
+        $ormConfiguration->setNamingStrategy(new \Doctrine\ORM\Mapping\UnderscoreNamingStrategy(CASE_LOWER));
 
         // create entity manager with proper db details
         if (config('usora.database_in_memory') === true) {
