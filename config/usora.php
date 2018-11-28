@@ -1,9 +1,19 @@
 <?php
 
 return [
+    'development_mode' => true,
+
     // database
-    'database_connection_name' => 'mysql',
-    'connection_mask_prefix' => 'usora_',
+    'database_name' => 'mydb',
+    'database_user' => 'root',
+    'database_password' => 'root',
+    'database_host' => 'mysql',
+    'database_driver' => 'pdo_mysql',
+    'database_in_memory' => false,
+
+    // cache
+    'redis_host' => 'redis',
+    'redis_port' => 6379,
 
     // host does the db migrations, clients do not
     'data_mode' => 'host', // 'host' or 'client'

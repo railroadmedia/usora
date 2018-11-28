@@ -74,18 +74,7 @@ class UsoraTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate:fresh', []);
-        $this->artisan('cache:clear', []);
-
         $this->faker = Factory::create();
-        $this->databaseManager = $this->app->make(DatabaseManager::class);
-        $this->userRepository = $this->app->make(UserRepository::class);
-
-        $this->permissionServiceMock = $this->getMockBuilder(PermissionService::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->app->instance(PermissionService::class, $this->permissionServiceMock);
 
         $this->authManager = $this->app->make(AuthManager::class);
         $this->hasher = $this->app->make(BcryptHasher::class);
@@ -111,19 +100,16 @@ class UsoraTestCase extends TestCase
             config()->set('usora.' . $key, $value);
         }
 
-        // set database
+        // misc
         config()->set('usora.data_mode', 'host');
-        config()->set('usora.database_connection_name', config('usora.connection_mask_prefix') . 'sqlite');
         config()->set('usora.authentication_controller_middleware', []);
-        config()->set('database.default', config('usora.connection_mask_prefix') . 'sqlite');
-        config()->set(
-            'database.connections.' . config('usora.connection_mask_prefix') . 'sqlite',
-            [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-            ]
-        );
+
+        // database
+        config()->set('usora.database_user', 'root');
+        config()->set('usora.database_password', 'root');
+        config()->set('usora.database_driver', 'pdo_sqlite');
+        config()->set('usora.database_in_memory', true);
+
 
         // set auth to our custom provider
         config()->set('auth.providers.usora.driver', 'usora');
@@ -144,7 +130,6 @@ class UsoraTestCase extends TestCase
         config()->set('permissions.table_users', config('usora.tables.users'));
         config()->set('permissions.brand', 'drumeo');
 
-        $app->register(PermissionsServiceProvider::class);
         $app->register(WpPasswordProvider::class);
     }
 

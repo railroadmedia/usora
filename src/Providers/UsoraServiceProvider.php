@@ -2,11 +2,16 @@
 
 namespace Railroad\Usora\Providers;
 
+use Doctrine\Common\Cache\RedisCache;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Support\ServiceProvider;
+use LaravelDoctrine\Migrations\MigrationsServiceProvider;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
 use Railroad\Usora\Services\ConfigService;
+use Redis;
 
 class UsoraServiceProvider extends ServiceProvider
 {
@@ -80,10 +85,56 @@ class UsoraServiceProvider extends ServiceProvider
      * Register the application services.
      *
      * @return void
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function register()
     {
         $this->app->register(AuthenticationServiceProvider::class);
         $this->app->register(WpPasswordProvider::class);
+
+        // setup doctrine
+        $redis = new Redis();
+        $redis->connect(config('usora.redis_host'), config('usora.redis_port'));
+
+        $cache = new RedisCache();
+        $cache->setRedis($redis);
+
+        $proxyDir = sys_get_temp_dir();
+
+        $config = new Configuration();
+        $config->setMetadataCacheImpl($cache);
+        $config->setQueryCacheImpl($cache);
+        $config->setResultCacheImpl($cache);
+        $config->setProxyDir($proxyDir);
+        $config->setProxyNamespace('DoctrineProxies');
+        $config->setAutoGenerateProxyClasses(config('usora.development_mode'));
+
+        $driverImpl = $config->newDefaultAnnotationDriver(__DIR__ . '/../Entities');
+        $config->setMetadataDriverImpl($driverImpl);
+
+        if (config('usora.database_in_memory') === true) {
+            $databaseOptions = [
+                'driver' => config('usora.database_driver'),
+                'dbname' => config('usora.database_name'),
+                'user' => config('usora.database_user'),
+                'password' => config('usora.database_password'),
+                'host' => config('usora.database_host'),
+            ];
+        } else {
+            $databaseOptions = [
+                'driver' => config('usora.database_driver'),
+                'user' => config('usora.database_user'),
+                'password' => config('usora.database_password'),
+                'memory' => true,
+            ];
+        }
+
+        $entityManager = EntityManager::create(
+            $databaseOptions,
+            $config
+        );
+
+        app()->instance(EntityManager::class, $entityManager);
     }
 }

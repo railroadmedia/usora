@@ -2,127 +2,164 @@
 
 namespace Railroad\Usora\Entities;
 
-use ArrayAccess;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\CanResetPassword;
-use Illuminate\Notifications\AnonymousNotifiable;
-use Railroad\Resora\Entities\Entity;
-use Railroad\Usora\Services\ConfigService;
-use Railroad\Permissions\Services\ConfigService as PermissionConfigService;
+use DateTime;
+use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 
-class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassword
+/**
+ * @Entity @Table(name="users")
+ * @ORM\HasLifecycleCallbacks
+ */
+class User
 {
-    public function dot()
+    use Timestamps;
+
+    /**
+     * @Id @GeneratedValue @Column(type="integer")
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @Column(type="string")
+     * @var string
+     */
+    protected $email;
+
+    /**
+     * @Column(type="string")
+     * @var string
+     */
+    protected $password;
+
+    /**
+     * @Column(type="string",nullable=true)
+     * @var string
+     */
+    protected $rememberToken;
+
+    /**
+     * @Column(type="string",nullable=true)
+     * @var string
+     */
+    protected $sessionSalt;
+
+    /**
+     * @Column(type="string")
+     * @var string
+     */
+    protected $displayName;
+
+    /**
+     * User constructor.
+     *
+     * @throws \Exception
+     */
+    public function __construct()
     {
-        $original = $this->getArrayCopy();
-        $dotArray = [];
+        $this->setCreatedAt(new DateTime());
 
-        // fields
-        foreach ($this['fields'] ?? [] as $field) {
-            $dotArray['fields.' . $field['key']] = $field['value'];
+        if ($this->getUpdatedAt() == null) {
+            $this->setUpdatedAt(new DateTime());
         }
+    }
 
-        unset($original['fields']);
-
-        if (empty($dotArray['fields.profile_picture_image_url'])) {
-            $dotArray['fields.profile_picture_image_url'] =
-                'https://dmmior4id2ysr.cloudfront.net/assets/images/avatar.jpg';
-        }
-
-        return array_merge(array_dot($original), $dotArray);
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     * @throws \Exception
+     */
+    public function updateModifiedDatetime()
+    {
+        $this->setUpdatedAt(new DateTime());
     }
 
     /**
      * @return string
      */
-    public function getAuthIdentifierName()
+    public function getEmail()
+    : string
     {
-        return 'id';
+        return $this->email;
     }
 
     /**
-     * @return mixed|null
+     * @param string $email
      */
-    public function getAuthIdentifier()
-    {
-        return $this[$this->getAuthIdentifierName()];
+    public function setEmail(string $email)
+    : void {
+        $this->email = $email;
     }
 
     /**
-     * @return mixed|null|string
+     * @return string
      */
-    public function getAuthPassword()
+    public function getPassword()
+    : string
     {
-        return $this['password'];
+        return $this->password;
     }
 
     /**
-     * @return mixed|null|string
+     * @param string $password
+     */
+    public function setPassword(string $password)
+    : void {
+        $this->password = $password;
+    }
+
+    /**
+     * @return string
      */
     public function getRememberToken()
+    : string
     {
-        return $this[$this->getRememberTokenName()];
+        return $this->rememberToken;
     }
 
     /**
-     * @param string $value
+     * @param string $rememberToken
      */
-    public function setRememberToken($value)
-    {
-        $this['remember_token'] = $value;
+    public function setRememberToken(string $rememberToken)
+    : void {
+        $this->rememberToken = $rememberToken;
     }
 
     /**
      * @return string
      */
-    public function getRememberTokenName()
+    public function getSessionSalt()
+    : string
     {
-        return 'remember_token';
-    }
-
-    public function getEmailForPasswordReset()
-    {
-        return $this['email'];
+        return $this->sessionSalt;
     }
 
     /**
-     * @param string $token
+     * @param string $sessionSalt
      */
-    public function sendPasswordResetNotification($token)
-    {
-        (new AnonymousNotifiable)
-            ->route(ConfigService::$passwordResetNotificationChannel, $this->getEmailForPasswordReset())
-            ->notify(new ConfigService::$passwordResetNotificationClass($token));
+    public function setSessionSalt(string $sessionSalt)
+    : void {
+        $this->sessionSalt = $sessionSalt;
     }
 
-    public function is($role)
+    /**
+     * @return string
+     */
+    public function getDisplayName()
+    : string
     {
-        foreach ($this['permissions']['roles'] as $userRole) {
-            if ($userRole == $role) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->displayName;
     }
 
-    public function can($ability)
+    /**
+     * @param string $displayName
+     */
+    public function setDisplayName(string $displayName)
+    : void {
+        $this->displayName = $displayName;
+    }
+
+    public function getId()
     {
-        foreach ($this['permissions']['roles'] as $userRole) {
-            foreach(PermissionConfigService::$roleAbilities[$userRole] ?? [] as $roleAbility)
-            {
-                if ($roleAbility == $ability) {
-                    return true;
-                }
-            }
-        }
-
-        foreach ($this['permissions']['abilities'] as $userAbility) {
-            if ($userAbility == $ability) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->id;
     }
 }

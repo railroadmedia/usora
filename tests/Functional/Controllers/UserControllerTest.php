@@ -2,6 +2,13 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
 
@@ -12,36 +19,39 @@ class UserControllerTest extends UsoraTestCase
         parent::setUp();
     }
 
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
     public function test_users_store_with_permission()
     {
-        $userData = [
-            'display_name' => $this->faker->words(4, true),
-            'email' => $this->faker->email,
-            'password' => 'my-password',
-        ];
+        /**
+         * @var $entityManager EntityManager
+         */
+        $entityManager = app(EntityManager::class);
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        // Run the schema update tool using our entity metadata
+        $entityManager->getMetadataFactory()->getCacheDriver()->deleteAll();
+        $metadata =
+            $entityManager->getMetadataFactory()
+                ->getAllMetadata();
 
-        $response = $this->call(
-            'PUT',
-            '/user/store',
-            $userData
-        );
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->dropDatabase();
+        $schemaTool->updateSchema($metadata);
 
-        // assert the users data was saved in the db
-        $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
-            [
-                'display_name' => $userData['display_name'],
-                'email' => $userData['email'],
-            ]
-        );
+        $loader = new Loader();
+        $loader->addFixture(app(UserFixtureLoader::class));
 
-        // assert the users password was encrypted and saved, and that they can login
-        $this->assertTrue(auth()->attempt(['email' => $userData['email'], 'password' => $userData['password']]));
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($entityManager, $purger);
+        $executor->execute($loader->getFixtures());
 
-        // assert the session has the success message
-        $response->assertSessionHas('success', true);
+        $user2 = $entityManager->find(User::class, 1);
+
+        dd($user2);
+
+        $this->assertTrue(true);
     }
 
     public function test_users_store_without_permission()
@@ -72,7 +82,7 @@ class UserControllerTest extends UsoraTestCase
 
         $credentials = [
             'email' => $userData['email'],
-            'password' => $userData['password']
+            'password' => $userData['password'],
         ];
 
         // assert the users data can not be used to login
@@ -96,7 +106,8 @@ class UserControllerTest extends UsoraTestCase
     {
         $userId = $this->createNewUser();
 
-        $this->authManager->guard()->onceUsingId($userId);
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $newDisplayName = $this->faker->words(4, true);
         $newEmail = $this->faker->email;
@@ -106,7 +117,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userId,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -124,7 +135,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userId,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -133,7 +144,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userId,
-                'email' => $newEmail
+                'email' => $newEmail,
             ]
         );
     }
@@ -144,9 +155,11 @@ class UserControllerTest extends UsoraTestCase
 
         $userIdLoggedIn = $this->createNewUser();
 
-        $this->authManager->guard()->onceUsingId($userIdLoggedIn);
+        $this->authManager->guard()
+            ->onceUsingId($userIdLoggedIn);
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $newDisplayName = $this->faker->words(4, true);
         $newEmail = $this->faker->email;
@@ -156,7 +169,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -174,7 +187,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -183,7 +196,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'email' => $newEmail
+                'email' => $newEmail,
             ]
         );
     }
@@ -194,7 +207,8 @@ class UserControllerTest extends UsoraTestCase
 
         $userIdLoggedIn = $this->createNewUser();
 
-        $this->authManager->guard()->onceUsingId($userIdLoggedIn);
+        $this->authManager->guard()
+            ->onceUsingId($userIdLoggedIn);
 
         $newDisplayName = $this->faker->words(4, true);
 
@@ -214,7 +228,7 @@ class UserControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
     }
@@ -234,7 +248,8 @@ class UserControllerTest extends UsoraTestCase
     {
         $userId = $this->createNewUser();
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $this->call(
             'DELETE',
@@ -245,7 +260,7 @@ class UserControllerTest extends UsoraTestCase
         $this->assertDatabaseMissing(
             ConfigService::$tableUsers,
             [
-                'id' => $userId
+                'id' => $userId,
             ]
         );
     }
@@ -266,7 +281,7 @@ class UserControllerTest extends UsoraTestCase
         $this->assertDatabaseHas(
             ConfigService::$tableUsers,
             [
-                'id' => $userId
+                'id' => $userId,
             ]
         );
     }
