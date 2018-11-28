@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\DataFixtures;
 
+use Carbon\Carbon;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Faker\Generator;
@@ -32,5 +33,11 @@ class UserFixtureLoader implements FixtureInterface
 
         $manager->persist($user);
         $manager->flush();
+
+        $manager->clear();
+
+        $user2 = $manager->find(User::class, 1);
+
+        dd($user2);
     }
 }

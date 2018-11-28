@@ -4,9 +4,11 @@ namespace Railroad\Usora\Entities;
 
 use DateTime;
 use LaravelDoctrine\Extensions\Timestamps\Timestamps;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Entity @Table(name="users")
+ * @ORM\Entity ORM\@Table(name="users")
  * @ORM\HasLifecycleCallbacks
  */
 class User
@@ -14,64 +16,40 @@ class User
     use Timestamps;
 
     /**
-     * @Id @GeneratedValue @Column(type="integer")
+     * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
      * @var int
      */
     protected $id;
 
     /**
-     * @Column(type="string")
+     * @ORM\Column(type="string")
      * @var string
      */
     protected $email;
 
     /**
-     * @Column(type="string")
+     * @ORM\Column(type="string")
      * @var string
      */
     protected $password;
 
     /**
-     * @Column(type="string",nullable=true)
+     * @ORM\Column(type="string",nullable=true)
      * @var string
      */
     protected $rememberToken;
 
     /**
-     * @Column(type="string",nullable=true)
+     * @ORM\Column(type="string",nullable=true)
      * @var string
      */
     protected $sessionSalt;
 
     /**
-     * @Column(type="string")
+     * @ORM\Column(type="string")
      * @var string
      */
     protected $displayName;
-
-    /**
-     * User constructor.
-     *
-     * @throws \Exception
-     */
-    public function __construct()
-    {
-        $this->setCreatedAt(new DateTime());
-
-        if ($this->getUpdatedAt() == null) {
-            $this->setUpdatedAt(new DateTime());
-        }
-    }
-
-    /**
-     * @ORM\PrePersist()
-     * @ORM\PreUpdate()
-     * @throws \Exception
-     */
-    public function updateModifiedDatetime()
-    {
-        $this->setUpdatedAt(new DateTime());
-    }
 
     /**
      * @return string
