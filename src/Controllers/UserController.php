@@ -3,14 +3,16 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
+use Railroad\Usora\Entities\User;
+use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
 use Railroad\Usora\Requests\UserUpdateRequest;
-use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -20,6 +22,11 @@ class UserController extends Controller
      * @var UserRepository
      */
     private $userRepository;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
 
     /**
      * @var PermissionService
@@ -34,12 +41,13 @@ class UserController extends Controller
     /**
      * UserController constructor.
      *
-     * @param UserRepository $userRepository
+     * @param EntityManager $entityManager
+     * @param PermissionService $permissionService
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository, PermissionService $permissionService, Hasher $hasher)
+    public function __construct(EntityManager $entityManager, PermissionService $permissionService, Hasher $hasher)
     {
-        $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
         $this->hasher = $hasher;
 
@@ -49,6 +57,7 @@ class UserController extends Controller
     /**
      * @param UserCreateRequest $request
      * @return RedirectResponse
+     * @throws \Doctrine\ORM\ORMException
      */
     public function store(UserCreateRequest $request)
     {
@@ -56,27 +65,23 @@ class UserController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user = $this->userRepository->create(
-            array_merge(
-                $request->only(
-                    [
-                        'email',
-                        'display_name',
-                    ]
-                ),
-                [
-                    'password' => $this->hasher->make($request->get('password')),
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
-                ]
-            )
-        );
+        $user = new User();
+        $user->setEmail($request->get('email'));
+        $user->setDisplayName($request->get('display_name'));
+        $user->setPassword($this->hasher->make($request->get('password')));
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+            redirect()
+                ->away($request->get('redirect'))
+                ->with($message) :
+            redirect()
+                ->back()
+                ->with($message);
     }
 
     /**
@@ -86,10 +91,7 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, $id)
     {
-        if (
-            !$this->permissionService->can(auth()->id(), 'update-users')
-            && auth()->id() != $id
-        ) {
+        if (!$this->permissionService->can(auth()->id(), 'update-users') && auth()->id() != $id) {
             throw new NotFoundHttpException();
         }
 
@@ -102,7 +104,8 @@ class UserController extends Controller
                     ]
                 ),
                 [
-                    'updated_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()
+                        ->toDateTimeString(),
                 ]
             )
         );
@@ -110,8 +113,12 @@ class UserController extends Controller
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+            redirect()
+                ->away($request->get('redirect'))
+                ->with($message) :
+            redirect()
+                ->back()
+                ->with($message);
     }
 
     /**
@@ -130,7 +137,11 @@ class UserController extends Controller
         $message = ['success' => true];
 
         return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+            redirect()
+                ->away($request->get('redirect'))
+                ->with($message) :
+            redirect()
+                ->back()
+                ->with($message);
     }
 }

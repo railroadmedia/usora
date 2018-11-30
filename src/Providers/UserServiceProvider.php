@@ -2,19 +2,19 @@
 
 namespace Railroad\Usora\Providers;
 
+use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
 use Railroad\Usora\Entities\User;
-use Railroad\Usora\Repositories\UserRepository;
 
 class UserServiceProvider implements UserProvider
 {
     /**
-     * @var UserRepository
+     * @var EntityManager
      */
-    private $userRepository;
+    private $entityManager;
 
     /**
      * @var Hasher
@@ -24,12 +24,12 @@ class UserServiceProvider implements UserProvider
     /**
      * UserServiceProvider constructor.
      *
-     * @param UserRepository $userRepository
+     * @param EntityManager $entityManager
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository, Hasher $hasher)
+    public function __construct(EntityManager $entityManager, Hasher $hasher)
     {
-        $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
         $this->hasher = $hasher;
     }
 
@@ -39,7 +39,7 @@ class UserServiceProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return $this->userRepository->read($identifier);
+        return $this->entityManager->getRepository(User::class)->find($identifier);
     }
 
     /**
@@ -92,9 +92,7 @@ class UserServiceProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (empty($credentials) ||
-            (count($credentials) === 1 &&
-                array_key_exists('password', $credentials))) {
+        if (empty($credentials) || (count($credentials) === 1 && array_key_exists('password', $credentials))) {
             return null;
         }
 
@@ -106,7 +104,9 @@ class UserServiceProvider implements UserProvider
             }
         }
 
-        return $this->userRepository->query()->where($getByAttributes)->first();
+        return $this->userRepository->query()
+            ->where($getByAttributes)
+            ->first();
     }
 
     public function validateCredentials(Authenticatable $user, array $credentials)

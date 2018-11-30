@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository"
  * @ORM\HasLifecycleCallbacks
- * @ORM\Table(name="users", indexes={
+ * @ORM\Table(name="usora_users", indexes={
  *     @ORM\Index(name="email_index", columns={"email"}),
  *     @ORM\Index(name="display_name_index", columns={"display_name"}),
  *     @ORM\Index(name="created_at_index", columns={"created_at"}),

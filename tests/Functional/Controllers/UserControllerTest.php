@@ -3,12 +3,9 @@
 namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
+use Illuminate\Support\Facades\DB;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Entities\User;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
 
@@ -17,6 +14,10 @@ class UserControllerTest extends UsoraTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class)]);
     }
 
     /**
@@ -25,33 +26,35 @@ class UserControllerTest extends UsoraTestCase
      */
     public function test_users_store_with_permission()
     {
-        /**
-         * @var $entityManager EntityManager
-         */
-        $entityManager = app(EntityManager::class);
+        $userData = [
+            'display_name' => $this->faker->words(4, true),
+            'email' => $this->faker->email,
+            'password' => 'my-password',
+        ];
 
-        // Run the schema update tool using our entity metadata
-        $entityManager->getMetadataFactory()->getCacheDriver()->deleteAll();
-        $metadata =
-            $entityManager->getMetadataFactory()
-                ->getAllMetadata();
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->dropDatabase();
-        $schemaTool->updateSchema($metadata);
+        $response = $this->call(
+            'PUT',
+            '/user/store',
+            $userData
+        );
 
-        $loader = new Loader();
-        $loader->addFixture(app(UserFixtureLoader::class));
+        // assert the users data was saved in the db
+        $this->assertDatabaseHas(
+            ConfigService::$tableUsers,
+            [
+                'display_name' => $userData['display_name'],
+                'email' => $userData['email'],
+            ]
+        );
 
-        $purger = new ORMPurger();
-        $executor = new ORMExecutor($entityManager, $purger);
-        $executor->execute($loader->getFixtures());
+        // assert the users password was encrypted and saved, and that they can login
+        $this->assertTrue(auth()->attempt(['email' => $userData['email'], 'password' => $userData['password']]));
 
-        $user2 = $entityManager->find(User::class, 1);
-
-        dd($user2);
-
-        $this->assertTrue(true);
+        // assert the session has the success message
+        $response->assertSessionHas('success', true);
     }
 
     public function test_users_store_without_permission()

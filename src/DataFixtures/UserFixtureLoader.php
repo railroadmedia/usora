@@ -35,9 +35,5 @@ class UserFixtureLoader implements FixtureInterface
         $manager->flush();
 
         $manager->clear();
-
-        $user2 = $manager->find(User::class, 1);
-
-        dd($user2);
     }
 }

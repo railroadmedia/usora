@@ -3,6 +3,8 @@
 namespace Railroad\Usora\Tests;
 
 use Carbon\Carbon;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Application;
@@ -13,9 +15,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Orchestra\Testbench\TestCase;
-use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
-use Railroad\Permissions\Providers\PermissionsServiceProvider;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
@@ -70,6 +70,11 @@ class UsoraTestCase extends TestCase
      */
     protected $permissionServiceMock;
 
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
     protected function setUp()
     {
         parent::setUp();
@@ -84,6 +89,27 @@ class UsoraTestCase extends TestCase
         $this->mailFake = Mail::getFacadeRoot();
 
         Carbon::setTestNow(Carbon::now());
+
+        $this->permissionServiceMock = $this->getMockBuilder(PermissionService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->app->instance(PermissionService::class, $this->permissionServiceMock);
+
+        // Run the schema update tool using our entity metadata
+        $this->entityManager = app(EntityManager::class);
+
+        $this->entityManager->getMetadataFactory()
+            ->getCacheDriver()
+            ->deleteAll();
+
+        $metadata =
+            $this->entityManager->getMetadataFactory()
+                ->getAllMetadata();
+
+        $schemaTool = new SchemaTool($this->entityManager);
+        $schemaTool->dropDatabase();
+        $schemaTool->updateSchema($metadata);
     }
 
     /**
@@ -104,12 +130,25 @@ class UsoraTestCase extends TestCase
         config()->set('usora.data_mode', 'host');
         config()->set('usora.authentication_controller_middleware', []);
 
+        // db
+        config()->set('usora.data_mode', 'host');
+        config()->set('usora.database_connection_name', config('usora.connection_mask_prefix') . 'sqlite');
+        config()->set('usora.authentication_controller_middleware', []);
+        config()->set('database.default', config('usora.connection_mask_prefix') . 'sqlite');
+        config()->set(
+            'database.connections.' . config('usora.connection_mask_prefix') . 'sqlite',
+            [
+                'driver' => 'sqlite',
+                'database' => ':memory:',
+                'prefix' => '',
+            ]
+        );
+
         // database
         config()->set('usora.database_user', 'root');
         config()->set('usora.database_password', 'root');
         config()->set('usora.database_driver', 'pdo_sqlite');
         config()->set('usora.database_in_memory', true);
-
 
         // set auth to our custom provider
         config()->set('auth.providers.usora.driver', 'usora');
@@ -152,8 +191,9 @@ class UsoraTestCase extends TestCase
             'updated_at' => time(),
         ];
 
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId($user);
+        $userId =
+            $this->databaseManager->table(ConfigService::$tableUsers)
+                ->insertGetId($user);
 
         return $userId;
     }

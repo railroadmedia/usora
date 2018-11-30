@@ -9,6 +9,7 @@ use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\Migrations\MigrationsServiceProvider;
 use MikeMcLin\WpPassword\WpPasswordProvider;
@@ -177,6 +178,10 @@ class UsoraServiceProvider extends ServiceProvider
             $ormConfiguration,
             $eventManager
         );
+
+        // make sure laravel is using the same connection
+        DB::connection()->setPdo($entityManager->getConnection()->getWrappedConnection());
+        DB::connection()->setReadPdo($entityManager->getConnection()->getWrappedConnection());
 
         // register the entity manager as a singleton
         app()->instance(EntityManager::class, $entityManager);
