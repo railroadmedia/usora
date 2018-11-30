@@ -9,6 +9,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
@@ -79,6 +80,17 @@ class UsoraTestCase extends TestCase
     {
         parent::setUp();
 
+        // Run the schema update tool using our entity metadata
+        $this->entityManager = app(EntityManager::class);
+
+        $this->entityManager->getMetadataFactory()
+            ->getCacheDriver()
+            ->deleteAll();
+
+        // make sure laravel is using the same connection
+        DB::connection()->setPdo($this->entityManager->getConnection()->getWrappedConnection());
+        DB::connection()->setReadPdo($this->entityManager->getConnection()->getWrappedConnection());
+
         $this->artisan('migrate:fresh', []);
         $this->artisan('cache:clear', []);
 
@@ -98,13 +110,6 @@ class UsoraTestCase extends TestCase
             ->getMock();
 
         $this->app->instance(PermissionService::class, $this->permissionServiceMock);
-
-        // Run the schema update tool using our entity metadata
-        $this->entityManager = app(EntityManager::class);
-
-        $this->entityManager->getMetadataFactory()
-            ->getCacheDriver()
-            ->deleteAll();
     }
 
     /**

@@ -179,10 +179,6 @@ class UsoraServiceProvider extends ServiceProvider
             $eventManager
         );
 
-        // make sure laravel is using the same connection
-        DB::connection()->setPdo($entityManager->getConnection()->getWrappedConnection());
-        DB::connection()->setReadPdo($entityManager->getConnection()->getWrappedConnection());
-
         // register the entity manager as a singleton
         app()->instance(EntityManager::class, $entityManager);
     }
