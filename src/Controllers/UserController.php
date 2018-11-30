@@ -21,6 +21,8 @@ class UserController extends Controller
      */
     private $entityManager;
 
+    private $userRepository;
+
     /**
      * @var PermissionService
      */

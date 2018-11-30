@@ -7,7 +7,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 
 /**
- * @ORM\Entity(repositoryClass="Doctrine\ORM\EntityRepository")
+ * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserRepository")
  * @ORM\HasLifecycleCallbacks
  * @ORM\Table(name="usora_users")
  */

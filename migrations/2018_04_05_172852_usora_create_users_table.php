@@ -19,7 +19,7 @@ class UsoraCreateUsersTable extends Migration
             function(Blueprint $table) {
                 $table->increments('id');
                 
-                $table->string('email')->index();
+                $table->string('email')->unique();
                 $table->string('password');
                 $table->string('remember_token')->nullable();
                 $table->string('session_salt')->nullable();

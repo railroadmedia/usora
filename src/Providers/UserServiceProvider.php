@@ -128,7 +128,7 @@ class UserServiceProvider implements UserProvider
         }
 
         return $this->entityManager->getRepository(User::class)
-                ->findBy($getByAttributes)[0] ?? null;
+            ->findOneBy($getByAttributes);
     }
 
     /**

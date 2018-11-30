@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\JsonResponse;
@@ -22,9 +23,10 @@ class AuthenticationController extends Controller
     use ThrottlesLogins;
 
     /**
-     * @var UserRepository
+     * @var EntityManager
      */
-    private $userRepository;
+    private $entityManager;
+
     /**
      * @var Hasher
      */
@@ -36,13 +38,13 @@ class AuthenticationController extends Controller
     /**
      * CookieController constructor.
      *
-     * @param UserRepository $userRepository
+     * @param EntityManager $entityManager
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository, Hasher $hasher)
+    public function __construct(EntityManager $entityManager, Hasher $hasher)
     {
-        $this->userRepository = $userRepository;
         $this->hasher = $hasher;
+        $this->entityManager = $entityManager;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
