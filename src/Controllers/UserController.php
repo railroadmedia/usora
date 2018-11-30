@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
-use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
 use Railroad\Usora\Requests\UserUpdateRequest;
 use Railroad\Usora\Services\ConfigService;
@@ -17,11 +16,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller
 {
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
     /**
      * @var EntityManager
      */
