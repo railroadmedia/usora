@@ -3,8 +3,8 @@
 namespace Railroad\Usora\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
-use LaravelDoctrine\Extensions\Timestamps\Timestamps;
 
 /**
  * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserRepository")
@@ -13,7 +13,7 @@ use LaravelDoctrine\Extensions\Timestamps\Timestamps;
  */
 class User implements Authenticatable
 {
-    use Timestamps;
+    use TimestampableEntity;
 
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")

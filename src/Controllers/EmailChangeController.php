@@ -3,6 +3,7 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Routing\Controller;
@@ -17,6 +18,11 @@ use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeController extends Controller
 {
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
     /**
      * @var EmailChangeRepository
      */
@@ -53,12 +59,14 @@ class EmailChangeController extends Controller
         $payload = [
             'email' => $request->get('email'),
             'token' => $this->createNewToken($request->get('email')),
-            'created_at' => Carbon::now()->toDateTimeString(),
+            'created_at' => Carbon::now()
+                ->toDateTimeString(),
         ];
 
-        $updateCount = $this->emailChangeRepository->query()
-            ->where('user_id', auth()->id())
-            ->update($payload);
+        $updateCount =
+            $this->emailChangeRepository->query()
+                ->where('user_id', auth()->id())
+                ->update($payload);
 
         if ($updateCount == 0) {
 
@@ -71,16 +79,19 @@ class EmailChangeController extends Controller
 
         $this->sendEmailChangeNotification($payload['token'], $payload['email']);
 
-        $message =
-            [
-                'successes' => new MessageBag(
-                    ['password' => 'An email confirmation link has been sent to your new email address.']
-                ),
-            ];
+        $message = [
+            'successes' => new MessageBag(
+                ['password' => 'An email confirmation link has been sent to your new email address.']
+            ),
+        ];
 
         return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+            redirect()
+                ->away($request->get('redirect'))
+                ->with($message) :
+            redirect()
+                ->back()
+                ->with($message);
     }
 
     /**
@@ -91,33 +102,39 @@ class EmailChangeController extends Controller
      */
     public function confirm(EmailChangeConfirmationRequest $request)
     {
-        $emailChangeData = $this->emailChangeRepository->query()
-            ->where('token', $request->get('token'))
-            ->first();
+        $emailChangeData =
+            $this->emailChangeRepository->query()
+                ->where('token', $request->get('token'))
+                ->first();
 
-
-        if (Carbon::parse($emailChangeData['created_at']) < Carbon::now()->subHours(ConfigService::$emailChangeTtl)) {
-            return redirect()->back()->withErrors(['token' => 'Your email reset token has expired.']);
+        if (Carbon::parse($emailChangeData['created_at']) <
+            Carbon::now()
+                ->subHours(ConfigService::$emailChangeTtl)) {
+            return redirect()
+                ->back()
+                ->withErrors(['token' => 'Your email reset token has expired.']);
         }
 
-        $this->userRepository
-            ->update(
+        $this->userRepository->update(
                 $emailChangeData->user_id,
                 ['email' => $emailChangeData->email]
             );
 
         $this->emailChangeRepository->destroy($emailChangeData->id);
 
-        $message =
-            [
-                'successes' => new MessageBag(
-                    ['password' => 'Your email has been updated successfully.']
-                ),
-            ];
+        $message = [
+            'successes' => new MessageBag(
+                ['password' => 'Your email has been updated successfully.']
+            ),
+        ];
 
         return $request->has('redirect') ?
-            redirect()->away($request->get('redirect'))->with($message) :
-            redirect()->back()->with($message);
+            redirect()
+                ->away($request->get('redirect'))
+                ->with($message) :
+            redirect()
+                ->back()
+                ->with($message);
     }
 
     /**
@@ -134,8 +151,7 @@ class EmailChangeController extends Controller
 
     public function sendEmailChangeNotification($token, $email)
     {
-        (new AnonymousNotifiable)
-            ->route(ConfigService::$emailChangeNotificationChannel, $email)
+        (new AnonymousNotifiable)->route(ConfigService::$emailChangeNotificationChannel, $email)
             ->notify(new ConfigService::$emailChangeNotificationClass($token));
     }
 }
