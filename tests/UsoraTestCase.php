@@ -166,30 +166,4 @@ class UsoraTestCase extends TestCase
 
         $app->register(WpPasswordProvider::class);
     }
-
-    /**
-     * Create and store a new user
-     *
-     * @return int
-     */
-    public function createNewUser()
-    {
-        $rawPassword = $this->faker->word;
-
-        $user = [
-            'email' => $this->faker->email,
-            'password' => $this->hasher->make($rawPassword),
-            'remember_token' => str_random(60),
-            'session_salt' => str_random(60),
-            'display_name' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userId =
-            $this->databaseManager->table(ConfigService::$tableUsers)
-                ->insertGetId($user);
-
-        return $userId;
-    }
 }

@@ -106,7 +106,7 @@ class UserControllerTest extends UsoraTestCase
 
     public function test_user_update_with_owner()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
 
         $this->authManager->guard()
             ->onceUsingId($userId);
@@ -153,9 +153,8 @@ class UserControllerTest extends UsoraTestCase
 
     public function test_user_update_with_permission()
     {
-        $userIdToUpdate = $this->createNewUser();
-
-        $userIdLoggedIn = $this->createNewUser();
+        $userIdToUpdate = 1;
+        $userIdLoggedIn = 2;
 
         $this->authManager->guard()
             ->onceUsingId($userIdLoggedIn);
@@ -205,9 +204,8 @@ class UserControllerTest extends UsoraTestCase
 
     public function test_user_update_without_permission()
     {
-        $userIdToUpdate = $this->createNewUser();
-
-        $userIdLoggedIn = $this->createNewUser();
+        $userIdToUpdate = 1;
+        $userIdLoggedIn = 2;
 
         $this->authManager->guard()
             ->onceUsingId($userIdLoggedIn);
@@ -248,7 +246,7 @@ class UserControllerTest extends UsoraTestCase
 
     public function test_user_delete_with_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
 
         $this->permissionServiceMock->method('can')
             ->willReturn(true);
@@ -269,7 +267,7 @@ class UserControllerTest extends UsoraTestCase
 
     public function test_user_delete_without_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
 
         $response = $this->call(
             'DELETE',

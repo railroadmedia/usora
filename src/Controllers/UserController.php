@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
@@ -88,6 +87,7 @@ class UserController extends Controller
      * @param UserUpdateRequest $request
      * @param integer $id
      * @return RedirectResponse
+     * @throws \Doctrine\ORM\ORMException
      */
     public function update(UserUpdateRequest $request, $id)
     {
@@ -95,20 +95,16 @@ class UserController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user = $this->userRepository->update(
-            $id,
-            array_merge(
-                $request->only(
-                    [
-                        'display_name',
-                    ]
-                ),
-                [
-                    'updated_at' => Carbon::now()
-                        ->toDateTimeString(),
-                ]
-            )
-        );
+        $user =
+            $this->entityManager->getRepository(User::class)
+                ->find($id);
+
+        if (!is_null($user)) {
+            $user->setDisplayName($request->get('display_name'));
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
 
         $message = ['success' => true];
 
@@ -125,6 +121,7 @@ class UserController extends Controller
      * @param Request $request
      * @param integer $id
      * @return RedirectResponse
+     * @throws \Doctrine\ORM\ORMException
      */
     public function delete(Request $request, $id)
     {
@@ -132,7 +129,14 @@ class UserController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $this->userRepository->destroy($id);
+        $user =
+            $this->entityManager->getRepository(User::class)
+                ->find($id);
+
+        if (!is_null($user)) {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+        }
 
         $message = ['success' => true];
 

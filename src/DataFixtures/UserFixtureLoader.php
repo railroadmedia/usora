@@ -26,14 +26,20 @@ class UserFixtureLoader implements FixtureInterface
 
     public function load(ObjectManager $manager)
     {
-        $user = new User();
-        $user->setEmail('test+1@test.com');
-        $user->setDisplayName('testuser1');
-        $user->setPassword(Hash::make('Password1#'));
+        $count = 2;
 
-        $manager->persist($user);
+        while ($count > 0) {
+            $user = new User();
+            $user->setEmail('test+' . $count . '@test.com');
+            $user->setDisplayName('testuser' . $count);
+            $user->setPassword(Hash::make('Password' . $count . '#'));
+
+            $manager->persist($user);
+
+            $count--;
+        }
+
         $manager->flush();
-
         $manager->clear();
     }
 }
