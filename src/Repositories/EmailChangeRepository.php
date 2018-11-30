@@ -2,22 +2,22 @@
 
 namespace Railroad\Usora\Repositories;
 
-use Railroad\Resora\Queries\CachedQuery;
-use Railroad\Resora\Repositories\RepositoryBase;
-use Railroad\Usora\Services\ConfigService;
+use Doctrine\ORM\EntityRepository;
+use Railroad\Usora\Entities\User;
 
-class EmailChangeRepository extends RepositoryBase
+/**
+ * Class EmailChangeRepository
+ *
+ * @package Railroad\Usora\Repositories
+ */
+class EmailChangeRepository extends EntityRepository
 {
-    /**
-     * @return CachedQuery|$this
-     */
-    protected function newQuery()
+    public function updateOrCreateForUser($userId, $newEmail, $newToken)
     {
-        return (new CachedQuery($this->connection()))->from(ConfigService::$tableEmailChanges);
-    }
+        $existing = $this->getEntityManager()->getRepository(User::class)->findOneBy(['user_id' => $userId]);
 
-    protected function connection()
-    {
-        return app('db')->connection(ConfigService::$databaseConnectionName);
+        if (!is_null($existing)) {
+//            $existing->setEmail()
+        }
     }
 }

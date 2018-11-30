@@ -9,6 +9,8 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use Railroad\Usora\Entities\EmailChange;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
 use Railroad\Usora\Repositories\EmailChangeRepository;
 use Railroad\Usora\Repositories\UserRepository;
@@ -36,15 +38,19 @@ class EmailChangeController extends Controller
     /**
      * ChangeEmailController constructor.
      *
+     * @param EntityManager $entityManager
      * @param EmailChangeRepository $emailChangeRepository
-     * @param UserRepository $userRepository
      */
     public function __construct(
-        EmailChangeRepository $emailChangeRepository,
-        UserRepository $userRepository
+        EntityManager $entityManager,
+        EmailChangeRepository $emailChangeRepository
     ) {
+        $this->entityManager = $entityManager;
         $this->emailChangeRepository = $emailChangeRepository;
-        $this->userRepository = $userRepository;
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
+        $this->emailChangeRepository = $this->entityManager->getRepository(EmailChange::class);
+
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
@@ -116,9 +122,9 @@ class EmailChangeController extends Controller
         }
 
         $this->userRepository->update(
-                $emailChangeData->user_id,
-                ['email' => $emailChangeData->email]
-            );
+            $emailChangeData->user_id,
+            ['email' => $emailChangeData->email]
+        );
 
         $this->emailChangeRepository->destroy($emailChangeData->id);
 
