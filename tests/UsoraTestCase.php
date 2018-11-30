@@ -79,6 +79,9 @@ class UsoraTestCase extends TestCase
     {
         parent::setUp();
 
+        $this->artisan('migrate:fresh', []);
+        $this->artisan('cache:clear', []);
+
         $this->faker = Factory::create();
 
         $this->authManager = $this->app->make(AuthManager::class);
@@ -102,14 +105,6 @@ class UsoraTestCase extends TestCase
         $this->entityManager->getMetadataFactory()
             ->getCacheDriver()
             ->deleteAll();
-
-        $metadata =
-            $this->entityManager->getMetadataFactory()
-                ->getAllMetadata();
-
-        $schemaTool = new SchemaTool($this->entityManager);
-        $schemaTool->dropDatabase();
-        $schemaTool->updateSchema($metadata);
     }
 
     /**

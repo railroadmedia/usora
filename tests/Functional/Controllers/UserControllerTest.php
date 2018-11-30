@@ -4,7 +4,6 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Illuminate\Support\Facades\DB;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;

@@ -39,7 +39,8 @@ class UserServiceProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return $this->entityManager->getRepository(User::class)->find($identifier);
+        return $this->entityManager->getRepository(User::class)
+            ->find($identifier);
     }
 
     /**
@@ -63,27 +64,49 @@ class UserServiceProvider implements UserProvider
     /**
      * @param Authenticatable $user
      * @param string $token
-     * @return int|null
+     * @return bool
+     * @throws \Doctrine\ORM\ORMException
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        return $this->userRepository->update(
-            $user->getAuthIdentifier(),
-            [$user->getRememberTokenName() => $token]
-        );
+        $user =
+            $this->entityManager->getRepository(User::class)
+                ->find($user->getAuthIdentifier());
+
+        if (!is_null($user)) {
+            $user->setRememberToken($token);
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * @param Authenticatable $user
      * @param string $salt
-     * @return int|null
+     * @return bool
+     * @throws \Doctrine\ORM\ORMException
      */
     public function updateSessionSalt(Authenticatable $user, $salt)
     {
-        return $this->userRepository->update(
-            $user->getAuthIdentifier(),
-            ['session_salt' => $salt]
-        );
+        $user =
+            $this->entityManager->getRepository(User::class)
+                ->find($user->getAuthIdentifier());
+
+        if (!is_null($user)) {
+            $user->setSessionSalt($salt);
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -104,11 +127,15 @@ class UserServiceProvider implements UserProvider
             }
         }
 
-        return $this->userRepository->query()
-            ->where($getByAttributes)
-            ->first();
+        return $this->entityManager->getRepository(User::class)
+                ->findBy($getByAttributes)[0] ?? null;
     }
 
+    /**
+     * @param Authenticatable $user
+     * @param array $credentials
+     * @return bool
+     */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
         $plain = $credentials['password'];
