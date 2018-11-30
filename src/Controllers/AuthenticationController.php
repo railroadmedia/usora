@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use MikeMcLin\WpPassword\Facades\WpPassword;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Guards\SaltedSessionGuard;
 use Railroad\Usora\Repositories\UserRepository;
@@ -26,6 +27,11 @@ class AuthenticationController extends Controller
      * @var EntityManager
      */
     private $entityManager;
+
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
 
     /**
      * @var Hasher
@@ -45,6 +51,8 @@ class AuthenticationController extends Controller
     {
         $this->hasher = $hasher;
         $this->entityManager = $entityManager;
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -77,49 +85,46 @@ class AuthenticationController extends Controller
         }
 
         if (auth()->attempt($request->only('email', 'password'), ConfigService::$rememberMe)) {
-            $user = $this->userRepository->read(auth()->id());
+            $user = $this->userRepository->find(auth()->id());
 
             foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
                 ClientRelayService::authorizeUserOnDomain(
-                    $user['id'],
-                    $this->hasher->make($user['id'] . $user['password'] . $user['session_salt']),
+                    $user->getId(),
+                    $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
                     $domain
                 );
             }
-            event(new UserEvent($user->id, 'authenticated'));
 
-            $redirect = $request->has('redirect') ?
-                $request->get('redirect') :
-                ConfigService::$loginSuccessRedirectPath;
+            event(new UserEvent($user->getId(), 'authenticated'));
+
+            $redirect =
+                $request->has('redirect') ? $request->get('redirect') : ConfigService::$loginSuccessRedirectPath;
 
             return redirect()->away($redirect);
         } else {
-            $userByEmail =
-                $this->userRepository->query()
-                    ->where('email', $request->get('email'))
-                    ->orderBy('id', 'desc')
-                    ->first();
-            if($userByEmail) {
-                if (WpPassword::check(trim($request->get('password')), $userByEmail['password'])) {
+            $userByEmail = $this->userRepository->findOneBy(['email' => $request->get('email')]);
+
+            if (!is_null($userByEmail)) {
+                if (WpPassword::check(trim($request->get('password')), $userByEmail->getPassword())) {
 
                     SaltedSessionGuard::$updateSalt = false;
-                    auth()->loginUsingId($userByEmail['id'], ConfigService::$rememberMe);
+                    auth()->loginUsingId($userByEmail->getId(), ConfigService::$rememberMe);
 
                     foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
                         ClientRelayService::authorizeUserOnDomain(
-                            $userByEmail['id'],
+                            $userByEmail->getId(),
                             $this->hasher->make(
-                                $userByEmail['id'] . $userByEmail['password'] . $userByEmail['session_salt']
+                                $userByEmail->getId() . $userByEmail->getPassword() . $userByEmail->getSessionSalt()
                             ),
                             $domain
                         );
                     }
 
-                    event(new UserEvent($userByEmail->id, 'authenticated'));
+                    event(new UserEvent($userByEmail->getId(), 'authenticated'));
 
-                    $redirect = $request->has('redirect') ?
-                        $request->get('redirect') :
-                        ConfigService::$loginSuccessRedirectPath;
+                    $redirect =
+                        $request->has('redirect') ? $request->get('redirect') :
+                            ConfigService::$loginSuccessRedirectPath;
 
                     return redirect()->away($redirect);
                 }
@@ -161,14 +166,14 @@ class AuthenticationController extends Controller
         $verificationToken = $request->get('vt');
         $userId = $request->get('uid');
 
-        $user = $this->userRepository->read($userId);
+        $user = $this->userRepository->find($userId);
 
         if (!empty($user) &&
-            $this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
+            $this->hasher->check($user->getId() . $user->getPassword() . $user->getSessionSalt(), $verificationToken)) {
 
             SaltedSessionGuard::$updateSalt = false;
 
-            auth()->loginUsingId($user['id'], ConfigService::$rememberMe);
+            auth()->loginUsingId($user->getId(), ConfigService::$rememberMe);
         }
 
         return response('');
@@ -222,8 +227,8 @@ class AuthenticationController extends Controller
             'usora::post-message-verification-token',
             [
                 'failed' => false,
-                'token' => $this->hasher->make($user['id'] . $user['password'] . $user['session_salt']),
-                'userId' => $user['id'],
+                'token' => $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
+                'userId' => $user->getId(),
             ]
         );
     }
@@ -238,8 +243,10 @@ class AuthenticationController extends Controller
             $request->all(),
             [
                 'uid' => 'required|integer|exists:' .
-                    ConfigService::$databaseConnectionName . '.' .
-                    ConfigService::$tableUsers . ',id',
+                    ConfigService::$databaseConnectionName .
+                    '.' .
+                    ConfigService::$tableUsers .
+                    ',id',
                 'vt' => 'required|string',
             ]
         );
@@ -251,9 +258,9 @@ class AuthenticationController extends Controller
         $userId = $request->get('uid');
         $verificationToken = $request->get('vt');
 
-        $user = $this->userRepository->read($userId);
+        $user = $this->userRepository->find($userId);
 
-        if ($this->hasher->check($user['id'] . $user['password'] . $user['session_salt'], $verificationToken)) {
+        if ($this->hasher->check($user->getId() . $user->getPassword() . $user->getSessionSalt(), $verificationToken)) {
             SaltedSessionGuard::$updateSalt = false;
 
             auth()->loginUsingId($userId, ConfigService::$rememberMe);
@@ -280,8 +287,7 @@ class AuthenticationController extends Controller
 
         auth()->logout();
 
-        return $request->has('redirect') ?
-            redirect()->away($request->get('redirect')) :
+        return $request->has('redirect') ? redirect()->away($request->get('redirect')) :
             redirect()->to(ConfigService::$loginPagePath);
     }
 

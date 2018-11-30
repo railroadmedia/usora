@@ -2,13 +2,16 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
 use Railroad\Usora\Requests\UserUpdateRequest;
 use Railroad\Usora\Services\ConfigService;
@@ -21,6 +24,9 @@ class UserController extends Controller
      */
     private $entityManager;
 
+    /**
+     * @var UserRepository
+     */
     private $userRepository;
 
     /**
@@ -45,6 +51,8 @@ class UserController extends Controller
         $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
         $this->hasher = $hasher;
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -91,9 +99,7 @@ class UserController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user =
-            $this->entityManager->getRepository(User::class)
-                ->find($id);
+        $user = $this->userRepository->find($id);
 
         if (!is_null($user)) {
             $user->setDisplayName($request->get('display_name'));
@@ -125,9 +131,7 @@ class UserController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user =
-            $this->entityManager->getRepository(User::class)
-                ->find($id);
+        $user = $this->userRepository->find($id);
 
         if (!is_null($user)) {
             $this->entityManager->remove($user);

@@ -27,16 +27,18 @@ class UserFixtureLoader implements FixtureInterface
     public function load(ObjectManager $manager)
     {
         $count = 2;
+        $interval = 1;
 
-        while ($count > 0) {
+        while ($interval <= $count) {
             $user = new User();
-            $user->setEmail('test+' . $count . '@test.com');
-            $user->setDisplayName('testuser' . $count);
-            $user->setPassword(Hash::make('Password' . $count . '#'));
+            $user->setEmail('test+' . $interval . '@test.com');
+            $user->setDisplayName('testuser' . $interval);
+            $user->setPassword(Hash::make('Password' . $interval . '#'));
+            $user->setSessionSalt('salt' . $interval);
 
             $manager->persist($user);
 
-            $count--;
+            $interval++;
         }
 
         $manager->flush();

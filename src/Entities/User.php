@@ -34,16 +34,16 @@ class User implements Authenticatable
     protected $password;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      * @var string
      */
-    protected $rememberToken;
+    protected $rememberToken = '';
 
     /**
      * @ORM\Column(type="string", nullable=true)
      * @var string
      */
-    protected $sessionSalt;
+    protected $sessionSalt = '';
 
     /**
      * @ORM\Column(type="string")
