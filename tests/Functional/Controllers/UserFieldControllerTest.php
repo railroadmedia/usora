@@ -2,19 +2,31 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use Railroad\Usora\DataFixtures\UserFieldFixtureLoader;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+
 
 class UserFieldControllerTest extends UsoraTestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class), app(UserFieldFixtureLoader::class)]);
     }
 
     public function test_users_field_store_with_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
+
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $userFieldData = [
             'user_id' => $userId,
@@ -42,15 +54,16 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_store_with_owner()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
+
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $userFieldData = [
             'user_id' => $userId,
             'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
         ];
-
-        $this->authManager->guard()->onceUsingId($userId);
 
         $response = $this->call(
             'PUT',
@@ -70,10 +83,13 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_store_without_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
+
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $userFieldData = [
-            'user_id' => $userId,
+            'user_id' => $this->faker->randomNumber(),
             'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
         ];
@@ -111,18 +127,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_update_with_permission()
     {
-        $userId = $this->createNewUser();
-
-        $userField = [
-            'user_id' => $userId,
-            'key' => $this->faker->word,
-            'value' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
-            ->insertGetId($userField);
+        $userId = 1;
 
         $userFieldData = [
             'user_id' => $userId,
@@ -134,7 +139,7 @@ class UserFieldControllerTest extends UsoraTestCase
         $this->assertDatabaseMissing(
             ConfigService::$tableUserFields,
             [
-                'id' => $userFieldId,
+                'id' => 1,
                 'key' => $userFieldData['key'],
                 'value' => $userFieldData['value'],
             ]
@@ -144,7 +149,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update/' . $userFieldId,
+            '/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -160,18 +165,10 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_update_with_owner()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
 
-        $userField = [
-            'user_id' => $userId,
-            'key' => $this->faker->word,
-            'value' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
-            ->insertGetId($userField);
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $userFieldData = [
             'user_id' => $userId,
@@ -185,11 +182,9 @@ class UserFieldControllerTest extends UsoraTestCase
             $userFieldData
         );
 
-        $this->authManager->guard()->onceUsingId($userId);
-
         $response = $this->call(
             'PATCH',
-            '/user-field/update/' . $userFieldId,
+            '/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -205,21 +200,12 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_update_without_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 2;
 
-        $userField = [
-            'user_id' => $userId,
-            'key' => $this->faker->word,
-            'value' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
-            ->insertGetId($userField);
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $userFieldData = [
-            'user_id' => $userId,
             'key' => $this->faker->word,
             'value' => $this->faker->words(4, true),
         ];
@@ -232,7 +218,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update/' . $userFieldId,
+            '/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -421,31 +407,18 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_delete_with_permission()
     {
-        $userId = $this->createNewUser();
-
-        $userField = [
-            'user_id' => $userId,
-            'key' => $this->faker->word,
-            'value' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
-            ->insertGetId($userField);
-
         $this->permissionServiceMock->method('can')->willReturn(true);
 
         $response = $this->call(
             'DELETE',
-            '/user-field/delete/' . $userFieldId
+            '/user-field/delete/' . 1
         );
 
         // assert the user was removed from the db
         $this->assertDatabaseMissing(
             ConfigService::$tableUserFields,
             [
-                'id' => $userFieldId,
+                'id' => 1,
             ]
         );
 
@@ -455,22 +428,9 @@ class UserFieldControllerTest extends UsoraTestCase
 
     public function test_users_field_delete_without_permission()
     {
-        $userId = $this->createNewUser();
-
-        $userField = [
-            'user_id' => $userId,
-            'key' => $this->faker->word,
-            'value' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userFieldId = $this->databaseManager->table(ConfigService::$tableUserFields)
-            ->insertGetId($userField);
-
         $response = $this->call(
             'DELETE',
-            '/user-field/delete/' . $userFieldId
+            '/user-field/delete/' . 1
         );
 
         // assert the response code is not found
@@ -480,7 +440,7 @@ class UserFieldControllerTest extends UsoraTestCase
         $this->assertDatabaseHas(
             ConfigService::$tableUserFields,
             [
-                'id' => $userFieldId,
+                'id' => 1,
             ]
         );
     }

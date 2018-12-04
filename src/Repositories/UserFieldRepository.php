@@ -2,23 +2,13 @@
 
 namespace Railroad\Usora\Repositories;
 
+use Doctrine\ORM\EntityRepository;
 use Railroad\Resora\Queries\CachedQuery;
 use Railroad\Resora\Repositories\RepositoryBase;
 use Railroad\Usora\Repositories\Queries\UserFieldQuery;
 use Railroad\Usora\Services\ConfigService;
 
-class UserFieldRepository extends RepositoryBase
+class UserFieldRepository extends EntityRepository
 {
-    /**
-     * @return CachedQuery|$this
-     */
-    protected function newQuery()
-    {
-        return (new UserFieldQuery($this->connection()))->from(ConfigService::$tableUserFields);
-    }
 
-    protected function connection()
-    {
-        return app('db')->connection(ConfigService::$databaseConnectionName);
-    }
 }
