@@ -6,9 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Support\Str;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class ResetPasswordControllerTest extends UsoraTestCase
 {
@@ -22,6 +25,9 @@ class ResetPasswordControllerTest extends UsoraTestCase
         parent::setUp();
 
         $this->passwordBroker = $this->app->make(PasswordBroker::class);
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class)]);
     }
 
     public function test_reset_password_validation_failed()
@@ -45,34 +51,13 @@ class ResetPasswordControllerTest extends UsoraTestCase
         $hashKey = Str::random(40);
         $password = Str::random(12);
 
-        $user = [
-            'email' => $this->faker->email,
-            'password' => $this->hasher->make($password),
-            'remember_token' => str_random(60),
-            'display_name' => $this->faker->words(4, true),
-            'updated_at' => time(),
-        ];
-
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId($user);
-
-        $this->databaseManager->connection(ConfigService::$databaseConnectionName)
-            ->table(ConfigService::$tablePasswordResets)
-            ->insert(
-                [
-                    'email' => $user['email'],
-                    'token' => hash_hmac('sha256', Str::random(40), $hashKey),
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                ]
-            );
-
         $response = $this->call(
             'POST',
             'password/reset',
-            ['email' => $user['email'], 'password' => $password, 'password_confirmation' => $password, 'token' => '123']
+            ['email' => 'test+1@test.com', 'password' => $password, 'password_confirmation' => $password, 'token' => '123']
         );
 
-        $this->assertTrue(auth()->attempt(['email' => $user['email'], 'password' => $password]));
+        $this->assertTrue(auth()->attempt(['email' => 'test+1@test.com', 'password' => $password]));
 
         $response->assertSessionHasErrors(['password' => 'Password reset failed, please try again.',]);
     }

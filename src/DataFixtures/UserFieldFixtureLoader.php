@@ -11,7 +11,7 @@ class UserFieldFixtureLoader implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
-        $count = 2;
+        $count = 3;
         $interval = 1;
 
         while ($interval <= $count) {

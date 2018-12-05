@@ -2,25 +2,37 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Carbon\Carbon;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use JMS\Serializer\SerializerBuilder;
 use Railroad\Permissions\Services\PermissionService;
+use Railroad\Usora\Entities\User;
+use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Requests\UserFieldJsonCreateRequest;
 use Railroad\Usora\Requests\UserFieldJsonUpdateRequest;
 use Railroad\Usora\Requests\UserFieldJsonUpdateByKeyRequest;
-use Railroad\Usora\Repositories\UserFieldRepository;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserFieldJsonController extends Controller
 {
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @var UserFieldRepository
      */
     private $userFieldRepository;
+
+    /**
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     */
+    private $userRepository;
 
     /**
      * @var PermissionService
@@ -28,15 +40,25 @@ class UserFieldJsonController extends Controller
     private $permissionService;
 
     /**
+     * @var \JMS\Serializer\Serializer
+     */
+    private $serializer;
+
+    /**
      * UserFieldJsonController constructor.
      *
      * @param UserFieldRepository $userFieldRepository
      * @param PermissionService $permissionService
      */
-    public function __construct(UserFieldRepository $userFieldRepository, PermissionService $permissionService)
+    public function __construct(EntityManager $entityManager, PermissionService $permissionService)
     {
-        $this->userFieldRepository = $userFieldRepository;
+        $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
+
+        $this->userFieldRepository = $this->entityManager->getRepository(UserField::class);
+        $this->userRepository = $this->entityManager->getRepository(User::class);
+
+        $this->serializer = SerializerBuilder::create()->build();;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -51,11 +73,9 @@ class UserFieldJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $users = $this->userFieldRepository->query()
-            ->where('user_id', $id)
-            ->get();
+        $userFields = $this->userFieldRepository->findBy(['user' => $id]);
 
-        return response()->json($users);
+        return response($this->serializer->serialize($userFields, 'json'));
     }
 
     /**
@@ -68,9 +88,9 @@ class UserFieldJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $userField = $this->userFieldRepository->read($id);
+        $userField = $this->userFieldRepository->find($id);
 
-        return response()->json($userField);
+        return response($this->serializer->serialize($userField, 'json'));
     }
 
     /**
@@ -79,10 +99,7 @@ class UserFieldJsonController extends Controller
      */
     public function store(UserFieldJsonCreateRequest $request)
     {
-        if (
-            !$this->permissionService->can(auth()->id(), 'create-users')
-            && $request->get('user_id') != auth()->id()
-        ) {
+        if (!$this->permissionService->can(auth()->id(), 'create-users') && $request->get('user_id') != auth()->id()) {
             throw new NotFoundHttpException();
         }
 
@@ -90,23 +107,17 @@ class UserFieldJsonController extends Controller
             $request->attributes->set('user_id', auth()->id());
         }
 
-        $userField = $this->userFieldRepository->create(
-            array_merge(
-                $request->only(
-                    [
-                        'user_id',
-                        'key',
-                        'value',
-                    ]
-                ),
-                [
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
-                ]
-            )
-        );
+        $user = $this->userRepository->find($request->get('user_id'));
 
-        return response()->json($userField);
+        $userField = new UserField();
+        $userField->setUser($user);
+        $userField->setKey($request->get('key'));
+        $userField->setValue($request->get('value'));
+
+        $this->entityManager->persist($userField);
+        $this->entityManager->flush();
+
+        return response($this->serializer->serialize($userField, 'json'));
     }
 
     /*
@@ -116,32 +127,28 @@ class UserFieldJsonController extends Controller
      */
     public function update(UserFieldJsonUpdateRequest $request, $id)
     {
-        $userField = $this->userFieldRepository->read($id);
+        $userField = $this->userFieldRepository->find($id);
 
         if (!$this->permissionService->can(auth()->id(), 'update-users')) {
-            if ($userField['user_id'] !== auth()->id()) {
+            if ($userField->getUser()->getId() !== auth()->id()) {
                 throw new NotFoundHttpException();
             }
 
             $request->request->remove('user_id');
         }
+        if (!is_null($userField)) {
+            if ($request->get('user_id')) {
+                $user = $this->userRepository->find($request->get('user_id'));
+                $userField->setUser($user);
+            }
+            $userField->setKey($request->get('key'));
+            $userField->setValue($request->get('value'));
 
-        $userField = $this->userFieldRepository->update(
-            $id,
-            array_merge(
-                $request->only(
-                    [
-                        'key',
-                        'value',
-                    ]
-                ),
-                [
-                    'updated_at' => Carbon::now()->toDateTimeString(),
-                ]
-            )
-        );
+            $this->entityManager->persist($userField);
+            $this->entityManager->flush();
+        }
 
-        return response()->json($userField);
+        return response($this->serializer->serialize($userField, 'json'));
     }
 
     /**
@@ -156,46 +163,27 @@ class UserFieldJsonController extends Controller
             $userId = $request->get('user_id', auth()->id());
         }
 
-        // update or create
-        $updateCount = $this->userFieldRepository->query()
-            ->where(
-                [
-                    'key' => $request->get('key'),
-                    'user_id' => $userId,
-                ]
-            )
-            ->update(
-                [
-                    'value' => $request->get('value'),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
-                ]
-            );
+        $user = $this->userRepository->find($userId);
 
-        if ($updateCount == 0) {
+        $userField = $this->userFieldRepository->findOneBy(
+            [
+                'key' => $request->get('key'),
+                'user' => $user->getId(),
+            ]
+        );
 
-            $userField = $this->userFieldRepository->create(
-                [
-                    'key' => $request->get('key'),
-                    'user_id' => $userId,
-                    'value' => $request->get('value'),
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                ]
-            );
+        if (is_null($userField)) {
+            $userField = new UserField();
 
-        } else {
-
-            $userField = $this->userFieldRepository->query()
-                ->where(
-                    [
-                        'key' => $request->get('key'),
-                        'user_id' => $userId,
-                    ]
-                )
-                ->get()
-                ->first();
         }
+        $userField->setKey($request->get('key'));
+        $userField->setValue($request->get('value'));
+        $userField->setUser($user);
 
-        return response()->json($userField);
+        $this->entityManager->persist($userField);
+        $this->entityManager->flush();
+
+        return response($this->serializer->serialize($userField, 'json'));
     }
 
     /**
@@ -225,65 +213,58 @@ class UserFieldJsonController extends Controller
             if ($validator->fails()) {
                 $errors = [];
 
-                foreach ($validator->errors()->getMessages() as $key => $value) {
+                foreach (
+                    $validator->errors()
+                        ->getMessages() as $key => $value
+                ) {
                     $errors[] = [
                         "source" => $key,
-                        "detail" => $value[0]
+                        "detail" => $value[0],
                     ];
                 }
 
-                throw new HttpResponseException(response()->json(['status' => 'error',
-                        'code' => 422,
-                        'total_results' => 0,
-                        'results' => [],
-                        'errors' => $errors], 422));
+                throw new HttpResponseException(
+                    response()->json(
+                        [
+                            'status' => 'error',
+                            'code' => 422,
+                            'total_results' => 0,
+                            'results' => [],
+                            'errors' => $errors,
+                        ],
+                        422
+                    )
+                );
             }
         }
 
         $userFields = [];
+        $user = $this->userRepository->find($userId);
 
         // update or create
         foreach ($fields as $key => $value) {
-            $updateCount = $this->userFieldRepository->query()
-                ->where(
-                    [
-                        'key' => $key,
-                        'user_id' => $userId,
-                    ]
-                )
-                ->update(
-                    [
-                        'value' => $value,
-                        'updated_at' => Carbon::now()->toDateTimeString(),
-                    ]
-                );
+            $userField = $this->userFieldRepository->findOneBy(
+                [
+                    'key' => $key,
+                    'user' => $user->getId(),
+                ]
+            );
 
-            if ($updateCount == 0) {
-                $userField = $this->userFieldRepository->create(
-                    [
-                        'key' => $key,
-                        'user_id' => $userId,
-                        'value' => $value,
-                        'created_at' => Carbon::now()->toDateTimeString(),
-                    ]
-                );
-            } else {
+            if (is_null($userField)) {
+                $userField = new UserField();
 
-                $userField = $this->userFieldRepository->query()
-                ->where(
-                    [
-                        'key' => $key,
-                        'user_id' => $userId,
-                    ]
-                )
-                ->get()
-                ->first();
             }
+            $userField->setKey($key);
+            $userField->setValue($value);
+            $userField->setUser($user);
+
+            $this->entityManager->persist($userField);
+            $this->entityManager->flush();
 
             $userFields[] = $userField;
         }
 
-        return response()->json($userFields);
+        return response($this->serializer->serialize($userFields, 'json'));
     }
 
     /**
@@ -296,7 +277,12 @@ class UserFieldJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $this->userFieldRepository->destroy($id);
+        $userField = $this->userFieldRepository->find($id);
+
+        if (!is_null($userField)) {
+            $this->entityManager->remove($userField);
+            $this->entityManager->flush();
+        }
 
         return new JsonResponse(null, 204);
     }

@@ -3,19 +3,27 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use JMS\Serializer\SerializerBuilder;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserJsonCreateRequest;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
 use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Railroad\Usora\Entities\User;
 
 class UserJsonController extends Controller
 {
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
     /**
      * @var UserRepository
      */
@@ -32,17 +40,26 @@ class UserJsonController extends Controller
     private $hasher;
 
     /**
+     * @var \JMS\Serializer\Serializer
+     */
+    private $serializer;
+
+    /**
      * UserController constructor.
      *
      * @param UserRepository $userRepository
      * @param PermissionService $permissionService
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository, PermissionService $permissionService, Hasher $hasher)
+    public function __construct(EntityManager $entityManager, PermissionService $permissionService, Hasher $hasher)
     {
-        $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
         $this->hasher = $hasher;
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
+
+        $this->serializer = SerializerBuilder::create()->build();;
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -84,9 +101,9 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user = $this->userRepository->read($id);
+        $user = $this->userRepository->find($id);
 
-        return response()->json($user);
+        return response($this->serializer->serialize($user, 'json'));
     }
 
     /**
@@ -99,23 +116,15 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $user = $this->userRepository->create(
-            array_merge(
-                $request->only(
-                    [
-                        'email',
-                        'display_name',
-                    ]
-                ),
-                [
-                    'password' => $this->hasher->make($request->get('password')),
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
-                ]
-            )
-        );
+        $user = new User();
+        $user->setEmail($request->get('email'));
+        $user->setDisplayName($request->get('display_name'));
+        $user->setPassword($this->hasher->make($request->get('password')));
 
-        return response()->json($user);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return response($this->serializer->serialize($user, 'json'));
     }
 
     /**
@@ -131,24 +140,21 @@ class UserJsonController extends Controller
         ) {
             throw new NotFoundHttpException();
         }
-
-        $only = [
-            'display_name',
-        ];
+        $user = $this->userRepository->find($id);
+        $user->setDisplayName($request->get('display_name'));
 
         if ($this->permissionService->can(auth()->id(), 'update-users')) {
-            $only[] = 'email';
+            $user->setEmail($request->get('email'));
         }
-
-        $attributes = $request->only($only);
 
         if ($this->permissionService->can(auth()->id(), 'update-users') && !empty($request->get('password'))) {
-            $attributes['password'] = $this->hasher->make($request->get('password'));
+            $user->setPassword($this->hasher->make($request->get('password')));
         }
 
-        $user = $this->userRepository->update($id, $attributes);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
-        return response()->json($user);
+        return response($this->serializer->serialize($user, 'json'));
     }
 
     /**
@@ -161,7 +167,12 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $this->userRepository->destroy($id);
+        $user = $this->userRepository->find($id);
+
+        if (!is_null($user)) {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+        }
 
         return new JsonResponse(null, 204);
     }

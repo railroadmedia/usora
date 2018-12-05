@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,7 +9,6 @@ use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Entities\User;
-use Railroad\Usora\Repositories\UserFieldRepository;
 use Railroad\Usora\Requests\UserFieldCreateRequest;
 use Railroad\Usora\Requests\UserFieldUpdateByKeyRequest;
 use Railroad\Usora\Requests\UserFieldUpdateRequest;
@@ -101,7 +99,8 @@ class UserFieldController extends Controller
         $userField = $this->userFieldRepository->find($id);
 
         if (!$this->permissionService->can(auth()->id(), 'update-users')) {
-            if ($userField->getUser()->getId() !== auth()->id()) {
+            if ($userField->getUser()
+                    ->getId() !== auth()->id()) {
                 throw new NotFoundHttpException();
             }
 
@@ -109,7 +108,7 @@ class UserFieldController extends Controller
         }
 
         if (!is_null($userField)) {
-            if($request->get('user_id')) {
+            if ($request->get('user_id')) {
                 $user = $this->userRepository->find($request->get('user_id'));
                 $userField->setUser($user);
             }
@@ -142,34 +141,24 @@ class UserFieldController extends Controller
             $userId = $request->get('user_id', auth()->id());
         }
 
-        // update or create
-        $updateCount =
-            $this->userFieldRepository->query()
-                ->where(
-                    [
-                        'key' => $request->get('key'),
-                        'user_id' => $userId,
-                    ]
-                )
-                ->update(
-                    [
-                        'value' => $request->get('value'),
-                        'updated_at' => Carbon::now()
-                            ->toDateTimeString(),
-                    ]
-                );
+        $user = $this->userRepository->find($userId);
+        $userField = $this->userFieldRepository->findOneBy(
+            [
+                'key' => $request->get('key'),
+                'user' => $user->getId(),
+            ]
+        );
 
-        if ($updateCount == 0) {
-            $this->userFieldRepository->create(
-                [
-                    'key' => $request->get('key'),
-                    'user_id' => $userId,
-                    'value' => $request->get('value'),
-                    'created_at' => Carbon::now()
-                        ->toDateTimeString(),
-                ]
-            );
+        if (is_null($userField)) {
+            $userField = new UserField();
+
         }
+        $userField->setKey($request->get('key'));
+        $userField->setValue($request->get('value'));
+        $userField->setUser($user);
+
+        $this->entityManager->persist($userField);
+        $this->entityManager->flush();
 
         $message = ['success' => true];
 
@@ -194,10 +183,12 @@ class UserFieldController extends Controller
             $userId = $request->get('user_id', auth()->id());
         }
 
+        $user = $this->userRepository->find($userId);
+
         // validate
         foreach ($fields as $key => $value) {
             $validator = validator(
-                ['key' => $key, 'value' => $value, 'user_id' => $userId],
+                ['key' => $key, 'value' => $value, 'user_id' => $user->getId()],
                 [
                     'user_id' => 'required|numeric',
                     'key' => 'required|string|max:255|min:1',
@@ -218,33 +209,23 @@ class UserFieldController extends Controller
 
         // update or create
         foreach ($fields as $key => $value) {
-            $updateCount =
-                $this->userFieldRepository->query()
-                    ->where(
-                        [
-                            'key' => $key,
-                            'user_id' => $userId,
-                        ]
-                    )
-                    ->update(
-                        [
-                            'value' => $value,
-                            'updated_at' => Carbon::now()
-                                ->toDateTimeString(),
-                        ]
-                    );
+            $userField = $this->userFieldRepository->findOneBy(
+                [
+                    'key' => $key,
+                    'user' => $user->getId(),
+                ]
+            );
 
-            if ($updateCount == 0) {
-                $this->userFieldRepository->create(
-                    [
-                        'key' => $key,
-                        'user_id' => $userId,
-                        'value' => $value,
-                        'created_at' => Carbon::now()
-                            ->toDateTimeString(),
-                    ]
-                );
+            if (is_null($userField)) {
+                $userField = new UserField();
+
             }
+            $userField->setKey($key);
+            $userField->setValue($value);
+            $userField->setUser($user);
+
+            $this->entityManager->persist($userField);
+            $this->entityManager->flush();
         }
 
         $message = ['success' => true];

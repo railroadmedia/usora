@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\Request;
@@ -10,9 +11,14 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
+use Railroad\Usora\Entities\User;
 
 class ResetPasswordController extends Controller
 {
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
     /**
      * @var UserRepository
      */
@@ -29,10 +35,12 @@ class ResetPasswordController extends Controller
      * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(UserRepository $userRepository, Hasher $hasher)
+    public function __construct(EntityManager $entityManager, Hasher $hasher)
     {
-        $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
         $this->hasher = $hasher;
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }

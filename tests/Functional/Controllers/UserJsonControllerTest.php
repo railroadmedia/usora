@@ -2,8 +2,11 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class UserJsonControllerTest extends UsoraTestCase
 {
@@ -12,6 +15,10 @@ class UserJsonControllerTest extends UsoraTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class)]);
     }
 
     public function test_users_index_with_permission()
@@ -74,24 +81,11 @@ class UserJsonControllerTest extends UsoraTestCase
     {
         $rawPassword = $this->faker->word;
 
-        $user = [
-            'email' => $this->faker->email,
-            'password' => $this->hasher->make($rawPassword),
-            'remember_token' => str_random(60),
-            'session_salt' => str_random(60),
-            'display_name' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
-        ];
-
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId($user);
-
         $this->permissionServiceMock->method('can')->willReturn(true);
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user/show/' . $userId
+            self::API_PREFIX . '/user/show/' . 1
         );
 
         // assert response status code
@@ -100,8 +94,8 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert the user data is subset of response
         $this->assertArraySubset(
             [
-                'email' => $user['email'],
-                'display_name' => $user['display_name']
+                'email' => 'test+1@test.com',
+                'display_name' => 'testuser1'
             ],
             $response->decodeResponseJson()
         );
@@ -109,11 +103,12 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_users_show_without_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 3;
+        $this->authManager->guard()->onceUsingId($userId);
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user/show/' . $userId
+            self::API_PREFIX . '/user/show/' . 1
         );
 
         // assert the response code is not found
@@ -219,7 +214,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_user_update_with_owner()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
 
         $this->authManager->guard()->onceUsingId($userId);
 
@@ -274,9 +269,9 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_user_update_with_permission()
     {
-        $userIdToUpdate = $this->createNewUser();
+        $userIdToUpdate = 1;
 
-        $userIdLoggedIn = $this->createNewUser();
+        $userIdLoggedIn = 2;
 
         $this->authManager->guard()->onceUsingId($userIdLoggedIn);
 
@@ -317,15 +312,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName
-            ]
-        );
-
-        // assert the new email field was not saved in the db
-        $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
-            [
-                'id' => $userIdToUpdate,
+                'display_name' => $newDisplayName,
                 'email' => $newEmail
             ]
         );
@@ -333,9 +320,9 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_user_update_without_permission()
     {
-        $userIdToUpdate = $this->createNewUser();
+        $userIdToUpdate = 1;
 
-        $userIdLoggedIn = $this->createNewUser();
+        $userIdLoggedIn = 2;
 
         $this->authManager->guard()->onceUsingId($userIdLoggedIn);
 
@@ -367,7 +354,7 @@ class UserJsonControllerTest extends UsoraTestCase
         $response = $this->call(
             'PATCH',
             self::API_PREFIX . '/user/update/' . rand(),
-            []
+            ['display_name' => 1]
         );
 
         // assert response status code
@@ -377,14 +364,15 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertEquals([
             [
                 "source" => "display_name",
-                "detail" => "The display name field is required.",
+                "detail" => "The display name must be a string.",
             ]
         ], $response->decodeResponseJson()['errors']);
     }
 
     public function test_user_delete_with_permission()
     {
-        $userId = $this->createNewUser();
+        $userId = 1;
+        $this->authManager->guard()->onceUsingId($userId);
 
         $this->permissionServiceMock->method('can')->willReturn(true);
 
@@ -407,8 +395,8 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_user_delete_without_permission()
     {
-        $userId = $this->createNewUser();
-
+        $userId = 1;
+        $this->authManager->guard()->onceUsingId(rand());
         $response = $this->call(
             'DELETE',
             self::API_PREFIX . '/user/delete/' . $userId
