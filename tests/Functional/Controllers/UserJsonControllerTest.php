@@ -23,20 +23,13 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_users_index_with_permission()
     {
-        $this->permissionServiceMock->method('can')->willReturn(true);
-
-        $this->createNewUser();
-        $this->createNewUser();
-        $this->createNewUser();
-        $this->createNewUser();
-        $this->createNewUser();
-        $this->createNewUser();
-        $this->createNewUser();
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $request = [
             'limit' => 3,
-            'order_by_column' => 'display_name',
-            'order_by_direction' => 'asc'
+            'order_by_column' => 'displayName',
+            'order_by_direction' => 'asc',
         ];
 
         $responsePageTwo = $this->call(
@@ -77,11 +70,89 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertLessThanOrEqual(0, $cmp);
     }
 
+    public function test_users_index_with_display_name_criteria()
+    {
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
+
+        $request = [
+            'limit' => 3,
+            'order_by_column' => 'displayName',
+            'order_by_direction' => 'asc',
+            'search_term' => 'user',
+        ];
+
+        $responsePageTwo = $this->call(
+            'GET',
+            self::API_PREFIX . '/user/index',
+            $request + ['page' => 2]
+        );
+
+        // assert response status code
+        $this->assertEquals(200, $responsePageTwo->getStatusCode());
+
+        $dataPageTwo = $responsePageTwo->decodeResponseJson();
+
+        // assert response length
+        $this->assertEquals($request['limit'], count($dataPageTwo));
+
+        // assert ascending order of display_name column
+        for ($i = 0; $i < count($dataPageTwo) - 1; $i++) {
+            $current = $dataPageTwo[$i];
+            $next = $dataPageTwo[$i + 1];
+            $cmp = strcasecmp($current['display_name'], $next['display_name']);
+            $this->assertLessThanOrEqual(0, $cmp);
+        }
+
+        $responsePageOne = $this->call(
+            'GET',
+            self::API_PREFIX . '/user/index',
+            $request + ['page' => 1]
+        );
+
+        $dataPageOne = $responsePageOne->decodeResponseJson();
+
+        // assert response length
+        $this->assertEquals($request['limit'], count($dataPageOne));
+
+        // assert ascending order of display_name column across pages
+        $cmp = strcasecmp($dataPageOne[count($dataPageOne) - 1]['display_name'], $dataPageTwo[0]['display_name']);
+        $this->assertLessThanOrEqual(0, $cmp);
+    }
+
+    public function test_users_index_with_email_criteria()
+    {
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
+
+        $request = [
+            'limit' => 3,
+            'order_by_column' => 'displayName',
+            'order_by_direction' => 'asc',
+            'search_term' => 'test+1@test',
+        ];
+
+        $responsePage = $this->call(
+            'GET',
+            self::API_PREFIX . '/user/index',
+            $request + ['page' => 1]
+        );
+
+        // assert response status code
+        $this->assertEquals(200, $responsePage->getStatusCode());
+
+        $dataPage = $responsePage->decodeResponseJson();
+
+        $this->assertEquals(1, count($dataPage));
+
+    }
+
     public function test_users_show_with_permission()
     {
         $rawPassword = $this->faker->word;
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $response = $this->call(
             'GET',
@@ -95,7 +166,7 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertArraySubset(
             [
                 'email' => 'test+1@test.com',
-                'display_name' => 'testuser1'
+                'display_name' => 'testuser1',
             ],
             $response->decodeResponseJson()
         );
@@ -104,7 +175,8 @@ class UserJsonControllerTest extends UsoraTestCase
     public function test_users_show_without_permission()
     {
         $userId = 3;
-        $this->authManager->guard()->onceUsingId($userId);
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $response = $this->call(
             'GET',
@@ -123,7 +195,8 @@ class UserJsonControllerTest extends UsoraTestCase
             'password' => 'my-password',
         ];
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $response = $this->call(
             'PUT',
@@ -177,7 +250,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $credentials = [
             'email' => $userData['email'],
-            'password' => $userData['password']
+            'password' => $userData['password'],
         ];
 
         // assert the users data can not be used to login
@@ -196,27 +269,31 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertEquals(422, $response->getStatusCode());
 
         // assert response validation error messages
-        $this->assertEquals([
+        $this->assertEquals(
             [
-                "source" => "email",
-                "detail" => "The email field is required.",
+                [
+                    "source" => "email",
+                    "detail" => "The email field is required.",
+                ],
+                [
+                    "source" => "display_name",
+                    "detail" => "The display name field is required.",
+                ],
+                [
+                    "source" => "password",
+                    "detail" => "The password field is required.",
+                ],
             ],
-            [
-                "source" => "display_name",
-                "detail" => "The display name field is required.",
-            ],
-            [
-                "source" => "password",
-                "detail" => "The password field is required.",
-            ]
-        ], $response->decodeResponseJson()['errors']);
+            $response->decodeResponseJson()['errors']
+        );
     }
 
     public function test_user_update_with_owner()
     {
         $userId = 1;
 
-        $this->authManager->guard()->onceUsingId($userId);
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
         $newDisplayName = $this->faker->words(4, true);
         $newEmail = $this->faker->email;
@@ -226,7 +303,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userId,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -253,7 +330,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userId,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -262,7 +339,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userId,
-                'email' => $newEmail
+                'email' => $newEmail,
             ]
         );
     }
@@ -273,9 +350,11 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $userIdLoggedIn = 2;
 
-        $this->authManager->guard()->onceUsingId($userIdLoggedIn);
+        $this->authManager->guard()
+            ->onceUsingId($userIdLoggedIn);
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $newDisplayName = $this->faker->words(4, true);
         $newEmail = $this->faker->email;
@@ -285,7 +364,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
 
@@ -313,7 +392,7 @@ class UserJsonControllerTest extends UsoraTestCase
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
-                'email' => $newEmail
+                'email' => $newEmail,
             ]
         );
     }
@@ -324,7 +403,8 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $userIdLoggedIn = 2;
 
-        $this->authManager->guard()->onceUsingId($userIdLoggedIn);
+        $this->authManager->guard()
+            ->onceUsingId($userIdLoggedIn);
 
         $newDisplayName = $this->faker->words(4, true);
 
@@ -344,7 +424,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ConfigService::$tableUsers,
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName
+                'display_name' => $newDisplayName,
             ]
         );
     }
@@ -361,20 +441,25 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertEquals(422, $response->getStatusCode());
 
         // assert response validation error messages
-        $this->assertEquals([
+        $this->assertEquals(
             [
-                "source" => "display_name",
-                "detail" => "The display name must be a string.",
-            ]
-        ], $response->decodeResponseJson()['errors']);
+                [
+                    "source" => "display_name",
+                    "detail" => "The display name must be a string.",
+                ],
+            ],
+            $response->decodeResponseJson()['errors']
+        );
     }
 
     public function test_user_delete_with_permission()
     {
         $userId = 1;
-        $this->authManager->guard()->onceUsingId($userId);
+        $this->authManager->guard()
+            ->onceUsingId($userId);
 
-        $this->permissionServiceMock->method('can')->willReturn(true);
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
 
         $response = $this->call(
             'DELETE',
@@ -388,7 +473,7 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertDatabaseMissing(
             ConfigService::$tableUsers,
             [
-                'id' => $userId
+                'id' => $userId,
             ]
         );
     }
@@ -396,7 +481,8 @@ class UserJsonControllerTest extends UsoraTestCase
     public function test_user_delete_without_permission()
     {
         $userId = 1;
-        $this->authManager->guard()->onceUsingId(rand());
+        $this->authManager->guard()
+            ->onceUsingId(rand());
         $response = $this->call(
             'DELETE',
             self::API_PREFIX . '/user/delete/' . $userId
@@ -409,7 +495,7 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertDatabaseHas(
             ConfigService::$tableUsers,
             [
-                'id' => $userId
+                'id' => $userId,
             ]
         );
     }

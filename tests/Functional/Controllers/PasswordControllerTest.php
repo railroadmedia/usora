@@ -2,32 +2,33 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
-use Railroad\Usora\Services\ConfigService;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class PasswordControllerTest extends UsoraTestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class)]);
     }
 
     public function test_users_store_with_permission()
     {
-        $rawPassword = $this->faker->words(3, true);
+        $rawPassword = 'Password1#';
 
         $user = [
-            'email' => $this->faker->email,
+            'email' => 'test+1@test.com',
             'password' => $this->hasher->make($rawPassword),
-            'remember_token' => str_random(60),
-            'session_salt' => str_random(60),
-            'display_name' => $this->faker->words(4, true),
-            'created_at' => time(),
-            'updated_at' => time(),
+            'display_name' => 'testuser1'
         ];
 
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId($user);
+        $userId = 1;
 
         auth()->loginUsingId($userId);
 

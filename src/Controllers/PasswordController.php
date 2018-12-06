@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\Request;
@@ -11,9 +12,14 @@ use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
+use Railroad\Usora\Entities\User;
 
 class PasswordController extends Controller
 {
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
     /**
      * @var UserRepository
      */
@@ -35,11 +41,13 @@ class PasswordController extends Controller
      * @param Hasher $hasher
      * @param PermissionService $permissionService
      */
-    public function __construct(UserRepository $userRepository, Hasher $hasher, PermissionService $permissionService)
+    public function __construct(EntityManager $entityManager, Hasher $hasher, PermissionService $permissionService)
     {
-        $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
         $this->hasher = $hasher;
         $this->permissionService = $permissionService;
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -68,26 +76,26 @@ class PasswordController extends Controller
 
         $user = auth()->user();
 
-        if (!auth()->attempt(['email' => $user['email'], 'password' => $request->get('current_password')])) {
-            return redirect()->back()->withErrors(
-                ['current_password' => 'The current password you entered is incorrect.']
-            );
+        if (!auth()->attempt(['email' => $user->getEmail(), 'password' => $request->get('current_password')])) {
+            return redirect()
+                ->back()
+                ->withErrors(
+                    ['current_password' => 'The current password you entered is incorrect.']
+                );
         }
 
         $hashedPassword = $this->hasher->make($request->get('new_password'));
+        $user->setPassword($hashedPassword);
 
-        $this->userRepository->updateOrCreate(
-            ['id' => $request->get('user_id', $user['id'])],
-            ['password' => $hashedPassword]
-        );
-
-        $user['password'] = $hashedPassword;
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         event(new PasswordReset($user));
 
-        auth()->loginUsingId($user['id']);
+        auth()->loginUsingId($user->getId());
 
-        return redirect()->back()
+        return redirect()
+            ->back()
             ->with(
                 'successes',
                 new MessageBag(['password' => 'Your password has been reset successfully.'])

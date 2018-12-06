@@ -5,15 +5,18 @@ namespace Railroad\Usora\Entities;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Notifications\AnonymousNotifiable;
+use Railroad\Usora\Services\ConfigService;
 
 /**
  * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserRepository")
  * @ORM\HasLifecycleCallbacks
  * @ORM\Table(name="usora_users")
  */
-class User implements Authenticatable
+class User implements Authenticatable, CanResetPassword
 {
-    use TimestampableEntity;
+    use TimestampableEntity, \Illuminate\Auth\Passwords\CanResetPassword;
 
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
@@ -179,5 +182,15 @@ class User implements Authenticatable
     public function getRememberTokenName(): string
     {
         return 'remember_token';
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        (new AnonymousNotifiable())->route(
+                ConfigService::$passwordResetNotificationChannel,
+                $this->getEmailForPasswordReset()
+            )
+            ->notify(new ConfigService::$passwordResetNotificationClass($token));
+
     }
 }

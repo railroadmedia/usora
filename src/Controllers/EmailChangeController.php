@@ -5,6 +5,7 @@ namespace Railroad\Usora\Controllers;
 use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
@@ -12,8 +13,6 @@ use Illuminate\Support\Str;
 use Railroad\Usora\Entities\EmailChange;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
-use Railroad\Usora\Repositories\EmailChangeRepository;
-use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\EmailChangeConfirmationRequest;
 use Railroad\Usora\Requests\EmailChangeRequest;
 use Railroad\Usora\Services\ConfigService;
@@ -26,27 +25,24 @@ class EmailChangeController extends Controller
     private $entityManager;
 
     /**
-     * @var EmailChangeRepository
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
      */
     private $emailChangeRepository;
 
     /**
-     * @var UserRepository
+     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
      */
     private $userRepository;
 
     /**
-     * ChangeEmailController constructor.
+     * EmailChangeController constructor.
      *
      * @param EntityManager $entityManager
-     * @param EmailChangeRepository $emailChangeRepository
      */
     public function __construct(
-        EntityManager $entityManager,
-        EmailChangeRepository $emailChangeRepository
+        EntityManager $entityManager
     ) {
         $this->entityManager = $entityManager;
-        $this->emailChangeRepository = $emailChangeRepository;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
         $this->emailChangeRepository = $this->entityManager->getRepository(EmailChange::class);
@@ -69,17 +65,21 @@ class EmailChangeController extends Controller
                 ->toDateTimeString(),
         ];
 
-        $updateCount =
-            $this->emailChangeRepository->query()
-                ->where('user_id', auth()->id())
-                ->update($payload);
+        $user = $this->userRepository->find(auth()->id());
 
-        if ($updateCount == 0) {
+        $emailChange = $this->emailChangeRepository->findOneBy(['user' => $user->getId()]);
 
-            $payload['user_id'] = auth()->id();
-
-            $this->emailChangeRepository->updateOrCreate($payload);
+        if (!$emailChange) {
+            $emailChange = new EmailChange();
+            $emailChange->setCreatedAt(Carbon::now());
         }
+
+        $emailChange->setEmail($payload['email']);
+        $emailChange->setToken($payload['token']);
+        $emailChange->setUser($user);
+
+        $this->entityManager->persist($emailChange);
+        $this->entityManager->flush();
 
         event(new EmailChangeRequestEvent($payload['token'], $payload['email']));
 
@@ -106,14 +106,30 @@ class EmailChangeController extends Controller
      * @param  EmailChangeConfirmationRequest $request
      * @return RedirectResponse
      */
-    public function confirm(EmailChangeConfirmationRequest $request)
+    public function confirm(Request $request)
     {
-        $emailChangeData =
-            $this->emailChangeRepository->query()
-                ->where('token', $request->get('token'))
-                ->first();
+        $validator = validator(
+            $request->all(),
+            [
+                'token' => 'bail|required|string|exists:' .
 
-        if (Carbon::parse($emailChangeData['created_at']) <
+                    ConfigService::$databaseConnectionName . '.' . ConfigService::$tableEmailChanges,
+                'token',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validator);
+        }
+
+        $emailChangeData = $this->emailChangeRepository->findOneBy(['token' => $request->get('token')]);
+
+        if (Carbon::parse(
+                $emailChangeData->getCreatedAt()
+                    ->format('Y-m-d H:i:s')
+            ) <
             Carbon::now()
                 ->subHours(ConfigService::$emailChangeTtl)) {
             return redirect()
@@ -121,12 +137,20 @@ class EmailChangeController extends Controller
                 ->withErrors(['token' => 'Your email reset token has expired.']);
         }
 
-        $this->userRepository->update(
-            $emailChangeData->user_id,
-            ['email' => $emailChangeData->email]
-        );
+        $user =
+            $this->userRepository->findOneBy(
+                [
+                    'id' => $emailChangeData->getUser()
+                        ->getId(),
+                ]
+            );
+        $user->setEmail($emailChangeData->getEmail());
 
-        $this->emailChangeRepository->destroy($emailChangeData->id);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $this->entityManager->remove($emailChangeData);
+        $this->entityManager->flush();
 
         $message = [
             'successes' => new MessageBag(

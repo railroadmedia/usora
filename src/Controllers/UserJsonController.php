@@ -59,7 +59,9 @@ class UserJsonController extends Controller
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
 
-        $this->serializer = SerializerBuilder::create()->build();;
+        $this->serializer =
+            SerializerBuilder::create()
+                ->build();
 
         $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
@@ -74,21 +76,37 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $query = $this->userRepository->query()
-            ->limit($request->get('limit', 25))
-            ->skip(($request->get('page', 1) - 1) * $request->get('limit', 25))
-            ->orderBy($request->get('order_by_column', 'created_at'), $request->get('order_by_direction', 'desc'));
-
         $searchTerm = $request->get('search_term', '');
 
+        $query =
+            $this->userRepository->createQueryBuilder('u');
+
         if (!empty($searchTerm)) {
-            $query = $query->where('email', 'LIKE', '%' . $searchTerm . '%')
-                ->where('display_name', 'LIKE', '%' . $searchTerm . '%', 'OR');
+
+            $query->where(
+                    $query->expr()
+                        ->orX(
+                            $query->expr()
+                                ->like('u.email', ':term'),
+                            $query->expr()
+                                ->like('u.displayName', ':term')
+                        )
+                )
+                ->setParameter('term', '%' . addcslashes($searchTerm, '%_') . '%');
         }
 
-        $users = $query->get();
+        $query->setMaxResults($request->get('limit', 25))
+            ->setFirstResult(($request->get('page', 1) - 1) * $request->get('limit', 25))
+            ->orderBy(
+                'u.' . $request->get('order_by_column', 'createdAt'),
+                $request->get('order_by_direction', 'desc')
+            );
 
-        return response()->json($users);
+        $users =
+            $query->getQuery()
+                ->getResult();
+
+        return response($this->serializer->serialize($users, 'json'));
     }
 
     /**
@@ -134,10 +152,7 @@ class UserJsonController extends Controller
      */
     public function update(UserJsonUpdateRequest $request, $id)
     {
-        if (
-            !$this->permissionService->can(auth()->id(), 'update-users')
-            && auth()->id() != $id
-        ) {
+        if (!$this->permissionService->can(auth()->id(), 'update-users') && auth()->id() != $id) {
             throw new NotFoundHttpException();
         }
         $user = $this->userRepository->find($id);

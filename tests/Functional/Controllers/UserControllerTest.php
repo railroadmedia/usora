@@ -238,7 +238,7 @@ class UserControllerTest extends UsoraTestCase
         $response = $this->call(
             'PATCH',
             '/user/update/' . rand(),
-            []
+            ['display_name' => 123]
         );
 
         $response->assertSessionHasErrors(['display_name']);

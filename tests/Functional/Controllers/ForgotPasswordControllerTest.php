@@ -3,17 +3,21 @@
 namespace Railroad\Usora\Tests\Functional;
 
 use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Mail;
-use Railroad\Usora\Entities\User;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class ForgotPasswordControllerTest extends UsoraTestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class)]);
     }
 
     public function test_send_reset_link_email_validation_failed()
@@ -29,29 +33,22 @@ class ForgotPasswordControllerTest extends UsoraTestCase
 
     public function test_send_reset_link_email()
     {
-        $user = [
-            'email' => $this->faker->email,
-            'password' => $this->hasher->make($this->faker->word),
-            'remember_token' => str_random(60),
-            'display_name' => $this->faker->words(4, true),
-            'updated_at' => time(),
-        ];
-
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId($user);
-
-        $userEntity = new User();
-        $userEntity['id'] = $userId;
-
-        $response = $this->call(
+        $this->call(
             'POST',
             'password/send-reset-email',
-            ['email' => $user['email']]
+            ['email' => 'test+1@test.com']
         );
 
-        $this->notificationFake->assertSentTo(new AnonymousNotifiable(), ConfigService::$passwordResetNotificationClass);
+        $this->notificationFake->assertSentTo(
+            new AnonymousNotifiable(),
+            ConfigService::$passwordResetNotificationClass
+        );
 
-        $this->assertEmpty($this->app->make('auth')->guard()->id());
+        $this->assertEmpty(
+            $this->app->make('auth')
+                ->guard()
+                ->id()
+        );
     }
 
 }
