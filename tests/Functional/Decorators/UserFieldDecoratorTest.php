@@ -2,9 +2,15 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use Railroad\Usora\DataFixtures\UserFieldFixtureLoader;
+use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Repositories\UserFieldRepository;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
+use Railroad\Usora\Entities\User;
 
 class UserFieldDecoratorTest extends UsoraTestCase
 {
@@ -22,40 +28,35 @@ class UserFieldDecoratorTest extends UsoraTestCase
     {
         parent::setUp();
 
-        $this->userRepository = app(UserRepository::class);
-        $this->userFieldRepository = app(UserFieldRepository::class);
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($this->entityManager, $purger);
+        $executor->execute([app(UserFixtureLoader::class), app(UserFieldFixtureLoader::class)]);
+
+        $this->userRepository = $this->entityManager->getRepository(User::class);
+        $this->userFieldRepository = $this->entityManager->getRepository(UserField::class);
+//        $this->userRepository = app(UserRepository::class);
+//        $this->userFieldRepository = app(UserFieldRepository::class);
     }
 
     public function test_decorate_none()
     {
-        $user = $this->userRepository->create($this->faker->user());
 
-        $response = $this->userRepository->read($user['id']);
+        $response = $this->userRepository->find(2);
 
-        $this->assertEquals([], $response['fields']);
+        $this->assertEquals([], $response->getFields());
     }
 
-    public function test_decorate_single()
-    {
-        $user = $this->userRepository->create($this->faker->user());
-
-        $userField = $this->userFieldRepository->create($this->faker->userField(['user_id' => $user['id']]));
-
-        $response = $this->userRepository->read($user['id']);
-
-        $this->assertEquals([$userField], $response['fields']);
-    }
+//    public function test_decorate_single()
+//    {
+//        $response = $this->userRepository->find(1);
+//
+//        $this->assertEquals([], $response->getFields());
+//    }
 
     public function test_decorate_multiple()
     {
-        $user = $this->userRepository->create($this->faker->user());
+        $response = $this->userRepository->find(1);
 
-        $userField1 = $this->userFieldRepository->create($this->faker->userField(['user_id' => $user['id']]));
-        $userField2 = $this->userFieldRepository->create($this->faker->userField(['user_id' => $user['id']]));
-        $userField3 = $this->userFieldRepository->create($this->faker->userField(['user_id' => $user['id']]));
-
-        $response = $this->userRepository->read($user['id']);
-
-        $this->assertEquals([$userField1, $userField2, $userField3], $response['fields']);
+        $this->assertEquals(3, count($response->getFields()));
     }
 }

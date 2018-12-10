@@ -55,6 +55,11 @@ class User implements Authenticatable, CanResetPassword
     protected $displayName;
 
     /**
+     * @ORM\OneToMany(targetEntity="UserField", mappedBy="user")
+     */
+    private $fields;
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -140,6 +145,11 @@ class User implements Authenticatable, CanResetPassword
     public function setDisplayName(string $displayName): void
     {
         $this->displayName = $displayName;
+    }
+
+    public function getFields()
+    {
+        return $this->fields->toArray();
     }
 
     // functions for laravel auth
