@@ -57,44 +57,36 @@ class ResetPasswordControllerTest extends UsoraTestCase
             ['email' => 'test+1@test.com', 'password' => $password, 'password_confirmation' => $password, 'token' => '123']
         );
 
-        $this->assertTrue(auth()->attempt(['email' => 'test+1@test.com', 'password' => $password]));
+        $this->assertFalse(auth()->attempt(['email' => 'test+1@test.com', 'password' => $password]));
 
         $response->assertSessionHasErrors(['password' => 'Password reset failed, please try again.',]);
     }
 
     public function test_reset_password()
     {
-        $password = Str::random(12);
         $newPassword = Str::random(12);
 
-        $user = [
-            'email' => $this->faker->email,
-            'password' => $this->hasher->make($password),
-            'remember_token' => str_random(60),
-            'display_name' => $this->faker->words(4, true),
-            'updated_at' => time(),
-        ];
+        $user =
+            $this->entityManager->getRepository(User::class)
+                ->find(1);
 
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId($user);
-
-        $userEntity = new User();
-        $userEntity['email'] = $user['email'];
-
-        $token = $this->passwordBroker->createToken($userEntity);
+        $token = $this->passwordBroker->createToken($user);
 
         $response = $this->call(
             'POST',
             'password/reset',
             [
-                'email' => $user['email'],
+                'email' => $user->getEmail(),
                 'password' => $newPassword,
                 'password_confirmation' => $newPassword,
                 'token' => $token,
             ]
         );
 
-        $this->assertTrue(auth()->attempt(['email' => $user['email'], 'password' => $newPassword]));
+        $this->assertFalse(auth()->attempt(['email' => $user->getEmail(), 'password' => $user->getPassword()]));
+
+        $this->assertTrue(auth()->attempt(['email' => $user->getEmail(), 'password' => $newPassword]));
+
     }
 
 }

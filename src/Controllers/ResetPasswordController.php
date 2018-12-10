@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
-use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Entities\User;
 
@@ -61,37 +60,42 @@ class ResetPasswordController extends Controller
             ]
         );
 
-        $response = $this->broker()->reset(
-            $request->only(
-                'email',
-                'password',
-                'password_confirmation',
-                'token'
-            ),
-            function ($user, $password) {
-                $hashedPassword = $this->hasher->make($password);
+        $response =
+            $this->broker()
+                ->reset(
+                    $request->only(
+                        'email',
+                        'password',
+                        'password_confirmation',
+                        'token'
+                    ),
+                    function ($user, $password) {
 
-                $this->userRepository->updateOrCreate(['id' => $user['id']], ['password' => $hashedPassword]);
+                        $hashedPassword = $this->hasher->make($password);
+                        $user->setPassword($hashedPassword);
+                        $this->entityManager->persist($user);
+                        $this->entityManager->flush();
 
-                $user['password'] = $hashedPassword;
+                        event(new PasswordReset($user));
 
-                event(new PasswordReset($user));
-
-                auth()->loginUsingId($user['id']);
-            }
-        );
+                        auth()->loginUsingId($user->getId());
+                    }
+                );
 
         if ($response === Password::PASSWORD_RESET) {
             session()->put('skip-third-party-auth-check', true);
 
-            return redirect()->to(ConfigService::$loginSuccessRedirectPath)
+            return redirect()
+                ->to(ConfigService::$loginSuccessRedirectPath)
                 ->with(
                     'successes',
                     new MessageBag(['password' => 'Your password has been reset successfully.'])
                 );
         }
 
-        return redirect()->back()->withErrors(['password' => 'Password reset failed, please try again.']);
+        return redirect()
+            ->back()
+            ->withErrors(['password' => 'Password reset failed, please try again.']);
     }
 
     /**
