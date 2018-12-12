@@ -9,8 +9,9 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Railroad\Resora\Entities\Entity;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Permissions\Services\ConfigService as PermissionConfigService;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassword
+class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassword, JWTSubject
 {
     public function dot()
     {
@@ -124,5 +125,29 @@ class User extends Entity implements Authenticatable, ArrayAccess, CanResetPassw
         }
 
         return false;
+    }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getAuthIdentifier();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [
+            'user' => [
+                'id' => $this['id']
+             ]
+        ];
     }
 }

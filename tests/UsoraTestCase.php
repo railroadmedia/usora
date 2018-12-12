@@ -110,7 +110,10 @@ class UsoraTestCase extends TestCase
         foreach ($defaultConfig as $key => $value) {
             config()->set('usora.' . $key, $value);
         }
-
+        $jwtConfig = require(__DIR__ . '/../config/jwt.php');
+        foreach ($jwtConfig as $key => $value) {
+            config()->set('jwt.' . $key, $value);
+        }
         // set database
         config()->set('usora.data_mode', 'host');
         config()->set('usora.database_connection_name', config('usora.connection_mask_prefix') . 'sqlite');
