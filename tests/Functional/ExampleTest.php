@@ -16,15 +16,7 @@ class ExampleTest extends UsoraTestCase
 
     public function test_example()
     {
-        $userId = $this->databaseManager->table(ConfigService::$tableUsers)
-            ->insertGetId([
-                'email' => $this->faker->email,
-                'password' => $this->hasher->make($this->faker->word),
-                'remember_token' => str_random(60),
-                'display_name' => $this->faker->words(4, true),
-                'created_at' => time(),
-                'updated_at' => time(),
-            ]);
+        $userId = 1;
 
         $response = $this->call('GET', '/authenticate/token',
             ['uid' => $userId, 'v' => rand()]);
