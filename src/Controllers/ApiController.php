@@ -3,9 +3,8 @@
 namespace Railroad\Usora\Controllers;
 
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
-use Railroad\Usora\Entities\User;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Http\Middleware\Authenticate;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -23,60 +22,106 @@ class ApiController extends Controller
     public function __construct(JWTAuth $jwtAuth)
     {
         $this->jwtAuth = $jwtAuth;
+
+        $this->middleware(Authenticate::class, ['except' => ['login']]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
         $jwt_token = null;
-        if (!Auth::attempt($input)) {
-            throw new InvalidCredentials('Invalid email or password provided.');
-        }
-//        dd($this->jwtAuth->attempt($input) );
-//        $jwt_token = JWTAuth::attemp(Auth::user());
 
         if (!$jwt_token = $this->jwtAuth->attempt($input)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid Email or Password',
-            ], 401);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Invalid Email or Password',
+                ],
+                401
+            );
         }
-//
-        return response()->json([
-            'success' => true,
-            'token' => $jwt_token,
-        ]);
+
+        return response()->json(
+            [
+                'success' => true,
+                'token' => $jwt_token,
+            ]
+        );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
-        $this->validate($request, [
-            'token' => 'required'
-        ]);
+        $validator = validator(
+            $request->all(),
+            [
+                'token' => 'required',
+
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response('');
+        }
 
         try {
-            JWTAuth::invalidate($request->token);
+            $this->jwtAuth->invalidate($this->jwtAuth->parseToken());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'User logged out successfully'
-            ]);
+            return response()->json(
+                [
+                    'success' => true,
+                    'message' => 'Successfully logged out',
+                ]
+            );
         } catch (JWTException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Sorry, the user cannot be logged out'
-            ], 500);
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Sorry, the user cannot be logged out',
+                ],
+                500
+            );
         }
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws JWTException
+     */
     public function getAuthUser(Request $request)
     {
-        $this->validate($request, [
-            'token' => 'required'
-        ]);
+        try {
 
-        $user = JWTAuth::authenticate($request->token);
+            if (!$user =
+                $this->jwtAuth->parseToken()
+                    ->authenticate()) {
+                return response()->json(['user_not_found'], 404);
+            }
 
-        return response()->json(['user' => $user]);
+        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+
+            return response()->json(['token_expired'], $e->getStatusCode());
+
+        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+
+            return response()->json(['token_invalid'], $e->getStatusCode());
+
+        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+
+            return response()->json(['token_absent'], $e->getStatusCode());
+
+        }
+
+        // the token is valid and we have found the user via the sub claim
+        return response()->json(compact('user'));
     }
 }
