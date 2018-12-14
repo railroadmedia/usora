@@ -169,6 +169,6 @@ Route::delete(
     \Railroad\Usora\Controllers\UserFieldController::class . '@delete'
 )->name('usora.user-field.delete');
 
-Route::post('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
-Route::post('api/logout', \Railroad\Usora\Controllers\ApiController::class . '@logout');
-Route::post('api/me', \Railroad\Usora\Controllers\ApiController::class . '@getAuthUser');
+Route::put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
+Route::put('api/logout', \Railroad\Usora\Controllers\ApiController::class . '@logout');
+Route::put('api/me', \Railroad\Usora\Controllers\ApiController::class . '@getAuthUser');
