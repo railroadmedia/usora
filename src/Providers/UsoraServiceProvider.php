@@ -16,6 +16,7 @@ use MikeMcLin\WpPassword\WpPasswordProvider;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
 use Railroad\Usora\Services\ConfigService;
+use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 use Redis;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -31,6 +32,7 @@ class UsoraServiceProvider extends ServiceProvider
         $this->publishes(
             [
                 __DIR__ . '/../../config/usora.php' => config_path('usora.php'),
+                __DIR__ . '/../../config/jwt.php' => config_path('jwt.php'),
             ]
         );
 
@@ -98,6 +100,8 @@ class UsoraServiceProvider extends ServiceProvider
     {
         $this->app->register(AuthenticationServiceProvider::class);
         $this->app->register(WpPasswordProvider::class);
+
+        $this->app->register(LaravelServiceProvider::class);
 
         // setup doctrine
         // this is where proxy class files will be stored

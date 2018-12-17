@@ -168,3 +168,7 @@ Route::delete(
     'user-field/delete/{id}',
     \Railroad\Usora\Controllers\UserFieldController::class . '@delete'
 )->name('usora.user-field.delete');
+
+Route::put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
+Route::put('api/logout', \Railroad\Usora\Controllers\ApiController::class . '@logout');
+Route::put('api/me', \Railroad\Usora\Controllers\ApiController::class . '@getAuthUser');

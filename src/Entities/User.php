@@ -8,13 +8,14 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Railroad\Usora\Services\ConfigService;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserRepository")
  * @ORM\HasLifecycleCallbacks
  * @ORM\Table(name="usora_users")
  */
-class User implements Authenticatable, CanResetPassword
+class User implements Authenticatable, CanResetPassword, JWTSubject
 {
     use TimestampableEntity, \Illuminate\Auth\Passwords\CanResetPassword;
 
@@ -202,5 +203,31 @@ class User implements Authenticatable, CanResetPassword
             )
             ->notify(new ConfigService::$passwordResetNotificationClass($token));
 
+    }
+
+
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getAuthIdentifier();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [
+            'user' => [
+                'id' => $this->getId()
+            ]
+        ];
     }
 }

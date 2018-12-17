@@ -126,6 +126,11 @@ class UsoraTestCase extends TestCase
             config()->set('usora.' . $key, $value);
         }
 
+        $jwtConfig = require(__DIR__ . '/../config/jwt.php');
+        foreach ($jwtConfig as $key => $value) {
+            config()->set('jwt.' . $key, $value);
+        }
+
         // misc
         config()->set('usora.data_mode', 'host');
         config()->set('usora.authentication_controller_middleware', []);
