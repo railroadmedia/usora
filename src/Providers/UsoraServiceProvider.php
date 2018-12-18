@@ -77,15 +77,6 @@ class UsoraServiceProvider extends ServiceProvider
 
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
-
-        // configure resora
-        config()->set(
-            'resora.decorators.users',
-            array_merge(
-                config()->get('resora.decorators.users', []),
-                [UserFieldDecorator::class, UserEntityDecorator::class]
-            )
-        );
     }
 
     /**

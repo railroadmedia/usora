@@ -34,8 +34,6 @@ class UserFieldDecoratorTest extends UsoraTestCase
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
         $this->userFieldRepository = $this->entityManager->getRepository(UserField::class);
-//        $this->userRepository = app(UserRepository::class);
-//        $this->userFieldRepository = app(UserFieldRepository::class);
     }
 
     public function test_decorate_none()
@@ -45,13 +43,6 @@ class UserFieldDecoratorTest extends UsoraTestCase
 
         $this->assertEquals([], $response->getFields());
     }
-
-//    public function test_decorate_single()
-//    {
-//        $response = $this->userRepository->find(1);
-//
-//        $this->assertEquals([], $response->getFields());
-//    }
 
     public function test_decorate_multiple()
     {
