@@ -246,7 +246,7 @@ class UserFieldController extends Controller
      */
     public function delete(Request $request, $id)
     {
-        if (!$this->permissionService->can(auth()->id(), 'delete-users')) {
+        if (!$this->permissionService->can(auth()->id(), 'delete-user-field')) {
             throw new NotFoundHttpException();
         }
 
