@@ -12,7 +12,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  */
 class EmailChange
 {
-
+    use TimestampableEntity;
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
      * @var int
@@ -97,26 +97,5 @@ class EmailChange
     public function setToken(string $token): void
     {
         $this->token = $token;
-    }
-
-    /**
-     * Sets createdAt.
-     *
-     * @param  string $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * Returns createdAt.
-     *
-     * @return string
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
     }
 }

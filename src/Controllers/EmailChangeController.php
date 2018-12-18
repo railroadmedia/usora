@@ -71,7 +71,6 @@ class EmailChangeController extends Controller
 
         if (!$emailChange) {
             $emailChange = new EmailChange();
-            $emailChange->setCreatedAt(Carbon::now());
         }
 
         $emailChange->setEmail($payload['email']);
