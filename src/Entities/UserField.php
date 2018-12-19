@@ -38,12 +38,6 @@ class UserField
      */
     protected $value;
 
-    //    /**
-    //     * @ORM\Column(type="string", nullable=true)
-    //     * @var string
-    //     */
-    //    protected $index = '';
-
     /**
      * @return int
      */
@@ -102,22 +96,5 @@ class UserField
     : void {
         $this->value = $value;
     }
-
-    //    /**
-    //     * @return string
-    //     */
-    //    public function getIndex()
-    //    : string
-    //    {
-    //        return $this->index;
-    //    }
-    //
-    //    /**
-    //     * @param string $index
-    //     */
-    //    public function setIndex(string $index)
-    //    : void {
-    //        $this->index = $index;
-    //    }
 
 }
