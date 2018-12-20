@@ -2,10 +2,8 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
-use Carbon\Carbon;
 use Railroad\Usora\DataFixtures\UserFieldFixtureLoader;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
@@ -216,25 +214,16 @@ class UserFieldJsonControllerTest extends UsoraTestCase
             [
                 'key' => 'key+1',
                 'id' => 1,
-                'user' => [
-                    'id' => '1',
-                ],
                 'value' => 'value 1',
             ],
             [
                 'key' => 'key+2',
                 'id' => 2,
-                'user' => [
-                    'id' => '1',
-                ],
                 'value' => 'value 2',
             ],
             [
                 'key' => 'key+3',
                 'id' => 3,
-                'user' => [
-                    'id' => '1',
-                ],
                 'value' => 'value 3',
             ],
         ];

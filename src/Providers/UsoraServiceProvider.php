@@ -111,6 +111,8 @@ class UsoraServiceProvider extends ServiceProvider
             __DIR__ . '/../../vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'
         );
 
+        \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
+
         // setup annotation reader
         $annotationReader = new AnnotationReader();
         $cachedAnnotationReader = new CachedReader(

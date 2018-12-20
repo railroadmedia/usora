@@ -3,12 +3,16 @@
 namespace Railroad\Usora\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Exclude;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserFieldRepository")
  * @ORM\HasLifecycleCallbacks
  * @ORM\Table(name="usora_user_fields")
+ * @ExclusionPolicy("none")
+ *
  */
 class UserField
 {
@@ -23,6 +27,8 @@ class UserField
     /**
      * @ORM\ManyToOne(targetEntity="Railroad\Usora\Entities\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @Exclude
+     *
      */
     private $user;
 
