@@ -49,6 +49,7 @@ class ApiController extends Controller
             [
                 'success' => true,
                 'token' => $jwt_token,
+                'userId' => auth()->id(),
             ]
         );
     }

@@ -25,7 +25,7 @@ class APIControllerTest extends UsoraTestCase
                 ->insertGetId($user);
 
         $response = $this->call(
-            'POST',
+            'PUT',
             'api/login',
             [
                 'email' => $user['email'],
@@ -35,12 +35,13 @@ class APIControllerTest extends UsoraTestCase
         $response->assertJson(['success' => 'true']);
 
         $this->assertArrayHasKey('token', $response->decodeResponseJson());
+        $this->assertArrayHasKey('userId', $response->decodeResponseJson());
     }
 
     public function test_invalid_credentials_auth()
     {
         $response = $this->call(
-            'POST',
+            'PUT',
             'api/login',
             [
                 'email' => $this->faker->email,
@@ -76,7 +77,7 @@ class APIControllerTest extends UsoraTestCase
                 ->insertGetId($user);
 
         $login = $this->call(
-            'POST',
+            'PUT',
             'api/login',
             [
                 'email' => $user['email'],
@@ -87,7 +88,7 @@ class APIControllerTest extends UsoraTestCase
         $token = $login->decodeResponseJson()['token'];
 
         $result = $this->call(
-            'POST',
+            'PUT',
             'api/logout',
             [
                 'token' => $token
@@ -115,7 +116,7 @@ class APIControllerTest extends UsoraTestCase
                 ->insertGetId($user);
 
         $login = $this->call(
-            'POST',
+            'PUT',
             'api/login',
             [
                 'email' => $user['email'],
@@ -126,7 +127,7 @@ class APIControllerTest extends UsoraTestCase
         $token = $login->decodeResponseJson()['token'];
 
         $result = $this->call(
-            'POST',
+            'PUT',
             'api/me',
             [
                 'token' => $token
