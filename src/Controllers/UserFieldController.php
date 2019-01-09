@@ -49,8 +49,6 @@ class UserFieldController extends Controller
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
         $this->userFieldRepository = $this->entityManager->getRepository(UserField::class);
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

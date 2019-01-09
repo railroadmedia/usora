@@ -48,8 +48,6 @@ class PasswordController extends Controller
         $this->permissionService = $permissionService;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

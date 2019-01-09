@@ -55,8 +55,6 @@ class AuthenticationController extends Controller
         $this->entityManager = $entityManager;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

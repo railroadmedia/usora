@@ -31,8 +31,6 @@ class ApiController extends Controller
         $this->serializer =
             SerializerBuilder::create()
                 ->build();
-
-        $this->middleware(Authenticate::class, ['except' => ['login']]);
     }
 
     /**

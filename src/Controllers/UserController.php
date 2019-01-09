@@ -53,8 +53,6 @@ class UserController extends Controller
         $this->hasher = $hasher;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

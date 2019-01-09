@@ -62,8 +62,6 @@ class UserJsonController extends Controller
         $this->serializer =
             SerializerBuilder::create()
                 ->build();
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

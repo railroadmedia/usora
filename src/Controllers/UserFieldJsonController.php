@@ -59,8 +59,6 @@ class UserFieldJsonController extends Controller
         $this->userRepository = $this->entityManager->getRepository(User::class);
 
         $this->serializer = SerializerBuilder::create()->build();
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**

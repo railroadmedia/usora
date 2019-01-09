@@ -46,8 +46,6 @@ class EmailChangeController extends Controller
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
         $this->emailChangeRepository = $this->entityManager->getRepository(EmailChange::class);
-
-        $this->middleware(ConfigService::$authenticationControllerMiddleware);
     }
 
     /**
