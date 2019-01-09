@@ -2,8 +2,6 @@
 
 namespace Railroad\Usora\Requests;
 
-use Railroad\Usora\Requests\FormRequest;
-
 class UserJsonUpdateRequest extends FormRequest
 {
     /**
@@ -24,7 +22,7 @@ class UserJsonUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'display_name' =>'string|max:255',
+            'display_name' => 'string|max:255',
         ];
     }
 }

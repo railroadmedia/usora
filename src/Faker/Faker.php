@@ -22,6 +22,7 @@ class Faker extends Generator
             $override
         );
     }
+
     public function userField(array $override = [])
     {
         return array_merge(

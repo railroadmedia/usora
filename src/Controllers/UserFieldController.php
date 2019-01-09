@@ -7,12 +7,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
-use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Requests\UserFieldCreateRequest;
 use Railroad\Usora\Requests\UserFieldUpdateByKeyRequest;
 use Railroad\Usora\Requests\UserFieldUpdateRequest;
-use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserFieldController extends Controller

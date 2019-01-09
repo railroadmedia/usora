@@ -16,7 +16,7 @@
             return;
         }
 
-        @foreach(\Railroad\Usora\Services\ConfigService::$domainsToAuthenticateOn as $domain)
+        @foreach(config('usora.domains_to_authenticate_on') as $domain)
             window.parent.postMessage(
                 {token: token, user_id: userId, failed: false},
                 'https://' + '{{ $domain }}'

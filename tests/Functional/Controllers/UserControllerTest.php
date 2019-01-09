@@ -6,7 +6,7 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Illuminate\Support\Facades\Route;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 
 class UserControllerTest extends UsoraTestCase
@@ -43,7 +43,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'display_name' => $userData['display_name'],
                 'email' => $userData['email'],
@@ -76,7 +76,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the users data was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'display_name' => $userData['display_name'],
                 'email' => $userData['email'],
@@ -117,7 +117,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new display name is different from existing
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
                 'display_name' => $newDisplayName,
@@ -135,7 +135,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new display name was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
                 'display_name' => $newDisplayName,
@@ -144,7 +144,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new email field was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
                 'email' => $newEmail,
@@ -168,7 +168,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new display name is different from existing
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
@@ -186,7 +186,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new display name was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
@@ -195,7 +195,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new email field was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'email' => $newEmail,
@@ -226,7 +226,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the new display name was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
@@ -259,7 +259,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the user was removed from the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
             ]
@@ -280,7 +280,7 @@ class UserControllerTest extends UsoraTestCase
 
         // assert the user was not removed from the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
             ]

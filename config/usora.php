@@ -19,12 +19,11 @@ return [
     'data_mode' => 'host', // 'host' or 'client'
 
     // tables
-    'table_prefix' => 'usora_',
     'tables' => [
-        'email_changes' => 'email_changes',
-        'users' => 'users',
-        'password_resets' => 'password_resets',
-        'user_fields' => 'user_fields',
+        'email_changes' => 'usora_email_changes',
+        'users' => 'usora_users',
+        'password_resets' => 'usora_password_resets',
+        'user_fields' => 'usora_user_fields',
     ],
 
     // routes

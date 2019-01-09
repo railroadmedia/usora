@@ -2,8 +2,6 @@
 
 namespace Railroad\Usora\Requests;
 
-use Railroad\Usora\Requests\FormRequest;
-
 class UserJsonCreateRequest extends FormRequest
 {
     /**
@@ -25,8 +23,8 @@ class UserJsonCreateRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'display_name' =>'required|string|max:255|min:2',
-            'password' => 'required|string'
+            'display_name' => 'required|string|max:255|min:2',
+            'password' => 'required|string',
         ];
     }
 }

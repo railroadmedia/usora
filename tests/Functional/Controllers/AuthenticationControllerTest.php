@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 
 class AuthenticationControllerTest extends UsoraTestCase
@@ -73,7 +73,7 @@ class AuthenticationControllerTest extends UsoraTestCase
                 ->guard()
                 ->id()
         );
-        $response->assertRedirect(ConfigService::$loginSuccessRedirectPath);
+        $response->assertRedirect(config('usora.login_success_redirect_path'));
     }
 
     public function test_authenticate_via_verification_token_validation_failed()
@@ -138,7 +138,7 @@ class AuthenticationControllerTest extends UsoraTestCase
             'usora/authenticate/with-third-party'
         );
 
-        $response->assertRedirect(ConfigService::$loginSuccessRedirectPath);
+        $response->assertRedirect(config('usora.login_success_redirect_path'));
     }
 
     public function test_authenticate_via_third_party()
@@ -148,10 +148,10 @@ class AuthenticationControllerTest extends UsoraTestCase
             'usora/authenticate/with-third-party'
         );
 
-        $response->assertSeeText(ConfigService::$loginSuccessRedirectPath);
-        $response->assertSeeText(ConfigService::$loginPagePath);
+        $response->assertSeeText(config('usora.login_success_redirect_path'));
+        $response->assertSeeText(config('usora.login_page_path'));
 
-        foreach (ConfigService::$domainsToCheckForAuthenticateOn as $domain) {
+        foreach (config('usora.domains_to_check_for_authentication') as $domain) {
             $response->assertSeeText($domain);
         }
     }
@@ -299,6 +299,6 @@ class AuthenticationControllerTest extends UsoraTestCase
                 ->guard()
                 ->id()
         );
-        $response->assertRedirect(ConfigService::$loginSuccessRedirectPath);
+        $response->assertRedirect(config('usora.login_success_redirect_path'));
     }
 }

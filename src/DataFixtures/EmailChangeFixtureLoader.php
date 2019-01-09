@@ -5,8 +5,8 @@ namespace Railroad\Usora\DataFixtures;
 use Carbon\Carbon;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Railroad\Usora\Entities\User;
 use Railroad\Usora\Entities\EmailChange;
+use Railroad\Usora\Entities\User;
 
 class EmailChangeFixtureLoader implements FixtureInterface
 {
@@ -32,7 +32,10 @@ class EmailChangeFixtureLoader implements FixtureInterface
         $emailChange2->setEmail('test_change2@test.com');
         $emailChange2->setToken('token2');
         $emailChange2->setUser($user2);
-        $emailChange2->setCreatedAt(Carbon::now()->subYear(1));
+        $emailChange2->setCreatedAt(
+            Carbon::now()
+                ->subYear(1)
+        );
 
         $manager->persist($emailChange2);
 

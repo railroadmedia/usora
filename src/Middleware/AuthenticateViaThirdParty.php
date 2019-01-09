@@ -4,7 +4,6 @@ namespace Railroad\Usora\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Railroad\Usora\Services\ConfigService;
 
 class AuthenticateViaThirdParty
 {
@@ -15,8 +14,9 @@ class AuthenticateViaThirdParty
      */
     public function handle($request, Closure $next)
     {
-        if (!auth()->check() && session()->get('skip-third-party-auth-check') != true &&
-            !empty(ConfigService::$domainsToCheckForAuthenticateOn)) {
+        if (!auth()->check() &&
+            session()->get('skip-third-party-auth-check') != true &&
+            !empty(config('usora.domains_to_check_for_authentication'))) {
             session()->put('skip-third-party-auth-check', true);
             session()->reflash();
 

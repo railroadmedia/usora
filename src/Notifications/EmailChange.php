@@ -2,9 +2,8 @@
 
 namespace Railroad\Usora\Notifications;
 
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
-use Railroad\Usora\Services\ConfigService;
+use Illuminate\Notifications\Notification;
 
 class EmailChange extends Notification
 {
@@ -25,7 +24,7 @@ class EmailChange extends Notification
     /**
      * Create a notification instance.
      *
-     * @param  string  $token
+     * @param  string $token
      * @return void
      */
     public function __construct($token)
@@ -36,18 +35,18 @@ class EmailChange extends Notification
     /**
      * Get the notification's channels.
      *
-     * @param  mixed  $notifiable
+     * @param  mixed $notifiable
      * @return array|string
      */
     public function via($notifiable)
     {
-        return [ConfigService::$emailChangeNotificationChannel];
+        return [config('usora.email_change_notification_channel')];
     }
 
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param  mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -56,8 +55,9 @@ class EmailChange extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        return (new MailMessage)
-            ->line('You are receiving this email because we received an email change request for your account.')
+        return (new MailMessage)->line(
+                'You are receiving this email because we received an email change request for your account.'
+            )
             ->action('Confirm', url()->route('usora.email-change.confirm', ['token' => $this->token]))
             ->line('If you did not request the email change, no further action is required.');
     }
@@ -65,7 +65,7 @@ class EmailChange extends Notification
     /**
      * Set a callback that should be used when building the notification mail message.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure $callback
      * @return void
      */
     public static function toMailUsing($callback)

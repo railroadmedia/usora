@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\DataFixtures;
 
-use Carbon\Carbon;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Faker\Generator;

@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\JsonResponse;
@@ -10,12 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use JMS\Serializer\SerializerBuilder;
 use Railroad\Permissions\Services\PermissionService;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserJsonCreateRequest;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
-use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Railroad\Usora\Entities\User;
 
 class UserJsonController extends Controller
 {
@@ -76,20 +74,19 @@ class UserJsonController extends Controller
 
         $searchTerm = $request->get('search_term', '');
 
-        $query =
-            $this->userRepository->createQueryBuilder('u');
+        $query = $this->userRepository->createQueryBuilder('u');
 
         if (!empty($searchTerm)) {
 
             $query->where(
-                    $query->expr()
-                        ->orX(
-                            $query->expr()
-                                ->like('u.email', ':term'),
-                            $query->expr()
-                                ->like('u.displayName', ':term')
-                        )
-                )
+                $query->expr()
+                    ->orX(
+                        $query->expr()
+                            ->like('u.email', ':term'),
+                        $query->expr()
+                            ->like('u.displayName', ':term')
+                    )
+            )
                 ->setParameter('term', '%' . addcslashes($searchTerm, '%_') . '%');
         }
 

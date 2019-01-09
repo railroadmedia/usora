@@ -12,9 +12,8 @@ use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Entities\UserField;
 use Railroad\Usora\Requests\UserFieldJsonCreateRequest;
-use Railroad\Usora\Requests\UserFieldJsonUpdateRequest;
 use Railroad\Usora\Requests\UserFieldJsonUpdateByKeyRequest;
-use Railroad\Usora\Services\ConfigService;
+use Railroad\Usora\Requests\UserFieldJsonUpdateRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserFieldJsonController extends Controller
@@ -58,7 +57,9 @@ class UserFieldJsonController extends Controller
         $this->userFieldRepository = $this->entityManager->getRepository(UserField::class);
         $this->userRepository = $this->entityManager->getRepository(User::class);
 
-        $this->serializer = SerializerBuilder::create()->build();
+        $this->serializer =
+            SerializerBuilder::create()
+                ->build();
     }
 
     /**
@@ -128,7 +129,8 @@ class UserFieldJsonController extends Controller
         $userField = $this->userFieldRepository->find($id);
 
         if (!$this->permissionService->can(auth()->id(), 'update-users')) {
-            if ($userField->getUser()->getId() !== auth()->id()) {
+            if ($userField->getUser()
+                    ->getId() !== auth()->id()) {
                 throw new NotFoundHttpException();
             }
 

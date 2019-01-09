@@ -10,9 +10,8 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Services\PermissionService;
-use Railroad\Usora\Repositories\UserRepository;
-use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Repositories\UserRepository;
 
 class PasswordController extends Controller
 {

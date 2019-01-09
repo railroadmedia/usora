@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
-use Railroad\Usora\Services\ConfigService;
 
 class ForgotPasswordController extends Controller
 {
@@ -29,18 +28,22 @@ class ForgotPasswordController extends Controller
         $request->validate(
             [
                 'email' => 'required|email|exists:' .
-                    ConfigService::$databaseConnectionName .
+                    config('usora.database_connection_name') .
                     '.' .
-                    ConfigService::$tableUsers . ',email',
+                    config('usora.tables.users') .
+                    ',email',
             ]
         );
 
-        $response = $this->broker()->sendResetLink(
-            $request->only('email')
-        );
+        $response =
+            $this->broker()
+                ->sendResetLink(
+                    $request->only('email')
+                );
 
         if ($response === Password::RESET_LINK_SENT) {
-            return redirect()->to(ConfigService::$loginPagePath)
+            return redirect()
+                ->to(config('usora.login_page_path'))
                 ->with(
                     'successes',
                     new MessageBag(['password' => 'Password reset link has been sent to your email.'])

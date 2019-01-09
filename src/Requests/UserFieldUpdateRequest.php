@@ -25,8 +25,8 @@ class UserFieldUpdateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'string|max:255|min:1',
-            'value' => 'nullable|string'
+            'key' => 'string|max:255|min:1',
+            'value' => 'nullable|string',
         ];
     }
 }

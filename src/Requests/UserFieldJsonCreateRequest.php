@@ -2,8 +2,6 @@
 
 namespace Railroad\Usora\Requests;
 
-use Railroad\Usora\Requests\FormRequest;
-
 class UserFieldJsonCreateRequest extends FormRequest
 {
     /**
@@ -25,8 +23,8 @@ class UserFieldJsonCreateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'required|string|max:255|min:1',
-            'value' => 'nullable|string'
+            'key' => 'required|string|max:255|min:1',
+            'value' => 'nullable|string',
         ];
     }
 }

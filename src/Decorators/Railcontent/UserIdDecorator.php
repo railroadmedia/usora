@@ -33,11 +33,12 @@ class UserIdDecorator
             $userIds[] = $result['user_id'];
         }
 
-        $users = $this->userRepository->query()
-            ->select(['id', 'display_name', 'created_at'])
-            ->whereIn('id', $userIds)
-            ->get()
-            ->keyBy('id');
+        $users =
+            $this->userRepository->query()
+                ->select(['id', 'display_name', 'created_at'])
+                ->whereIn('id', $userIds)
+                ->get()
+                ->keyBy('id');
 
         foreach ($results as $resultIndex => $result) {
             if (!empty($users[$result['user_id']])) {

@@ -16,7 +16,6 @@ use MikeMcLin\WpPassword\WpPasswordProvider;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
 use Railroad\Usora\Routes\RouteRegistrar;
-use Railroad\Usora\Services\ConfigService;
 use Redis;
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
@@ -54,42 +53,8 @@ class UsoraServiceProvider extends ServiceProvider
             ]
         );
 
-        // authentication
-        ConfigService::$authenticationMode = config('usora.authentication_mode');
-        ConfigService::$domainsToAuthenticateOn = config('usora.domains_to_authenticate_on');
-        ConfigService::$domainsToCheckForAuthenticateOn = config('usora.domains_to_check_for_authentication');
-
-        ConfigService::$loginPagePath = config('usora.login_page_path');
-        ConfigService::$loginSuccessRedirectPath = config('usora.login_success_redirect_path');
-        ConfigService::$rememberMe = config('usora.remember_me');
-
-        // database
-        ConfigService::$databaseConnectionName = config('usora.database_connection_name');
-        ConfigService::$connectionMaskPrefix = config('usora.connection_mask_prefix');
-        ConfigService::$dataMode = config('usora.data_mode');
-
-        // tables
-        ConfigService::$tablePrefix = config('usora.table_prefix');
-        ConfigService::$tableUsers = ConfigService::$tablePrefix . config('usora.tables.users');
-        ConfigService::$tableUserFields = ConfigService::$tablePrefix . config('usora.tables.user_fields');
-        ConfigService::$tableUserData = ConfigService::$tablePrefix . config('usora.tables.user_data');
-        ConfigService::$tablePasswordResets = ConfigService::$tablePrefix . config('usora.tables.password_resets');
-        ConfigService::$tableEmailChanges = ConfigService::$tablePrefix . config('usora.tables.email_changes');
-
-        // password reset
-        ConfigService::$passwordResetNotificationClass = config('usora.password_reset_notification_class');
-        ConfigService::$passwordResetNotificationChannel = config('usora.password_reset_notification_channel');
-
-        // email change
-        ConfigService::$emailChangeNotificationClass = config('usora.email_change_notification_class');
-        ConfigService::$emailChangeNotificationChannel = config('usora.email_change_notification_channel');
-        ConfigService::$emailChangeTtl = config('usora.email_change_token_ttl');
-
-        // middleware
-        ConfigService::$authenticationControllerMiddleware = config('usora.authentication_controller_middleware');
-
-        // migrations and routes and views
-        if (ConfigService::$dataMode == 'host') {
+        // only run migrations if this is the master 'host' implementation
+        if (config('usora.data_mode') == 'host') {
             $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         }
 

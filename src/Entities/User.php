@@ -7,7 +7,6 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Notifications\AnonymousNotifiable;
-use Railroad\Usora\Services\ConfigService;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
@@ -197,15 +196,15 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
 
     public function sendPasswordResetNotification($token)
     {
+        $class = config('usora.password_reset_notification_class');
+
         (new AnonymousNotifiable())->route(
-                ConfigService::$passwordResetNotificationChannel,
-                $this->getEmailForPasswordReset()
-            )
-            ->notify(new ConfigService::$passwordResetNotificationClass($token));
+            config('usora.password_reset_notification_channel'),
+            $this->getEmailForPasswordReset()
+        )
+            ->notify(new $class($token));
 
     }
-
-
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -226,8 +225,8 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     {
         return [
             'user' => [
-                'id' => $this->getId()
-            ]
+                'id' => $this->getId(),
+            ],
         ];
     }
 }

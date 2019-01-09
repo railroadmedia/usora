@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
-use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Entities\User;
 
 class ResetPasswordController extends Controller
@@ -84,7 +83,7 @@ class ResetPasswordController extends Controller
             session()->put('skip-third-party-auth-check', true);
 
             return redirect()
-                ->to(ConfigService::$loginSuccessRedirectPath)
+                ->to(config('usora.login_success_redirect_path'))
                 ->with(
                     'successes',
                     new MessageBag(['password' => 'Your password has been reset successfully.'])

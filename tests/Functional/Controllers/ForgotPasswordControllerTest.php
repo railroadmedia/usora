@@ -4,7 +4,7 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Illuminate\Notifications\AnonymousNotifiable;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -41,7 +41,7 @@ class ForgotPasswordControllerTest extends UsoraTestCase
 
         $this->notificationFake->assertSentTo(
             new AnonymousNotifiable(),
-            ConfigService::$passwordResetNotificationClass
+            config('usora.password_reset_notification_class')
         );
 
         $this->assertEmpty(

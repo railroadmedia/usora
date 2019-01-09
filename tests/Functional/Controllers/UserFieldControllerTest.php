@@ -4,7 +4,7 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Railroad\Usora\DataFixtures\UserFieldFixtureLoader;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -44,7 +44,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -73,7 +73,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -102,7 +102,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -137,7 +137,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert new key/value generated
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             [
                 'id' => 1,
                 'key' => $userFieldData['key'],
@@ -155,7 +155,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -178,7 +178,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert new key/value generated
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -190,7 +190,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -212,7 +212,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert new key/value generated
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
 
@@ -227,7 +227,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the new user field data was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldData
         );
     }
@@ -270,7 +270,7 @@ class UserFieldControllerTest extends UsoraTestCase
         // assert the users data was saved in the db
         foreach ($userFieldsData as $userField) {
             $this->assertDatabaseMissing(
-                ConfigService::$tableUserFields,
+                config('usora.tables.user_fields'),
                 $userField
             );
         }
@@ -318,7 +318,7 @@ class UserFieldControllerTest extends UsoraTestCase
         foreach ($userFieldsData as $userField) {
 
             $this->assertDatabaseHas(
-                ConfigService::$tableUserFields,
+                config('usora.tables.user_fields'),
                 $userField
             );
         }
@@ -346,7 +346,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldsInputData
         );
 
@@ -391,7 +391,7 @@ class UserFieldControllerTest extends UsoraTestCase
         // assert the users data was saved in the db
         foreach ($userFieldsData as $userField) {
             $this->assertDatabaseHas(
-                ConfigService::$tableUserFields,
+                config('usora.tables.user_fields'),
                 $userField
             );
         }
@@ -411,7 +411,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the user was removed from the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             [
                 'id' => 1,
             ]
@@ -433,7 +433,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the user was not removed from the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             [
                 'id' => 1,
             ]
@@ -459,7 +459,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUserFields,
+            config('usora.tables.user_fields'),
             $userFieldsInputData
         );
 

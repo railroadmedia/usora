@@ -2,10 +2,8 @@
 
 namespace Railroad\Usora\Requests;
 
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeConfirmationRequest extends FormRequest
 {
@@ -32,9 +30,7 @@ class EmailChangeConfirmationRequest extends FormRequest
                 'required',
                 'string',
                 Rule::exists(
-                    ConfigService::$databaseConnectionName .
-                    '.' .
-                    ConfigService::$tableEmailChanges,
+                    config('usora.database_connection_name') . '.' . config('usora.tables.email_changes'),
                     'token'
                 ),
             ],
@@ -44,7 +40,7 @@ class EmailChangeConfirmationRequest extends FormRequest
     public function messages()
     {
         return [
-            'token'  => 'Invalid token.',
+            'token' => 'Invalid token.',
         ];
     }
 }

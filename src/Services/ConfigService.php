@@ -7,21 +7,6 @@ class ConfigService
     /**
      * @var string
      */
-    public static $authenticationMode;
-
-    /**
-     * @var string
-     */
-    public static $databaseConnectionName;
-    
-    /**
-     * @var string
-     */
-    public static $connectionMaskPrefix;
-
-    /**
-     * @var string
-     */
     public static $dataMode;
 
     /**

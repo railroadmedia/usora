@@ -3,7 +3,6 @@
 namespace Railroad\Usora\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeRequest extends FormRequest
 {
@@ -26,9 +25,10 @@ class EmailChangeRequest extends FormRequest
     {
         return [
             'email' => 'required|email|unique:' .
-                    ConfigService::$databaseConnectionName .
-                    '.' .
-                    ConfigService::$tableUsers . ',email',
+                config('usora.database_connection_name') .
+                '.' .
+                config('usora.tables.users') .
+                ',email',
         ];
     }
 }

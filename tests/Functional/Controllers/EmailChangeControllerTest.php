@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Railroad\Usora\DataFixtures\EmailChangeFixtureLoader;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Events\EmailChangeRequest;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
@@ -69,7 +69,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         // assert the request data was saved in db
         $this->assertDatabaseHas(
-            ConfigService::$tableEmailChanges,
+            config('usora.tables.email_changes'),
             [
                 'user_id' => 1,
                 'email' => $newEmail,
@@ -80,8 +80,8 @@ class EmailChangeControllerTest extends UsoraTestCase
         // assert the email was sent and contains the confirmation token
         Notification::assertSentTo(
             (new AnonymousNotifiable)
-                ->route(ConfigService::$emailChangeNotificationChannel, $newEmail),
-            ConfigService::$emailChangeNotificationClass,
+                ->route(config('usora.email_change_notification_channel'), $newEmail),
+            config('usora.email_change_notification_class'),
             function ($notification) use ($token) {
                 return $notification->token === $token;
             }
@@ -136,7 +136,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         // assert the new email was saved in users table
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => 1,
                 'email' => $newEmail

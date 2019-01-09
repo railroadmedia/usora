@@ -25,8 +25,8 @@ class UserFieldCreateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'required|string|max:255',
-            'value' => 'nullable|string'
+            'key' => 'required|string|max:255',
+            'value' => 'nullable|string',
         ];
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Railroad\Usora\Services\ConfigService;
+
 
 class UsoraCreateUserFieldsTable extends Migration
 {
@@ -15,8 +15,8 @@ class UsoraCreateUserFieldsTable extends Migration
      */
     public function up()
     {
-        Schema::connection(ConfigService::$databaseConnectionName)->create(
-            ConfigService::$tableUserFields,
+        Schema::connection(config('usora.database_connection_name'))->create(
+            config('usora.tables.user_fields'),
             function (Blueprint $table) {
                 $table->increments('id');
 
@@ -39,6 +39,6 @@ class UsoraCreateUserFieldsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigService::$tableUserFields);
+        Schema::dropIfExists(config('usora.tables.user_fields'));
     }
 }

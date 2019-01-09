@@ -2,8 +2,6 @@
 
 namespace Railroad\Usora\Requests;
 
-use Railroad\Usora\Requests\FormRequest;
-
 class UserFieldJsonUpdateRequest extends FormRequest
 {
     /**
@@ -25,8 +23,8 @@ class UserFieldJsonUpdateRequest extends FormRequest
     {
         return [
             'user_id' => 'numeric',
-            'key' =>'string|max:255|min:1',
-            'value' => 'nullable|string'
+            'key' => 'string|max:255|min:1',
+            'value' => 'nullable|string',
         ];
     }
 }

@@ -27,15 +27,16 @@ class UserAccessDecorator implements DecoratorInterface
     {
         $userIds = $users->pluck('id');
 
-        $usersAccesses = $this->databaseManager->table(ConfigService::$tableUserAccess)
-            ->join(
-                ConfigService::$tableAccess,
-                ConfigService::$tableAccess . '.id',
-                '=',
-                ConfigService::$tableUserAccess . '.access_id'
-            )
-            ->whereIn('user_id', $userIds)
-            ->get();
+        $usersAccesses =
+            $this->databaseManager->table(ConfigService::$tableUserAccess)
+                ->join(
+                    ConfigService::$tableAccess,
+                    ConfigService::$tableAccess . '.id',
+                    '=',
+                    ConfigService::$tableUserAccess . '.access_id'
+                )
+                ->whereIn('user_id', $userIds)
+                ->get();
 
         foreach ($users as $userIndex => $user) {
             $users[$userIndex]['access'] = [];

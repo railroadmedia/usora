@@ -2,9 +2,7 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +12,6 @@ use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
 use Railroad\Usora\Requests\UserUpdateRequest;
-use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller

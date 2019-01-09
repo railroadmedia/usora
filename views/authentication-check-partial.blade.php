@@ -3,10 +3,10 @@
     var loginPageUrl = '{{ $loginPageUrl }}';
     var domainsToAuthenticateFromChecked = [];
     var domainsToAuthenticateFromCount =
-            {{ count(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn) }};
+            {{ count(config('usora.domains_to_check_for_authentication')) }};
     var failedDomains = 0;
 
-    @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)
+    @foreach(config('usora.domains_to_check_for_authentication') as $domain)
         domainsToAuthenticateFromChecked['{{ $domain }}'] = true;
 
     @endforeach
@@ -75,7 +75,7 @@
     }
 </script>
 
-@foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)
+@foreach(config('usora.domains_to_check_for_authentication') as $domain)
     <iframe id="receiver"
             src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">

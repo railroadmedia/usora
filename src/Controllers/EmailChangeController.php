@@ -15,7 +15,6 @@ use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
 use Railroad\Usora\Requests\EmailChangeConfirmationRequest;
 use Railroad\Usora\Requests\EmailChangeRequest;
-use Railroad\Usora\Services\ConfigService;
 
 class EmailChangeController extends Controller
 {
@@ -110,7 +109,7 @@ class EmailChangeController extends Controller
             [
                 'token' => 'bail|required|string|exists:' .
 
-                    ConfigService::$databaseConnectionName . '.' . ConfigService::$tableEmailChanges,
+                    config('usora.database_connection_name') . '.' . config('usora.tables.email_changes'),
                 'token',
             ]
         );
@@ -128,19 +127,18 @@ class EmailChangeController extends Controller
                     ->format('Y-m-d H:i:s')
             ) <
             Carbon::now()
-                ->subHours(ConfigService::$emailChangeTtl)) {
+                ->subHours(config('usora.email_change_token_ttl'))) {
             return redirect()
                 ->back()
                 ->withErrors(['token' => 'Your email reset token has expired.']);
         }
 
-        $user =
-            $this->userRepository->findOneBy(
-                [
-                    'id' => $emailChangeData->getUser()
-                        ->getId(),
-                ]
-            );
+        $user = $this->userRepository->findOneBy(
+            [
+                'id' => $emailChangeData->getUser()
+                    ->getId(),
+            ]
+        );
         $user->setEmail($emailChangeData->getEmail());
 
         $this->entityManager->persist($user);
@@ -178,7 +176,9 @@ class EmailChangeController extends Controller
 
     public function sendEmailChangeNotification($token, $email)
     {
-        (new AnonymousNotifiable)->route(ConfigService::$emailChangeNotificationChannel, $email)
-            ->notify(new ConfigService::$emailChangeNotificationClass($token));
+        $class = config('usora.email_change_notification_class');
+
+        (new AnonymousNotifiable)->route(config('usora.email_change_notification_channel'), $email)
+            ->notify(new $class($token));
     }
 }

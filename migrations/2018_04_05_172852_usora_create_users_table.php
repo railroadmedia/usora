@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Railroad\Usora\Services\ConfigService;
+
 
 class UsoraCreateUsersTable extends Migration
 {
@@ -14,8 +14,8 @@ class UsoraCreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::connection(ConfigService::$databaseConnectionName)->create(
-            ConfigService::$tableUsers,
+        Schema::connection(config('usora.database_connection_name'))->create(
+            config('usora.tables.users'),
             function(Blueprint $table) {
                 $table->increments('id');
                 
@@ -39,6 +39,6 @@ class UsoraCreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigService::$tableUsers);
+        Schema::dropIfExists(config('usora.tables.users'));
     }
 }

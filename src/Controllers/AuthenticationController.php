@@ -16,7 +16,6 @@ use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Guards\SaltedSessionGuard;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ClientRelayService;
-use Railroad\Usora\Services\ConfigService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -81,14 +80,14 @@ class AuthenticationController extends Controller
                     ->away($request->get('redirect'))
                     ->withErrors($errors) :
                 redirect()
-                    ->to(ConfigService::$loginPagePath)
+                    ->to(config('usora.login_page_path'))
                     ->withErrors($errors);
         }
 
-        if (auth()->attempt($request->only('email', 'password'), ConfigService::$rememberMe)) {
+        if (auth()->attempt($request->only('email', 'password'), config('usora.remember_me'))) {
             $user = $this->userRepository->find(auth()->id());
 
-            foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
+            foreach (config('usora.domains_to_authenticate_on') as $domain) {
                 ClientRelayService::authorizeUserOnDomain(
                     $user->getId(),
                     $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
@@ -99,7 +98,7 @@ class AuthenticationController extends Controller
             event(new UserEvent($user->getId(), 'authenticated'));
 
             $redirect =
-                $request->has('redirect') ? $request->get('redirect') : ConfigService::$loginSuccessRedirectPath;
+                $request->has('redirect') ? $request->get('redirect') : config('usora.login_success_redirect_path');
 
             return redirect()->away($redirect);
         } else {
@@ -109,9 +108,9 @@ class AuthenticationController extends Controller
                 if (WpPassword::check(trim($request->get('password')), $userByEmail->getPassword())) {
 
                     SaltedSessionGuard::$updateSalt = false;
-                    auth()->loginUsingId($userByEmail->getId(), ConfigService::$rememberMe);
+                    auth()->loginUsingId($userByEmail->getId(), config('usora.remember_me'));
 
-                    foreach (ConfigService::$domainsToAuthenticateOn as $domain) {
+                    foreach (config('usora.domains_to_authenticate_on') as $domain) {
                         ClientRelayService::authorizeUserOnDomain(
                             $userByEmail->getId(),
                             $this->hasher->make(
@@ -125,7 +124,7 @@ class AuthenticationController extends Controller
 
                     $redirect =
                         $request->has('redirect') ? $request->get('redirect') :
-                            ConfigService::$loginSuccessRedirectPath;
+                            config('usora.login_success_redirect_path');
 
                     return redirect()->away($redirect);
                 }
@@ -141,7 +140,7 @@ class AuthenticationController extends Controller
                 ->away($request->get('redirect'))
                 ->withErrors($errors) :
             redirect()
-                ->to(ConfigService::$loginPagePath)
+                ->to(config('usora.login_page_path'))
                 ->withErrors($errors);
     }
 
@@ -174,7 +173,7 @@ class AuthenticationController extends Controller
 
             SaltedSessionGuard::$updateSalt = false;
 
-            auth()->loginUsingId($user->getId(), ConfigService::$rememberMe);
+            auth()->loginUsingId($user->getId(), config('usora.remember_me'));
         }
 
         return response('');
@@ -193,14 +192,14 @@ class AuthenticationController extends Controller
                 return redirect()->away($request->get('success_redirect'));
             }
 
-            return redirect()->to(ConfigService::$loginSuccessRedirectPath);
+            return redirect()->to(config('usora.login_success_redirect_path'));
         }
 
         return view(
             'usora::authentication-check',
             [
-                'loginSuccessRedirectUrl' => url()->to(ConfigService::$loginSuccessRedirectPath),
-                'loginPageUrl' => session()->get('failure-redirect-url', url()->to(ConfigService::$loginPagePath)),
+                'loginSuccessRedirectUrl' => url()->to(config('usora.login_success_redirect_path')),
+                'loginPageUrl' => session()->get('failure-redirect-url', url()->to(config('usora.login_page_path'))),
             ]
         );
     }
@@ -244,9 +243,9 @@ class AuthenticationController extends Controller
             $request->all(),
             [
                 'uid' => 'required|integer|exists:' .
-                    ConfigService::$databaseConnectionName .
+                    config('usora.database_connection_name') .
                     '.' .
-                    ConfigService::$tableUsers .
+                    config('usora.tables.users') .
                     ',id',
                 'vt' => 'required|string',
             ]
@@ -264,7 +263,7 @@ class AuthenticationController extends Controller
         if ($this->hasher->check($user->getId() . $user->getPassword() . $user->getSessionSalt(), $verificationToken)) {
             SaltedSessionGuard::$updateSalt = false;
 
-            auth()->loginUsingId($userId, ConfigService::$rememberMe);
+            auth()->loginUsingId($userId, config('usora.remember_me'));
 
             return response()->json(['success' => 'true']);
         }
@@ -289,7 +288,7 @@ class AuthenticationController extends Controller
         auth()->logout();
 
         return $request->has('redirect') ? redirect()->away($request->get('redirect')) :
-            redirect()->to(ConfigService::$loginPagePath);
+            redirect()->to(config('usora.login_page_path'));
     }
 
     /**

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Support\Str;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;

@@ -3,7 +3,7 @@
 namespace Railroad\Usora\Tests\Functional;
 
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -215,7 +215,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             $userData
         );
     }
@@ -239,7 +239,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the users data was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'display_name' => $userData['display_name'],
                 'email' => $userData['email'],
@@ -298,7 +298,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the new display name is different from existing
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
                 'display_name' => $newDisplayName,
@@ -325,7 +325,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the new display name was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
                 'display_name' => $newDisplayName,
@@ -334,7 +334,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the new email field was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
                 'email' => $newEmail,
@@ -359,7 +359,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the new display name is different from existing
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
@@ -386,7 +386,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the new display name was saved in the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
@@ -419,7 +419,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the new display name was not saved in the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
                 'display_name' => $newDisplayName,
@@ -469,7 +469,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the user was removed from the db
         $this->assertDatabaseMissing(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
             ]
@@ -491,7 +491,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         // assert the user was not removed from the db
         $this->assertDatabaseHas(
-            ConfigService::$tableUsers,
+            config('usora.tables.users'),
             [
                 'id' => $userId,
             ]

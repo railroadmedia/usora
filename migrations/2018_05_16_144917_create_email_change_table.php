@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Railroad\Usora\Services\ConfigService;
+
 
 class CreateEmailChangeTable extends Migration
 {
@@ -14,8 +14,8 @@ class CreateEmailChangeTable extends Migration
      */
     public function up()
     {
-        Schema::connection(ConfigService::$databaseConnectionName)->create(
-            ConfigService::$tableEmailChanges,
+        Schema::connection(config('usora.database_connection_name'))->create(
+            config('usora.tables.email_changes'),
             function(Blueprint $table) {
                 $table->increments('id');
 
@@ -35,6 +35,6 @@ class CreateEmailChangeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigService::$tableEmailChanges);
+        Schema::dropIfExists(config('usora.tables.email_changes'));
     }
 }

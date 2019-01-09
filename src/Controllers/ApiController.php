@@ -2,12 +2,11 @@
 
 namespace Railroad\Usora\Controllers;
 
-use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Http\Middleware\Authenticate;
-use Tymon\JWTAuth\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Routing\Controller;
 use JMS\Serializer\SerializerBuilder;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\JWTAuth;
 
 class ApiController extends Controller
 {
@@ -56,7 +55,7 @@ class ApiController extends Controller
             [
                 'success' => true,
                 'token' => $jwt_token,
-                'userId' => auth()->id()
+                'userId' => auth()->id(),
             ]
         );
     }

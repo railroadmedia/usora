@@ -22,7 +22,7 @@ use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\UserRepository;
-use Railroad\Usora\Services\ConfigService;
+
 
 class UsoraTestCase extends TestCase
 {
@@ -165,7 +165,7 @@ class UsoraTestCase extends TestCase
 
         // set password configuration
         config()->set('auth.passwords.users.provider', 'usora');
-        config()->set('auth.passwords.users.table', config('usora.table_prefix') . 'password_resets');
+        config()->set('auth.passwords.users.table', config('usora.tables.password_resets'));
 
         $app->register(UsoraServiceProvider::class);
 

@@ -33,7 +33,9 @@ class ClientRelayService
         self::addToBodyTop(
             '<img src="https://' .
             rtrim($domain, '/') .
-            '/' . ltrim($urlPath, '/') . '?vt=' .
+            '/' .
+            ltrim($urlPath, '/') .
+            '?vt=' .
             urlencode($verificationToken) .
             '&uid=' .
             urlencode($userId) .

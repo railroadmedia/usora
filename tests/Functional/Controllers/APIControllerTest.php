@@ -5,7 +5,7 @@ namespace Railroad\Usora\Tests\Functional;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-use Railroad\Usora\Services\ConfigService;
+
 use Railroad\Usora\Tests\UsoraTestCase;
 
 class APIControllerTest extends UsoraTestCase

@@ -2,7 +2,7 @@
 
 namespace Railroad\Usora\Notifications;
 
-use \Illuminate\Auth\Notifications\ResetPassword as ResetPasswordBase;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordBase;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPassword extends ResetPasswordBase
@@ -10,7 +10,7 @@ class ResetPassword extends ResetPasswordBase
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param  mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -19,8 +19,9 @@ class ResetPassword extends ResetPasswordBase
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        return (new MailMessage)
-            ->line('You are receiving this email because we received a password reset request for your account.')
+        return (new MailMessage)->line(
+                'You are receiving this email because we received a password reset request for your account.'
+            )
             ->action('Reset Password', url()->route('usora.password.reset') . '?token=' . $this->token)
             ->line('If you did not request a password reset, no further action is required.');
     }

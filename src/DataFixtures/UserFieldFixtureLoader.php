@@ -15,7 +15,9 @@ class UserFieldFixtureLoader implements FixtureInterface
         $interval = 1;
 
         while ($interval <= $count) {
-            $user = $manager->getRepository(User::class)->find(1);
+            $user =
+                $manager->getRepository(User::class)
+                    ->find(1);
             $userField = new UserField();
             $userField->setKey('key+' . $interval);
             $userField->setValue('value ' . $interval);

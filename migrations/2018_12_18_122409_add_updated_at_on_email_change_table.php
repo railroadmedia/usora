@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Railroad\Usora\Services\ConfigService;
+
 
 class AddUpdatedAtOnEmailChangeTable extends Migration
 {
@@ -14,8 +14,8 @@ class AddUpdatedAtOnEmailChangeTable extends Migration
      */
     public function up()
     {
-        Schema::connection(ConfigService::$databaseConnectionName)->table(
-            ConfigService::$tableEmailChanges,
+        Schema::connection(config('usora.database_connection_name'))->table(
+            config('usora.tables.email_changes'),
             function(Blueprint $table) {
                 $table->timestamp('updated_at')->after('created_at')->nullable();
             }
@@ -29,8 +29,8 @@ class AddUpdatedAtOnEmailChangeTable extends Migration
      */
     public function down()
     {
-        Schema::connection(ConfigService::$databaseConnectionName)->table(
-            ConfigService::$tableEmailChanges,
+        Schema::connection(config('usora.database_connection_name'))->table(
+            config('usora.tables.email_changes'),
             function ($table) {
                 /**
                  * @var $table \Illuminate\Database\Schema\Blueprint

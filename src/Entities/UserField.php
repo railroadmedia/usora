@@ -3,9 +3,9 @@
 namespace Railroad\Usora\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\ExclusionPolicy;
-use JMS\Serializer\Annotation\Exclude;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\ExclusionPolicy;
 
 /**
  * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserFieldRepository")
@@ -47,8 +47,7 @@ class UserField
     /**
      * @return int
      */
-    public function getId()
-    : int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -64,16 +63,15 @@ class UserField
     /**
      * @param mixed $user
      */
-    public function setUser($user)
-    : void {
+    public function setUser($user): void
+    {
         $this->user = $user;
     }
 
     /**
      * @return string
      */
-    public function getKey()
-    : string
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -81,16 +79,15 @@ class UserField
     /**
      * @param string $key
      */
-    public function setKey(string $key)
-    : void {
+    public function setKey(string $key): void
+    {
         $this->key = $key;
     }
 
     /**
      * @return text
      */
-    public function getValue()
-    : string
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -98,8 +95,8 @@ class UserField
     /**
      * @param text $value
      */
-    public function setValue($value)
-    : void {
+    public function setValue($value): void
+    {
         $this->value = $value;
     }
 

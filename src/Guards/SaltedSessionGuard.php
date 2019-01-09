@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Guards;
 
-
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -72,7 +71,7 @@ class SaltedSessionGuard extends SessionGuard
 
         $this->clearUserDataFromStorage();
 
-        if (! is_null($this->user)) {
+        if (!is_null($this->user)) {
             $this->cycleRememberToken($user);
         }
 
@@ -84,7 +83,6 @@ class SaltedSessionGuard extends SessionGuard
 
         $this->loggedOut = true;
     }
-
 
     protected function getSaltName()
     {
