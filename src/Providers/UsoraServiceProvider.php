@@ -9,18 +9,36 @@ use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\Migrations\MigrationsServiceProvider;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Railroad\Usora\Decorators\UserEntityDecorator;
 use Railroad\Usora\Decorators\UserFieldDecorator;
+use Railroad\Usora\Routes\RouteRegistrar;
 use Railroad\Usora\Services\ConfigService;
-use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 use Redis;
+use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
 class UsoraServiceProvider extends ServiceProvider
 {
+    /**
+     * @var RouteRegistrar
+     */
+    private $routeRegistrar;
+
+    /**
+     * UsoraServiceProvider constructor.
+     *
+     * @param Application $application
+     */
+    public function __construct(Application $application)
+    {
+        parent::__construct($application);
+
+        $this->routeRegistrar = $application->make(RouteRegistrar::class);
+    }
+
     /**
      * Bootstrap the application services.
      *
@@ -75,7 +93,10 @@ class UsoraServiceProvider extends ServiceProvider
             $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         }
 
-        $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
+        if (config('usora.autoload_all_routes') == true) {
+            $this->routeRegistrar->registerAll();
+        }
+
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
     }
 

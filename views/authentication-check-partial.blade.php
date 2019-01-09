@@ -77,7 +77,7 @@
 
 @foreach(\Railroad\Usora\Services\ConfigService::$domainsToCheckForAuthenticateOn as $domain)
     <iframe id="receiver"
-            src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.post-message-verification-token'))['path'] ?? '', '/') }}"
+            src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">
     </iframe>
 @endforeach

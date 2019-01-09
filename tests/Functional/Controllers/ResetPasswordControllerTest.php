@@ -34,7 +34,7 @@ class ResetPasswordControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'POST',
-            'password/reset'
+            'usora/password/reset'
         );
 
         $response->assertSessionHasErrors(
@@ -53,7 +53,7 @@ class ResetPasswordControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            'password/reset',
+            'usora/password/reset',
             ['email' => 'test+1@test.com', 'password' => $password, 'password_confirmation' => $password, 'token' => '123']
         );
 
@@ -74,7 +74,7 @@ class ResetPasswordControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            'password/reset',
+            'usora/password/reset',
             [
                 'email' => $user->getEmail(),
                 'password' => $newPassword,

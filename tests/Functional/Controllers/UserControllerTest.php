@@ -4,6 +4,7 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Illuminate\Support\Facades\Route;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Services\ConfigService;
 use Railroad\Usora\Tests\UsoraTestCase;
@@ -36,7 +37,7 @@ class UserControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            '/user/store',
+            'usora/user/store',
             $userData
         );
 
@@ -66,7 +67,7 @@ class UserControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            '/user/store',
+            'usora/user/store',
             $userData
         );
 
@@ -95,7 +96,7 @@ class UserControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PUT',
-            '/user/store',
+            'usora/user/store',
             []
         );
 
@@ -125,7 +126,7 @@ class UserControllerTest extends UsoraTestCase
 
         $this->call(
             'PATCH',
-            '/user/update/' . $userId,
+            'usora/user/update/' . $userId,
             [
                 'display_name' => $newDisplayName,
                 'email' => $newEmail,
@@ -176,7 +177,7 @@ class UserControllerTest extends UsoraTestCase
 
         $this->call(
             'PATCH',
-            '/user/update/' . $userIdToUpdate,
+            'usora/user/update/' . $userIdToUpdate,
             [
                 'display_name' => $newDisplayName,
                 'email' => $newEmail,
@@ -214,7 +215,7 @@ class UserControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user/update/' . $userIdToUpdate,
+            'usora/user/update/' . $userIdToUpdate,
             [
                 'display_name' => $newDisplayName,
             ]
@@ -237,7 +238,7 @@ class UserControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PATCH',
-            '/user/update/' . rand(),
+            'usora/user/update/' . rand(),
             ['display_name' => 123]
         );
 
@@ -253,7 +254,7 @@ class UserControllerTest extends UsoraTestCase
 
         $this->call(
             'DELETE',
-            '/user/delete/' . $userId
+            'usora/user/delete/' . $userId
         );
 
         // assert the user was removed from the db
@@ -271,7 +272,7 @@ class UserControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'DELETE',
-            '/user/delete/' . $userId
+            'usora/user/delete/' . $userId
         );
 
         // assert the response code is not found

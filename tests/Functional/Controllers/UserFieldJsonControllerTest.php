@@ -11,8 +11,6 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class UserFieldJsonControllerTest extends UsoraTestCase
 {
-    const API_PREFIX = '/usora';
-
     protected function setUp()
     {
         parent::setUp();
@@ -40,7 +38,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update-or-create-by-key',
+            'usora/json-api/user-field/update-or-create-by-key',
             $userFieldsInputData
         );
 
@@ -90,7 +88,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update-or-create-multiple-by-key',
+            'usora/json-api/user-field/update-or-create-multiple-by-key',
             $userFieldsInputData
         );
 
@@ -137,7 +135,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update-or-create-multiple-by-key',
+            'usora/json-api/user-field/update-or-create-multiple-by-key',
             $userFieldsInputData
         );
 
@@ -179,7 +177,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update-or-create-by-key',
+            'usora/json-api/user-field/update-or-create-by-key',
             $userFieldsInputData
         );
 
@@ -232,7 +230,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user-field/index/' . $userId
+            'usora/json-api/user-field/index/' . $userId
         );
 
         // assert response status code
@@ -248,7 +246,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user-field/show/' . 1
+            'usora/json-api/user-field/show/' . 1
         );
 
         // assert response status code
@@ -270,7 +268,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user-field/show/' . 1
+            'usora/json-api/user-field/show/' . 1
         );
 
         // assert the response code is not found
@@ -294,7 +292,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            self::API_PREFIX . '/user-field/store',
+            'usora/json-api/user-field/store',
             $userFieldData
         );
 
@@ -324,7 +322,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            self::API_PREFIX . '/user-field/store',
+            'usora/json-api/user-field/store',
             $userFieldData
         );
 
@@ -342,7 +340,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PUT',
-            self::API_PREFIX . '/user-field/store',
+            'usora/json-api/user-field/store',
             []
         );
 
@@ -387,7 +385,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update/' . 1,
+            'usora/json-api/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -424,7 +422,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update/' . 1,
+            'usora/json-api/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -456,7 +454,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user-field/update/' . 1,
+            'usora/json-api/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -481,7 +479,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'DELETE',
-            self::API_PREFIX . '/user-field/delete/' . 1
+            'usora/json-api/user-field/delete/' . 1
         );
 
         // assert the user was removed from the db
@@ -504,7 +502,7 @@ class UserFieldJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'DELETE',
-            self::API_PREFIX . '/user-field/delete/' . 1
+            'usora/json-api/user-field/delete/' . 1
         );
 
         // assert the response code is not found

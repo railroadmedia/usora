@@ -155,6 +155,10 @@ class UsoraTestCase extends TestCase
         config()->set('usora.database_driver', 'pdo_sqlite');
         config()->set('usora.database_in_memory', true);
 
+        config()->set('usora.autoload_all_routes', true);
+        config()->set('usora.route_middleware_public_groups', []);
+        config()->set('usora.route_middleware_logged_in_groups', []);
+
         // set auth to our custom provider
         config()->set('auth.providers.usora.driver', 'usora');
         config()->set('auth.guards.web.provider', 'usora');

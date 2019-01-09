@@ -27,6 +27,12 @@ return [
         'user_fields' => 'user_fields',
     ],
 
+    // routes
+    'autoload_all_routes' => true,
+    'route_middleware_public_groups' => ['usora_public'],
+    'route_middleware_logged_in_groups' => ['usora_logged_in'],
+    'route_prefix' => 'usora',
+
     // authentication domains
     'domains_to_authenticate_on' => [
         'dev.domain1.com',

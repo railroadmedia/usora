@@ -25,7 +25,7 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'POST',
-            '/authenticate/credentials',
+            'usora/authenticate/with-credentials',
             ['email' => 'fail', 'password' => '123']
         );
 
@@ -43,7 +43,7 @@ class AuthenticationControllerTest extends UsoraTestCase
         for ($i = 0; $i < 9; $i++) {
             $response = $this->call(
                 'POST',
-                '/authenticate/credentials',
+                'usora/authenticate/with-credentials',
                 ['email' => 'test-1@test.com', 'password' => 'wrong-password']
             );
         }
@@ -63,7 +63,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            '/authenticate/credentials',
+            'usora/authenticate/with-credentials',
             ['email' => 'test+1@test.com', 'password' => 'Password1#']
         );
 
@@ -80,7 +80,7 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'GET',
-            '/authenticate/verification-token'
+            'usora/authenticate/with-verification-token'
         );
 
         $response->assertSeeText('');
@@ -95,7 +95,7 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'GET',
-            '/authenticate/verification-token',
+            'usora/authenticate/with-verification-token',
             ['uid' => 1, 'vt' => '123']
         );
 
@@ -115,7 +115,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/authenticate/verification-token',
+            'usora/authenticate/with-verification-token',
             ['uid' => 1, 'vt' => $this->hasher->make(1 . $user->getPassword() . 'salt1')]
         );
 
@@ -135,7 +135,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/authenticate/third-party'
+            'usora/authenticate/with-third-party'
         );
 
         $response->assertRedirect(ConfigService::$loginSuccessRedirectPath);
@@ -145,7 +145,7 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'GET',
-            '/authenticate/third-party'
+            'usora/authenticate/with-third-party'
         );
 
         $response->assertSeeText(ConfigService::$loginSuccessRedirectPath);
@@ -160,7 +160,7 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'GET',
-            '/authenticate/post-message-verification-token'
+            'usora/authenticate/render-post-message-verification-token'
         );
 
         $response->assertSeeText("var failed = '1';");
@@ -174,7 +174,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/authenticate/post-message-verification-token'
+            'usora/authenticate/render-post-message-verification-token'
         );
 
         $response->assertSeeText(
@@ -188,7 +188,7 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'POST',
-            '/authenticate/set-authentication-cookie'
+            'usora/authenticate/set-authentication-cookie'
         );
 
         $response->assertSeeText('');
@@ -205,7 +205,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            '/authenticate/set-authentication-cookie',
+            'usora/authenticate/set-authentication-cookie',
             ['uid' => $userId, 'vt' => $this->hasher->make('123')]
         );
 
@@ -225,7 +225,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            '/authenticate/set-authentication-cookie',
+            'usora/authenticate/set-authentication-cookie',
             [
                 'uid' => $user->getId(),
                 'vt' => $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
@@ -256,7 +256,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/deauthenticate'
+            'usora/deauthenticate'
         );
 
         $this->assertEmpty(
@@ -289,7 +289,7 @@ class AuthenticationControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            '/authenticate/credentials',
+            'usora/authenticate/with-credentials',
             ['email' => $user->getEmail(), 'password' => $rawPassword]
         );
 

@@ -28,7 +28,7 @@ class ClientRelayService
      */
     public static function authorizeUserOnDomain($userId, $verificationToken, $domain)
     {
-        $urlPath = parse_url(route('usora.authenticate.verification-token'))['path'] ?? '';
+        $urlPath = parse_url(route('usora.authenticate.with-verification-token'))['path'] ?? '';
 
         self::addToBodyTop(
             '<img src="https://' .

@@ -40,7 +40,7 @@ class PasswordControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user/update-password',
+            'usora/user/update-password',
             [
                 'current_password' => $rawPassword,
                 'new_password' => $newPassword,

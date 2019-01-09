@@ -24,7 +24,7 @@ class ForgotPasswordControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'POST',
-            'password/send-reset-email',
+            'usora/password/send-reset-email',
             ['email' => '123']
         );
 
@@ -35,7 +35,7 @@ class ForgotPasswordControllerTest extends UsoraTestCase
     {
         $this->call(
             'POST',
-            'password/send-reset-email',
+            'usora/password/send-reset-email',
             ['email' => 'test+1@test.com']
         );
 

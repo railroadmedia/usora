@@ -44,7 +44,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            '/email-change/request',
+            'usora/email-change/request',
             ['email' => $newEmail]
         );
 
@@ -92,7 +92,7 @@ class EmailChangeControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'POST',
-            '/email-change/request',
+            'usora/email-change/request',
             []
         );
 
@@ -115,7 +115,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'POST',
-            '/email-change/request',
+            'usora/email-change/request',
             ['email' => 'test1@test.com']
         );
 
@@ -130,7 +130,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/email-change/confirm',
+            'usora/email-change/confirm',
             ['token' => 'token1']
         );
 
@@ -156,7 +156,7 @@ class EmailChangeControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'GET',
-            '/email-change/confirm',
+            'usora/email-change/confirm',
             []
         );
 
@@ -169,7 +169,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/email-change/confirm',
+            'usora/email-change/confirm',
             ['token' => Str::random(40)]
         );
 
@@ -182,7 +182,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            '/email-change/confirm',
+            'usora/email-change/confirm',
             ['token' => 'token2']
         );
 

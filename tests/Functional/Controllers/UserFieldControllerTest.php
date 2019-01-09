@@ -38,7 +38,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            '/user-field/store',
+            'usora/user-field/store',
             $userFieldData
         );
 
@@ -67,7 +67,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            '/user-field/store',
+            'usora/user-field/store',
             $userFieldData
         );
 
@@ -96,7 +96,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            '/user-field/store',
+            'usora/user-field/store',
             $userFieldData
         );
 
@@ -114,7 +114,7 @@ class UserFieldControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PUT',
-            '/user-field/store',
+            'usora/user-field/store',
             []
         );
 
@@ -149,7 +149,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update/' . 1,
+            'usora/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -184,7 +184,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update/' . 1,
+            'usora/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -218,7 +218,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update/' . 1,
+            'usora/user-field/update/' . 1,
             $userFieldData
         );
 
@@ -263,7 +263,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update-or-create-multiple-by-key',
+            'usora/user-field/update-or-create-multiple-by-key',
             $userFieldsInputData
         );
 
@@ -310,7 +310,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update-or-create-multiple-by-key',
+            'usora/user-field/update-or-create-multiple-by-key',
             $userFieldsInputData
         );
 
@@ -340,7 +340,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update-or-create-by-key',
+            'usora/user-field/update-or-create-by-key',
             $userFieldsInputData
         );
 
@@ -384,7 +384,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update-or-create-multiple-by-key',
+            'usora/user-field/update-or-create-multiple-by-key',
             $userFieldsInputData
         );
 
@@ -406,7 +406,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'DELETE',
-            '/user-field/delete/' . 1
+            'usora/user-field/delete/' . 1
         );
 
         // assert the user was removed from the db
@@ -425,7 +425,7 @@ class UserFieldControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'DELETE',
-            '/user-field/delete/' . 1
+            'usora/user-field/delete/' . 1
         );
 
         // assert the response code is not found
@@ -453,7 +453,7 @@ class UserFieldControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            '/user-field/update-or-create-by-key',
+            'usora/user-field/update-or-create-by-key',
             $userFieldsInputData
         );
 

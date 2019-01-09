@@ -25,7 +25,7 @@ class APIControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            'api/login',
+            'usora/api/login',
             [
                 'email' => 'test+1@test.com',
                 'password' => $rawPassword,
@@ -41,7 +41,7 @@ class APIControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PUT',
-            'api/login',
+            'usora/api/login',
             [
                 'email' => $this->faker->email,
                 'password' => $this->faker->word,
@@ -64,7 +64,7 @@ class APIControllerTest extends UsoraTestCase
 
         $login = $this->call(
             'PUT',
-            'api/login',
+            'usora/api/login',
             [
                 'email' => 'test+1@test.com',
                 'password' => $rawPassword,
@@ -75,7 +75,7 @@ class APIControllerTest extends UsoraTestCase
 
         $result = $this->call(
             'PUT',
-            'api/logout',
+            'usora/api/logout',
             [
                 'token' => $token
             ]
@@ -90,7 +90,7 @@ class APIControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            'api/login',
+            'usora/api/login',
             [
                 'email' => 'test+1@test.com',
                 'password' => $rawPassword,
@@ -101,7 +101,7 @@ class APIControllerTest extends UsoraTestCase
 
         $result = $this->call(
             'PUT',
-            'api/me',
+            'usora/api/me',
             [
                 'token' => $token
             ]

@@ -5,6 +5,7 @@ namespace Railroad\Usora\Controllers;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AuthenticationController extends Controller
 {
     use ThrottlesLogins;
+    use ValidatesRequests;
 
     /**
      * @var EntityManager
@@ -39,7 +41,7 @@ class AuthenticationController extends Controller
     private $hasher;
 
     // the max login attempts allowed before lockout
-    protected $maxAttempts = 8;
+    protected $maxAttempts = 6;
 
     /**
      * CookieController constructor.
@@ -63,7 +65,8 @@ class AuthenticationController extends Controller
      */
     public function authenticateViaCredentials(Request $request)
     {
-        $request->validate(
+        $this->validate(
+            $request,
             [
                 'email' => 'required|string',
                 'password' => 'required|string',

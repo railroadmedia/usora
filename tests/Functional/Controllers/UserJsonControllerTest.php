@@ -10,8 +10,6 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class UserJsonControllerTest extends UsoraTestCase
 {
-    const API_PREFIX = '/usora';
-
     protected function setUp()
     {
         parent::setUp();
@@ -34,7 +32,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $responsePageTwo = $this->call(
             'GET',
-            self::API_PREFIX . '/user/index',
+            'usora/json-api/user/index',
             $request + ['page' => 2]
         );
 
@@ -56,7 +54,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $responsePageOne = $this->call(
             'GET',
-            self::API_PREFIX . '/user/index',
+            'usora/json-api/user/index',
             $request + ['page' => 1]
         );
 
@@ -84,7 +82,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $responsePageTwo = $this->call(
             'GET',
-            self::API_PREFIX . '/user/index',
+            'usora/json-api/user/index',
             $request + ['page' => 2]
         );
 
@@ -106,7 +104,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $responsePageOne = $this->call(
             'GET',
-            self::API_PREFIX . '/user/index',
+            'usora/json-api/user/index',
             $request + ['page' => 1]
         );
 
@@ -134,7 +132,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $responsePage = $this->call(
             'GET',
-            self::API_PREFIX . '/user/index',
+            'usora/json-api/user/index',
             $request + ['page' => 1]
         );
 
@@ -156,7 +154,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user/show/' . 1
+            'usora/json-api/user/show/' . 1
         );
 
         // assert response status code
@@ -180,7 +178,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'GET',
-            self::API_PREFIX . '/user/show/' . 1
+            'usora/json-api/user/show/' . 1
         );
 
         // assert the response code is not found
@@ -200,7 +198,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            self::API_PREFIX . '/user/store',
+            'usora/json-api/user/store',
             $userData
         );
 
@@ -232,7 +230,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PUT',
-            self::API_PREFIX . '/user/store',
+            'usora/json-api/user/store',
             $userData
         );
 
@@ -261,7 +259,7 @@ class UserJsonControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PUT',
-            self::API_PREFIX . '/user/store',
+            'usora/json-api/user/store',
             []
         );
 
@@ -309,7 +307,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user/update/' . $userId,
+            'usora/json-api/user/update/' . $userId,
             [
                 'display_name' => $newDisplayName,
                 'email' => $newEmail,
@@ -370,7 +368,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user/update/' . $userIdToUpdate,
+            'usora/json-api/user/update/' . $userIdToUpdate,
             [
                 'display_name' => $newDisplayName,
                 'email' => $newEmail,
@@ -410,7 +408,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user/update/' . $userIdToUpdate,
+            'usora/json-api/user/update/' . $userIdToUpdate,
             [
                 'display_name' => $newDisplayName,
             ]
@@ -433,7 +431,7 @@ class UserJsonControllerTest extends UsoraTestCase
     {
         $response = $this->call(
             'PATCH',
-            self::API_PREFIX . '/user/update/' . rand(),
+            'usora/json-api/user/update/' . rand(),
             ['display_name' => 1]
         );
 
@@ -463,7 +461,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $response = $this->call(
             'DELETE',
-            self::API_PREFIX . '/user/delete/' . $userId
+            'usora/json-api/user/delete/' . $userId
         );
 
         // assert the response code is no content
@@ -485,7 +483,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ->onceUsingId(rand());
         $response = $this->call(
             'DELETE',
-            self::API_PREFIX . '/user/delete/' . $userId
+            'usora/json-api/user/delete/' . $userId
         );
 
         // assert the response code is not found
