@@ -17,6 +17,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Railroad\Doctrine\Providers\DoctrineServiceProvider;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
@@ -154,6 +155,19 @@ class UsoraTestCase extends TestCase
         config()->set('usora.database_password', 'root');
         config()->set('usora.database_driver', 'pdo_sqlite');
         config()->set('usora.database_in_memory', true);
+
+        config()->set('doctrine.redis_host', $defaultConfig['redis_host']);
+        config()->set('doctrine.redis_port', $defaultConfig['redis_port']);
+        config()->set('doctrine.development_mode', $defaultConfig['development_mode'] ?? true);
+        config()->set('doctrine.database_driver', 'pdo_sqlite');
+        config()->set('doctrine.database_user', 'root');
+        config()->set('doctrine.database_password', 'root');
+        config()->set('doctrine.database_in_memory', true);
+
+        // if new packages entities are required for testing, their entity directory/namespace config should be merged here
+        config()->set('doctrine.entities', $defaultConfig['entities']);
+
+        $app->register(DoctrineServiceProvider::class);
 
         config()->set('usora.autoload_all_routes', true);
         config()->set('usora.route_middleware_public_groups', []);
