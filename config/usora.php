@@ -18,6 +18,13 @@ return [
     // host does the db migrations, clients do not
     'data_mode' => 'host', // 'host' or 'client'
 
+    'entities' => [
+        [
+            'path' => __DIR__ . '/../src/Entities',
+            'namespace' => 'Railroad\Usora\Entities'
+        ]
+    ],
+
     // tables
     'tables' => [
         'email_changes' => 'usora_email_changes',
