@@ -3,16 +3,21 @@
 namespace Railroad\Usora\Controllers;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use JMS\Serializer\SerializerBuilder;
+use League\Fractal\Pagination\Cursor;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Serializer\JsonApiSerializer;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserJsonCreateRequest;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
+use Railroad\Usora\Transformers\UserTransformer;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserJsonController extends Controller
@@ -72,6 +77,7 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
+
         $searchTerm = $request->get('search_term', '');
 
         $query = $this->userRepository->createQueryBuilder('u');
@@ -101,7 +107,11 @@ class UserJsonController extends Controller
             $query->getQuery()
                 ->getResult();
 
-        return response($this->serializer->serialize($users, 'json'));
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $cursor = new Cursor($query->getFirstResult(), $query->getMaxResults());
+
+        return fractal($users, new UserTransformer(), new JsonApiSerializer())->paginateWith($paginator);
     }
 
     /**

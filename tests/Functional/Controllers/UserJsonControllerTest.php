@@ -2,11 +2,10 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
-use Railroad\Usora\DataFixtures\UserFixtureLoader;
-
-use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
+use Railroad\Usora\Tests\UsoraTestCase;
 
 class UserJsonControllerTest extends UsoraTestCase
 {
@@ -39,7 +38,7 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert response status code
         $this->assertEquals(200, $responsePageTwo->getStatusCode());
 
-        $dataPageTwo = $responsePageTwo->decodeResponseJson();
+        $dataPageTwo = $responsePageTwo->decodeResponseJson()['data'];
 
         // assert response length
         $this->assertEquals($request['limit'], count($dataPageTwo));
@@ -48,7 +47,7 @@ class UserJsonControllerTest extends UsoraTestCase
         for ($i = 0; $i < count($dataPageTwo) - 1; $i++) {
             $current = $dataPageTwo[$i];
             $next = $dataPageTwo[$i + 1];
-            $cmp = strcasecmp($current['display_name'], $next['display_name']);
+            $cmp = strcasecmp($current['attributes']['display_name'], $next['attributes']['display_name']);
             $this->assertLessThanOrEqual(0, $cmp);
         }
 
@@ -58,13 +57,17 @@ class UserJsonControllerTest extends UsoraTestCase
             $request + ['page' => 1]
         );
 
-        $dataPageOne = $responsePageOne->decodeResponseJson();
+        $dataPageOne = $responsePageOne->decodeResponseJson()['data'];
 
         // assert response length
         $this->assertEquals($request['limit'], count($dataPageOne));
 
         // assert ascending order of display_name column across pages
-        $cmp = strcasecmp($dataPageOne[count($dataPageOne) - 1]['display_name'], $dataPageTwo[0]['display_name']);
+        $cmp =
+            strcasecmp(
+                $dataPageOne[count($dataPageOne) - 1]['attributes']['display_name'],
+                $dataPageTwo[0]['attributes']['display_name']
+            );
         $this->assertLessThanOrEqual(0, $cmp);
     }
 
