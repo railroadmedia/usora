@@ -24,7 +24,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ->willReturn(true);
 
         $request = [
-            'limit' => 3,
+            'per_page' => 3,
             'order_by_column' => 'displayName',
             'order_by_direction' => 'asc',
         ];
@@ -41,7 +41,7 @@ class UserJsonControllerTest extends UsoraTestCase
         $dataPageTwo = $responsePageTwo->decodeResponseJson()['data'];
 
         // assert response length
-        $this->assertEquals($request['limit'], count($dataPageTwo));
+        $this->assertEquals($request['per_page'], count($dataPageTwo));
 
         // assert ascending order of display_name column
         for ($i = 0; $i < count($dataPageTwo) - 1; $i++) {
@@ -60,14 +60,13 @@ class UserJsonControllerTest extends UsoraTestCase
         $dataPageOne = $responsePageOne->decodeResponseJson()['data'];
 
         // assert response length
-        $this->assertEquals($request['limit'], count($dataPageOne));
+        $this->assertEquals($request['per_page'], count($dataPageOne));
 
         // assert ascending order of display_name column across pages
-        $cmp =
-            strcasecmp(
-                $dataPageOne[count($dataPageOne) - 1]['attributes']['display_name'],
-                $dataPageTwo[0]['attributes']['display_name']
-            );
+        $cmp = strcasecmp(
+            $dataPageOne[count($dataPageOne) - 1]['attributes']['display_name'],
+            $dataPageTwo[0]['attributes']['display_name']
+        );
         $this->assertLessThanOrEqual(0, $cmp);
     }
 
@@ -77,7 +76,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ->willReturn(true);
 
         $request = [
-            'limit' => 3,
+            'per_page' => 3,
             'order_by_column' => 'displayName',
             'order_by_direction' => 'asc',
             'search_term' => 'user',
@@ -92,16 +91,16 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert response status code
         $this->assertEquals(200, $responsePageTwo->getStatusCode());
 
-        $dataPageTwo = $responsePageTwo->decodeResponseJson();
+        $dataPageTwo = $responsePageTwo->decodeResponseJson()['data'];
 
         // assert response length
-        $this->assertEquals($request['limit'], count($dataPageTwo));
+        $this->assertEquals($request['per_page'], count($dataPageTwo));
 
         // assert ascending order of display_name column
         for ($i = 0; $i < count($dataPageTwo) - 1; $i++) {
             $current = $dataPageTwo[$i];
             $next = $dataPageTwo[$i + 1];
-            $cmp = strcasecmp($current['display_name'], $next['display_name']);
+            $cmp = strcasecmp($current['attributes']['display_name'], $next['attributes']['display_name']);
             $this->assertLessThanOrEqual(0, $cmp);
         }
 
@@ -111,13 +110,17 @@ class UserJsonControllerTest extends UsoraTestCase
             $request + ['page' => 1]
         );
 
-        $dataPageOne = $responsePageOne->decodeResponseJson();
+        $dataPageOne = $responsePageOne->decodeResponseJson()['data'];
 
         // assert response length
-        $this->assertEquals($request['limit'], count($dataPageOne));
+        $this->assertEquals($request['per_page'], count($dataPageOne));
 
         // assert ascending order of display_name column across pages
-        $cmp = strcasecmp($dataPageOne[count($dataPageOne) - 1]['display_name'], $dataPageTwo[0]['display_name']);
+        $cmp =
+            strcasecmp(
+                $dataPageOne[count($dataPageOne) - 1]['attributes']['display_name'],
+                $dataPageTwo[0]['attributes']['display_name']
+            );
         $this->assertLessThanOrEqual(0, $cmp);
     }
 
@@ -127,7 +130,7 @@ class UserJsonControllerTest extends UsoraTestCase
             ->willReturn(true);
 
         $request = [
-            'limit' => 3,
+            'per_page' => 3,
             'order_by_column' => 'displayName',
             'order_by_direction' => 'asc',
             'search_term' => 'test+1@test',
@@ -142,7 +145,7 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert response status code
         $this->assertEquals(200, $responsePage->getStatusCode());
 
-        $dataPage = $responsePage->decodeResponseJson();
+        $dataPage = $responsePage->decodeResponseJson()['data'];
 
         $this->assertEquals(1, count($dataPage));
 
@@ -169,7 +172,7 @@ class UserJsonControllerTest extends UsoraTestCase
                 'email' => 'test+1@test.com',
                 'display_name' => 'testuser1',
             ],
-            $response->decodeResponseJson()
+            $response->decodeResponseJson()['data']['attributes']
         );
     }
 
@@ -214,7 +217,7 @@ class UserJsonControllerTest extends UsoraTestCase
         unset($userData['password']);
 
         // assert the user data is subset of response
-        $this->assertArraySubset($userData, $response->decodeResponseJson());
+        $this->assertArraySubset($userData, $response->decodeResponseJson()['data']['attributes']);
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
@@ -323,7 +326,7 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert the user data is subset of response
         $this->assertArraySubset(
             ['display_name' => $newDisplayName],
-            $response->decodeResponseJson()
+            $response->decodeResponseJson()['data']['attributes']
         );
 
         // assert the new display name was saved in the db
@@ -384,7 +387,7 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert the user data is subset of response
         $this->assertArraySubset(
             ['display_name' => $newDisplayName],
-            $response->decodeResponseJson()
+            $response->decodeResponseJson()['data']['attributes']
         );
 
         // assert the new display name was saved in the db

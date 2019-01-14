@@ -3,21 +3,19 @@
 namespace Railroad\Usora\Controllers;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use JMS\Serializer\SerializerBuilder;
-use League\Fractal\Pagination\Cursor;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Serializer\JsonApiSerializer;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserJsonCreateRequest;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
-use Railroad\Usora\Transformers\UserTransformer;
+use Railroad\Usora\Services\ResponseService;
+use Spatie\Fractal\Fractal;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserJsonController extends Controller
@@ -50,7 +48,7 @@ class UserJsonController extends Controller
     /**
      * UserController constructor.
      *
-     * @param UserRepository $userRepository
+     * @param EntityManager $entityManager
      * @param PermissionService $permissionService
      * @param Hasher $hasher
      */
@@ -69,7 +67,7 @@ class UserJsonController extends Controller
 
     /**
      * @param Request $request
-     * @return JsonResponse
+     * @return Fractal
      */
     public function index(Request $request)
     {
@@ -77,46 +75,40 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-
         $searchTerm = $request->get('search_term', '');
 
-        $query = $this->userRepository->createQueryBuilder('u');
+        $queryBuilder = $this->userRepository->createQueryBuilder('u');
 
         if (!empty($searchTerm)) {
-
-            $query->where(
-                $query->expr()
+            $queryBuilder->where(
+                $queryBuilder->expr()
                     ->orX(
-                        $query->expr()
+                        $queryBuilder->expr()
                             ->like('u.email', ':term'),
-                        $query->expr()
+                        $queryBuilder->expr()
                             ->like('u.displayName', ':term')
                     )
             )
                 ->setParameter('term', '%' . addcslashes($searchTerm, '%_') . '%');
         }
 
-        $query->setMaxResults($request->get('limit', 25))
-            ->setFirstResult(($request->get('page', 1) - 1) * $request->get('limit', 25))
+        $queryBuilder->setMaxResults($request->get('per_page', 25))
+            ->setFirstResult(($request->get('page', 1) - 1) * $request->get('per_page', 25))
             ->orderBy(
                 'u.' . $request->get('order_by_column', 'createdAt'),
                 $request->get('order_by_direction', 'desc')
             );
 
         $users =
-            $query->getQuery()
+            $queryBuilder->getQuery()
                 ->getResult();
 
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
-
-        $cursor = new Cursor($query->getFirstResult(), $query->getMaxResults());
-
-        return fractal($users, new UserTransformer(), new JsonApiSerializer())->paginateWith($paginator);
+        return ResponseService::user($users, $queryBuilder);
     }
 
     /**
      * @param integer $id
-     * @return JsonResponse
+     * @return Fractal
      */
     public function show($id)
     {
@@ -126,12 +118,14 @@ class UserJsonController extends Controller
 
         $user = $this->userRepository->find($id);
 
-        return response($this->serializer->serialize($user, 'json'));
+        return ResponseService::user($user);
     }
 
     /**
      * @param UserJsonCreateRequest $request
-     * @return JsonResponse
+     * @return Fractal
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function store(UserJsonCreateRequest $request)
     {
@@ -147,13 +141,15 @@ class UserJsonController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return response($this->serializer->serialize($user, 'json'));
+        return ResponseService::user($user);
     }
 
     /**
      * @param UserJsonUpdateRequest $request
      * @param integer $id
-     * @return JsonResponse
+     * @return Fractal
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function update(UserJsonUpdateRequest $request, $id)
     {
@@ -174,12 +170,14 @@ class UserJsonController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return response($this->serializer->serialize($user, 'json'));
+        return ResponseService::user($user);
     }
 
     /**
      * @param integer $id
-     * @return JsonResponse
+     * @return Fractal
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function delete($id)
     {
@@ -194,6 +192,6 @@ class UserJsonController extends Controller
             $this->entityManager->flush();
         }
 
-        return new JsonResponse(null, 204);
+        return new Fractal(null, 204);
     }
 }
