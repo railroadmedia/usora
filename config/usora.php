@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Fluent;
+
 return [
     'development_mode' => true,
 
@@ -31,6 +35,10 @@ return [
         'users' => 'usora_users',
         'password_resets' => 'usora_password_resets',
         'user_fields' => 'usora_user_fields',
+    ],
+
+    // user field columns
+    'user_field_definitions' => [
     ],
 
     // routes

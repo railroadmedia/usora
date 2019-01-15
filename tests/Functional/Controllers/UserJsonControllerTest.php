@@ -35,6 +35,8 @@ class UserJsonControllerTest extends UsoraTestCase
             $request + ['page' => 2]
         );
 
+        dd($responsePageTwo->getContent());
+
         // assert response status code
         $this->assertEquals(200, $responsePageTwo->getStatusCode());
 
@@ -57,7 +59,9 @@ class UserJsonControllerTest extends UsoraTestCase
             $request + ['page' => 1]
         );
 
+
         $dataPageOne = $responsePageOne->decodeResponseJson()['data'];
+
 
         // assert response length
         $this->assertEquals($request['per_page'], count($dataPageOne));
@@ -153,8 +157,6 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_users_show_with_permission()
     {
-        $rawPassword = $this->faker->word;
-
         $this->permissionServiceMock->method('can')
             ->willReturn(true);
 
@@ -209,7 +211,7 @@ class UserJsonControllerTest extends UsoraTestCase
         );
 
         // assert response status code
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(201, $response->getStatusCode());
 
         // assert the users password was encrypted and saved, and that they can login
         $this->assertTrue(auth()->attempt(['email' => $userData['email'], 'password' => $userData['password']]));
@@ -480,6 +482,25 @@ class UserJsonControllerTest extends UsoraTestCase
                 'id' => $userId,
             ]
         );
+    }
+
+    public function test_user_delete_with_permission_no_content()
+    {
+        $userId = 100;
+
+        $this->authManager->guard()
+            ->onceUsingId($userId);
+
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
+
+        $response = $this->call(
+            'DELETE',
+            'usora/json-api/user/delete/' . $userId
+        );
+
+        // assert the response code is no content
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
     public function test_user_delete_without_permission()

@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-
 class CreateEmailChangeTable extends Migration
 {
     /**
@@ -14,18 +13,22 @@ class CreateEmailChangeTable extends Migration
      */
     public function up()
     {
-        Schema::connection(config('usora.database_connection_name'))->create(
-            config('usora.tables.email_changes'),
-            function(Blueprint $table) {
-                $table->increments('id');
+        Schema::connection(config('usora.database_connection_name'))
+            ->create(
+                config('usora.tables.email_changes'),
+                function (Blueprint $table) {
+                    $table->increments('id');
 
-                $table->integer('user_id')->unique();
-                $table->string('email')->index();
-                $table->string('token');
+                    $table->integer('user_id')
+                        ->unique();
+                    $table->string('email')
+                        ->index();
+                    $table->string('token');
 
-                $table->timestamp('created_at')->nullable();
-            }
-        );
+                    $table->timestamp('created_at')
+                        ->nullable();
+                }
+            );
     }
 
     /**

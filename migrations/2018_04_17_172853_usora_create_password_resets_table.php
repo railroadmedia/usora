@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-
 class UsoraCreatePasswordResetsTable extends Migration
 {
     /**
@@ -14,17 +13,20 @@ class UsoraCreatePasswordResetsTable extends Migration
      */
     public function up()
     {
-        Schema::connection(config('usora.database_connection_name'))->create(
-            config('usora.tables.password_resets'),
-            function(Blueprint $table) {
-                $table->increments('id');
+        Schema::connection(config('usora.database_connection_name'))
+            ->create(
+                config('usora.tables.password_resets'),
+                function (Blueprint $table) {
+                    $table->increments('id');
 
-                $table->string('email')->index();
-                $table->string('token');
+                    $table->string('email')
+                        ->index();
+                    $table->string('token');
 
-                $table->timestamp('created_at')->nullable();
-            }
-        );
+                    $table->timestamp('created_at')
+                        ->nullable();
+                }
+            );
     }
 
     /**

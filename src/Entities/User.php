@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Entities;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -58,6 +59,14 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
      * @ORM\OneToMany(targetEntity="UserField", mappedBy="user")
      */
     private $fields;
+
+    /**
+     * User constructor.
+     */
+    public function __construct()
+    {
+        $this->fields = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -147,13 +156,23 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
         $this->displayName = $displayName;
     }
 
+    /**
+     * @return ArrayCollection|UserField[]
+     */
     public function getFields()
     {
-        return $this->fields->toArray();
+        return $this->fields;
+    }
+
+    /**
+     * @param mixed $fields
+     */
+    public function setFields($fields): void
+    {
+        $this->fields = $fields;
     }
 
     // functions for laravel auth
-
     /**
      * Get the name of the unique identifier for the user.
      *

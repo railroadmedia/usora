@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-
 class UsoraCreateUsersTable extends Migration
 {
     /**
@@ -14,22 +13,31 @@ class UsoraCreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::connection(config('usora.database_connection_name'))->create(
-            config('usora.tables.users'),
-            function(Blueprint $table) {
-                $table->increments('id');
-                
-                $table->string('email')->unique();
-                $table->string('password');
-                $table->string('remember_token')->nullable();
-                $table->string('session_salt')->nullable();
+        Schema::connection(config('usora.database_connection_name'))
+            ->create(
+                config('usora.tables.users'),
+                function (Blueprint $table) {
+                    $table->increments('id');
 
-                $table->string('display_name')->index();
+                    $table->string('email')
+                        ->unique();
+                    $table->string('password');
+                    $table->string('remember_token')
+                        ->nullable();
+                    $table->string('session_salt')
+                        ->nullable();
 
-                $table->timestamp('created_at')->nullable()->index();
-                $table->timestamp('updated_at')->nullable()->index();
-            }
-        );
+                    $table->string('display_name')
+                        ->index();
+
+                    $table->timestamp('created_at')
+                        ->nullable()
+                        ->index();
+                    $table->timestamp('updated_at')
+                        ->nullable()
+                        ->index();
+                }
+            );
     }
 
     /**

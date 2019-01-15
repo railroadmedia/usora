@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-
 class AddUpdatedAtOnEmailChangeTable extends Migration
 {
     /**
@@ -14,12 +13,15 @@ class AddUpdatedAtOnEmailChangeTable extends Migration
      */
     public function up()
     {
-        Schema::connection(config('usora.database_connection_name'))->table(
-            config('usora.tables.email_changes'),
-            function(Blueprint $table) {
-                $table->timestamp('updated_at')->after('created_at')->nullable();
-            }
-        );
+        Schema::connection(config('usora.database_connection_name'))
+            ->table(
+                config('usora.tables.email_changes'),
+                function (Blueprint $table) {
+                    $table->timestamp('updated_at')
+                        ->after('created_at')
+                        ->nullable();
+                }
+            );
     }
 
     /**
@@ -29,15 +31,12 @@ class AddUpdatedAtOnEmailChangeTable extends Migration
      */
     public function down()
     {
-        Schema::connection(config('usora.database_connection_name'))->table(
-            config('usora.tables.email_changes'),
-            function ($table) {
-                /**
-                 * @var $table \Illuminate\Database\Schema\Blueprint
-                 */
-
-                $table->dropColumn('updated_at');
-            }
-        );
+        Schema::connection(config('usora.database_connection_name'))
+            ->table(
+                config('usora.tables.email_changes'),
+                function (Blueprint $table) {
+                    $table->dropColumn('updated_at');
+                }
+            );
     }
 }

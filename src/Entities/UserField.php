@@ -25,7 +25,7 @@ class UserField
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Railroad\Usora\Entities\User")
+     * @ORM\ManyToOne(targetEntity="Railroad\Usora\Entities\User",inversedBy="fields")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      * @Exclude
      *
@@ -40,7 +40,7 @@ class UserField
 
     /**
      * @ORM\Column(type="text")
-     * @var text
+     * @var string
      */
     protected $value;
 
@@ -85,7 +85,7 @@ class UserField
     }
 
     /**
-     * @return text
+     * @return string
      */
     public function getValue(): string
     {
@@ -93,7 +93,7 @@ class UserField
     }
 
     /**
-     * @param text $value
+     * @param $value
      */
     public function setValue($value): void
     {

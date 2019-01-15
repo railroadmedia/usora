@@ -8,7 +8,6 @@ use Doctrine\ORM\ORMException;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use JMS\Serializer\SerializerBuilder;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
@@ -41,11 +40,6 @@ class UserJsonController extends Controller
     private $hasher;
 
     /**
-     * @var \JMS\Serializer\Serializer
-     */
-    private $serializer;
-
-    /**
      * UserController constructor.
      *
      * @param EntityManager $entityManager
@@ -57,12 +51,7 @@ class UserJsonController extends Controller
         $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
         $this->hasher = $hasher;
-
         $this->userRepository = $this->entityManager->getRepository(User::class);
-
-        $this->serializer =
-            SerializerBuilder::create()
-                ->build();
     }
 
     /**
@@ -77,16 +66,18 @@ class UserJsonController extends Controller
 
         $searchTerm = $request->get('search_term', '');
 
-        $queryBuilder = $this->userRepository->createQueryBuilder('u');
+        $queryBuilder = $this->userRepository->createQueryBuilder('user')
+            ->select("user, field")
+            ->leftJoin("user.fields", "field");
 
         if (!empty($searchTerm)) {
             $queryBuilder->where(
                 $queryBuilder->expr()
                     ->orX(
                         $queryBuilder->expr()
-                            ->like('u.email', ':term'),
+                            ->like('user.email', ':term'),
                         $queryBuilder->expr()
-                            ->like('u.displayName', ':term')
+                            ->like('user.displayName', ':term')
                     )
             )
                 ->setParameter('term', '%' . addcslashes($searchTerm, '%_') . '%');
@@ -95,7 +86,7 @@ class UserJsonController extends Controller
         $queryBuilder->setMaxResults($request->get('per_page', 25))
             ->setFirstResult(($request->get('page', 1) - 1) * $request->get('per_page', 25))
             ->orderBy(
-                'u.' . $request->get('order_by_column', 'createdAt'),
+                'user.' . $request->get('order_by_column', 'createdAt'),
                 $request->get('order_by_direction', 'desc')
             );
 
@@ -123,7 +114,7 @@ class UserJsonController extends Controller
 
     /**
      * @param UserJsonCreateRequest $request
-     * @return Fractal
+     * @return \Illuminate\Http\JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -141,13 +132,14 @@ class UserJsonController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return ResponseService::user($user);
+        return ResponseService::user($user)
+            ->respond(201);
     }
 
     /**
      * @param UserJsonUpdateRequest $request
      * @param integer $id
-     * @return Fractal
+     * @return \Illuminate\Http\JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -156,6 +148,7 @@ class UserJsonController extends Controller
         if (!$this->permissionService->can(auth()->id(), 'update-users') && auth()->id() != $id) {
             throw new NotFoundHttpException();
         }
+
         $user = $this->userRepository->find($id);
         $user->setDisplayName($request->get('display_name'));
 
@@ -170,7 +163,8 @@ class UserJsonController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return ResponseService::user($user);
+        return ResponseService::user($user)
+            ->respond(200);
     }
 
     /**
@@ -190,8 +184,10 @@ class UserJsonController extends Controller
         if (!is_null($user)) {
             $this->entityManager->remove($user);
             $this->entityManager->flush();
+
+            return response(null, 204);
         }
 
-        return new Fractal(null, 204);
+        return response(null, 404);
     }
 }
