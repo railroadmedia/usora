@@ -19,33 +19,42 @@ class AddCoreColumnsToUsersTable extends Migration
                 function (Blueprint $table) {
 
                     $table->string('first_name')
+                        ->index()
                         ->after('display_name')
                         ->nullable();
                     $table->string('last_name')
+                        ->index()
                         ->after('first_name')
                         ->nullable();
                     $table->string('gender')
+                        ->index()
                         ->after('last_name')
                         ->nullable();
                     $table->string('country')
+                        ->index()
                         ->after('gender')
                         ->nullable();
                     $table->string('region')
+                        ->index()
                         ->after('country')
                         ->nullable();
                     $table->string('city')
+                        ->index()
                         ->after('region')
                         ->nullable();
                     $table->date('birthday')
+                        ->index()
                         ->after('city')
                         ->nullable();
                     $table->bigInteger('phone_number')
+                        ->index()
                         ->after('birthday')
                         ->nullable();
                     $table->string('profile_picture_url')
                         ->after('phone_number')
                         ->nullable();
                     $table->string('timezone')
+                        ->index()
                         ->after('profile_picture_url')
                         ->nullable();
                     $table->text('settings')
