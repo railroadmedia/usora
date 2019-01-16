@@ -17,11 +17,13 @@ class ResponseService
     /**
      * @param $userOrUsers
      * @param QueryBuilder|null $queryBuilder
+     * @param array $includes
      * @return Fractal
      */
-    public static function user($userOrUsers, QueryBuilder $queryBuilder = null)
+    public static function user($userOrUsers, QueryBuilder $queryBuilder = null, array $includes = [])
     {
-        return self::create($userOrUsers, 'user', new UserTransformer, new JsonApiSerializer(), $queryBuilder);
+        return self::create($userOrUsers, 'user', new UserTransformer, new JsonApiSerializer(), $queryBuilder)
+            ->parseIncludes($includes);
     }
 
     /**
