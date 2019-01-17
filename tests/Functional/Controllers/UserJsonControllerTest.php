@@ -35,8 +35,6 @@ class UserJsonControllerTest extends UsoraTestCase
             $request + ['page' => 2]
         );
 
-        dd($responsePageTwo->getContent());
-
         // assert response status code
         $this->assertEquals(200, $responsePageTwo->getStatusCode());
 
@@ -59,9 +57,7 @@ class UserJsonControllerTest extends UsoraTestCase
             $request + ['page' => 1]
         );
 
-
         $dataPageOne = $responsePageOne->decodeResponseJson()['data'];
-
 
         // assert response length
         $this->assertEquals($request['per_page'], count($dataPageOne));
@@ -120,11 +116,10 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertEquals($request['per_page'], count($dataPageOne));
 
         // assert ascending order of display_name column across pages
-        $cmp =
-            strcasecmp(
-                $dataPageOne[count($dataPageOne) - 1]['attributes']['display_name'],
-                $dataPageTwo[0]['attributes']['display_name']
-            );
+        $cmp = strcasecmp(
+            $dataPageOne[count($dataPageOne) - 1]['attributes']['display_name'],
+            $dataPageTwo[0]['attributes']['display_name']
+        );
         $this->assertLessThanOrEqual(0, $cmp);
     }
 
