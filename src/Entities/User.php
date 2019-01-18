@@ -56,7 +56,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     protected $displayName;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserField", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="UserField", mappedBy="user", fetch="EAGER")
      */
     private $fields;
 

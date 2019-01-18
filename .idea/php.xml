@@ -115,6 +115,7 @@
       <path value="$PROJECT_DIR$/vendor/league/fractal" />
       <path value="$PROJECT_DIR$/vendor/spatie/fractalistic" />
       <path value="$PROJECT_DIR$/vendor/railroad/doctrine" />
+      <path value="$PROJECT_DIR$/../doctrine" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

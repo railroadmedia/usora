@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Services\PermissionService;
@@ -66,9 +67,9 @@ class UserJsonController extends Controller
 
         $searchTerm = $request->get('search_term', '');
 
-        $queryBuilder = $this->userRepository->createQueryBuilder('user')
-            ->select("user, field")
-            ->leftJoin("user.fields", "field");
+        $queryBuilder =
+            $this->userRepository->createQueryBuilder('user')
+                ->select("user");
 
         if (!empty($searchTerm)) {
             $queryBuilder->where(
@@ -114,7 +115,7 @@ class UserJsonController extends Controller
 
     /**
      * @param UserJsonCreateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -139,7 +140,7 @@ class UserJsonController extends Controller
     /**
      * @param UserJsonUpdateRequest $request
      * @param integer $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -169,7 +170,7 @@ class UserJsonController extends Controller
 
     /**
      * @param integer $id
-     * @return Fractal
+     * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -185,9 +186,9 @@ class UserJsonController extends Controller
             $this->entityManager->remove($user);
             $this->entityManager->flush();
 
-            return response(null, 204);
+            return ResponseService::empty(204);
         }
 
-        return response(null, 404);
+        return ResponseService::empty(404);
     }
 }

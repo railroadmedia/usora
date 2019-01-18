@@ -69,7 +69,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/http-message" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/railroad/doctrine" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/railroad/permissions" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/railroad/resora" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ralouphie/getallheaders" />
