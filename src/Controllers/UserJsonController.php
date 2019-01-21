@@ -68,8 +68,7 @@ class UserJsonController extends Controller
         $searchTerm = $request->get('search_term', '');
 
         $queryBuilder =
-            $this->userRepository->createQueryBuilder('user')
-                ->select("user");
+            $this->userRepository->createQueryBuilder('user');
 
         if (!empty($searchTerm)) {
             $queryBuilder->where(
@@ -78,7 +77,13 @@ class UserJsonController extends Controller
                         $queryBuilder->expr()
                             ->like('user.email', ':term'),
                         $queryBuilder->expr()
-                            ->like('user.displayName', ':term')
+                            ->like('user.displayName', ':term'),
+                        $queryBuilder->expr()
+                            ->like('user.firstName', ':term'),
+                        $queryBuilder->expr()
+                            ->like('user.lastName', ':term'),
+                        $queryBuilder->expr()
+                            ->like('user.phoneNumber', ':term')
                     )
             )
                 ->setParameter('term', '%' . addcslashes($searchTerm, '%_') . '%');

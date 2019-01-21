@@ -93,6 +93,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $dataPageTwo = $responsePageTwo->decodeResponseJson()['data'];
 
+
         // assert response length
         $this->assertEquals($request['per_page'], count($dataPageTwo));
 
@@ -167,7 +168,6 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertArraySubset(
             [
                 'email' => 'test+1@test.com',
-                'display_name' => 'testuser1',
             ],
             $response->decodeResponseJson()['data']['attributes']
         );
@@ -348,7 +348,6 @@ class UserJsonControllerTest extends UsoraTestCase
     public function test_user_update_with_permission()
     {
         $userIdToUpdate = 1;
-
         $userIdLoggedIn = 2;
 
         $this->authManager->guard()

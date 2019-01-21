@@ -194,47 +194,6 @@ class RouteRegistrar
                 )
                     ->name('usora.json-api.user.delete');
 
-                $this->router->get(
-                    'json-api/user-field/index/{id}',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@index'
-                )
-                    ->name('usora.json-api.user-field.index');
-
-                $this->router->get(
-                    'json-api/user-field/show/{id}',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@show'
-                )
-                    ->name('usora.json-api.user-field.show');
-
-                $this->router->put(
-                    'json-api/user-field/store',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@store'
-                )
-                    ->name('usora.json-api.user-field.store');
-
-                $this->router->patch(
-                    'json-api/user-field/update/{id}',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@update'
-                )
-                    ->name('usora.json-api.user-field.update');
-
-                $this->router->patch(
-                    'json-api/user-field/update-or-create-by-key',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@updateOrCreateByKey'
-                )
-                    ->name('usora.json-api.user-field.update-or-create-by-key');
-
-                $this->router->patch(
-                    'json-api/user-field/update-or-create-multiple-by-key',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@updateOrCreateMultipleByKey'
-                )
-                    ->name('usora.json-api.user-field.update-or-create-multiple-by-key');
-
-                $this->router->delete(
-                    'json-api/user-field/delete/{id}',
-                    \Railroad\Usora\Controllers\UserFieldJsonController::class . '@delete'
-                )
-                    ->name('usora.json-api.user-field.delete');
             }
         );
     }
@@ -264,35 +223,6 @@ class RouteRegistrar
                 )
                     ->name('usora.user.delete');
 
-                $this->router->put(
-                    'user-field/store',
-                    \Railroad\Usora\Controllers\UserFieldController::class . '@store'
-                )
-                    ->name('usora.user-field.store');
-
-                $this->router->patch(
-                    'user-field/update/{id}',
-                    \Railroad\Usora\Controllers\UserFieldController::class . '@update'
-                )
-                    ->name('usora.user-field.update');
-
-                $this->router->patch(
-                    'user-field/update-or-create-by-key',
-                    \Railroad\Usora\Controllers\UserFieldController::class . '@updateOrCreateByKey'
-                )
-                    ->name('usora.user-field.update-or-create-by-key');
-
-                $this->router->patch(
-                    'user-field/update-or-create-multiple-by-key',
-                    \Railroad\Usora\Controllers\UserFieldController::class . '@updateOrCreateMultipleByKey'
-                )
-                    ->name('usora.user-field.update-or-create-multiple-by-key');
-
-                $this->router->delete(
-                    'user-field/delete/{id}',
-                    \Railroad\Usora\Controllers\UserFieldController::class . '@delete'
-                )
-                    ->name('usora.user-field.delete');
             }
         );
     }

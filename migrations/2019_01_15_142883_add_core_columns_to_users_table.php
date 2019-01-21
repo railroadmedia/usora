@@ -58,7 +58,11 @@ class AddCoreColumnsToUsersTable extends Migration
                         ->after('birthday')
                         ->nullable();
 
-                    $table->string('profile_picture_url')
+                    $table->text('biography')
+                        ->after('phone_number')
+                        ->nullable();
+
+                    $table->text('profile_picture_url')
                         ->after('phone_number')
                         ->nullable();
 
@@ -67,12 +71,9 @@ class AddCoreColumnsToUsersTable extends Migration
                         ->after('profile_picture_url')
                         ->nullable();
 
-                    $table->text('settings')
+                    $table->string('permission_level')
+                        ->index()
                         ->after('timezone')
-                        ->nullable();
-
-                    $table->text('fields')
-                        ->after('settings')
                         ->nullable();
 
                 }
@@ -99,10 +100,10 @@ class AddCoreColumnsToUsersTable extends Migration
                     $table->dropColumn('city');
                     $table->dropColumn('birthday');
                     $table->dropColumn('phone_number');
+                    $table->dropColumn('biography');
                     $table->dropColumn('profile_picture_url');
                     $table->dropColumn('timezone');
-                    $table->dropColumn('settings');
-                    $table->dropColumn('fields');
+                    $table->dropColumn('permission_level');
 
                 }
             );

@@ -8,10 +8,6 @@ use Railroad\Usora\Entities\User;
 
 class UserTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = [
-        'fields'
-    ];
-
     public function transform(User $user)
     {
         return [
@@ -21,10 +17,5 @@ class UserTransformer extends TransformerAbstract
             'created_at' => Carbon::instance($user->getCreatedAt())->toDateTimeString(),
             'updated_at' => Carbon::instance($user->getUpdatedAt())->toDateTimeString(),
         ];
-    }
-
-    public function includeFields(User $user)
-    {
-        return $this->collection($user->getFields(), new UserFieldTransformer(), 'field');
     }
 }

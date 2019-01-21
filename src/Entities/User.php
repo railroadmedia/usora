@@ -2,12 +2,19 @@
 
 namespace Railroad\Usora\Entities;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
+use Faker\Generator;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
-use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Facades\Hash;
+use Railroad\Usora\Entities\Traits\BasicUserInformationProperties;
+use Railroad\Usora\Entities\Traits\DrumsUserProperties;
+use Railroad\Usora\Entities\Traits\GuitarUserProperties;
+use Railroad\Usora\Entities\Traits\LaravelAuthUserProperties;
+use Railroad\Usora\Entities\Traits\PianoUserProperties;
+use Railroad\Usora\Entities\Traits\UserNotificationSettingsProperties;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
@@ -17,7 +24,14 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  */
 class User implements Authenticatable, CanResetPassword, JWTSubject
 {
-    use TimestampableEntity, \Illuminate\Auth\Passwords\CanResetPassword;
+    use TimestampableEntity;
+
+    use BasicUserInformationProperties;
+    use DrumsUserProperties;
+    use GuitarUserProperties;
+    use PianoUserProperties;
+    use LaravelAuthUserProperties;
+    use UserNotificationSettingsProperties;
 
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
@@ -38,16 +52,16 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     protected $password;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @var string
      */
-    protected $rememberToken = '';
+    protected $rememberToken;
 
     /**
      * @ORM\Column(type="string", nullable=true)
      * @var string
      */
-    protected $sessionSalt = '';
+    protected $sessionSalt;
 
     /**
      * @ORM\Column(type="string")
@@ -56,22 +70,17 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     protected $displayName;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserField", mappedBy="user", fetch="EAGER")
-     */
-    private $fields;
-
-    /**
      * User constructor.
      */
     public function __construct()
     {
-        $this->fields = new ArrayCollection();
+
     }
 
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
@@ -79,7 +88,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail()
     {
         return $this->email;
     }
@@ -87,7 +96,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @param string $email
      */
-    public function setEmail(string $email): void
+    public function setEmail($email)
     {
         $this->email = $email;
     }
@@ -95,7 +104,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @return string
      */
-    public function getPassword(): string
+    public function getPassword()
     {
         return $this->password;
     }
@@ -103,7 +112,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @param string $password
      */
-    public function setPassword(string $password): void
+    public function setPassword($password)
     {
         $this->password = $password;
     }
@@ -111,7 +120,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @return string
      */
-    public function getRememberToken(): string
+    public function getRememberToken()
     {
         return $this->rememberToken;
     }
@@ -119,7 +128,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @param string $rememberToken
      */
-    public function setRememberToken($rememberToken): void
+    public function setRememberToken($rememberToken)
     {
         $this->rememberToken = $rememberToken;
     }
@@ -127,7 +136,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @return string
      */
-    public function getSessionSalt(): string
+    public function getSessionSalt()
     {
         return $this->sessionSalt;
     }
@@ -135,7 +144,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @param string $sessionSalt
      */
-    public function setSessionSalt(string $sessionSalt): void
+    public function setSessionSalt($sessionSalt)
     {
         $this->sessionSalt = $sessionSalt;
     }
@@ -143,7 +152,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @return string
      */
-    public function getDisplayName(): string
+    public function getDisplayName()
     {
         return $this->displayName;
     }
@@ -151,101 +160,62 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     /**
      * @param string $displayName
      */
-    public function setDisplayName(string $displayName): void
+    public function setDisplayName($displayName)
     {
         $this->displayName = $displayName;
     }
 
     /**
-     * @return ArrayCollection|UserField[]
+     * @param Generator $faker
+     * @param string $testDataIdKey
      */
-    public function getFields()
+    public function fillWithFakeData(Generator $faker, $testDataIdKey = '')
     {
-        return $this->fields;
-    }
+        $this->setEmail('test+' . $testDataIdKey . '@test.com');
+        $this->setDisplayName('testuser' . $testDataIdKey);
+        $this->setPassword(Hash::make('Password' . $testDataIdKey . '#'));
+        $this->setSessionSalt('salt' . $testDataIdKey);
+        $this->setDisplayName('user' . $testDataIdKey);
 
-    /**
-     * @param mixed $fields
-     */
-    public function setFields($fields): void
-    {
-        $this->fields = $fields;
-    }
+        $this->setFirstName($faker->firstName);
+        $this->setLastName($faker->lastName);
+        $this->setGender($faker->randomElement(['male', 'female', 'other']));
+        $this->setCountry($faker->country);
+        $this->setRegion($faker->word);
+        $this->setCity($faker->city);
+        $this->setBirthday(Carbon::instance($faker->dateTime));
+        $this->setPhoneNumber($faker->phoneNumber);
+        $this->setBiography($faker->paragraphs(5, true));
+        $this->setProfilePictureUrl($faker->imageUrl());
+        $this->setTimezone($faker->randomElement(timezone_identifiers_list()));
+        $this->setPermissionLevel($faker->randomElement([null, 'moderator', 'administrator']));
 
-    // functions for laravel auth
-    /**
-     * Get the name of the unique identifier for the user.
-     *
-     * @return string
-     */
-    public function getAuthIdentifierName(): string
-    {
-        return 'id';
-    }
+        $this->setNotifyOnLessonCommentReply($faker->boolean);
+        $this->setNotifyWeeklyUpdate($faker->boolean);
+        $this->setNotifyOnForumPostLike($faker->boolean);
+        $this->setNotifyOnForumFollowedThreadReply($faker->boolean);
+        $this->setNotifyOnLessonCommentLike($faker->boolean);
 
-    /**
-     * Get the unique identifier for the user.
-     *
-     * @return mixed
-     */
-    public function getAuthIdentifier(): int
-    {
-        return $this->getId();
-    }
+        $this->setLegacyDrumeoWordpressId(rand());
+        $this->setLegacyDrumeoIpbId(rand());
 
-    /**
-     * Get the password for the user.
-     *
-     * @return string
-     */
-    public function getAuthPassword(): string
-    {
-        return $this->getPassword();
-    }
+        $this->setDrumsPlayingSinceYear(rand(1900, 2050));
+        $this->setDrumsGearPhoto($faker->imageUrl());
+        $this->setDrumsGearCymbalBrands($faker->words(rand(1, 5), true));
+        $this->setDrumsGearSetBrands($faker->words(rand(1, 5), true));
+        $this->setDrumsGearHardwareBrands($faker->words(rand(1, 5), true));
+        $this->setDrumsGearStickBrands($faker->words(rand(1, 5), true));
 
-    /**
-     * Get the column name for the "remember me" token.
-     *
-     * @return string
-     */
-    public function getRememberTokenName(): string
-    {
-        return 'remember_token';
-    }
+        $this->setGuitarPlayingSinceYear(rand(1900, 2050));
+        $this->setGuitarGearPhoto($faker->imageUrl());
+        $this->setGuitarGearGuitarBrands($faker->words(rand(1, 5), true));
+        $this->setGuitarGearAmpBrands($faker->words(rand(1, 5), true));
+        $this->setGuitarGearPedalBrands($faker->words(rand(1, 5), true));
+        $this->setGuitarGearStringBrands($faker->words(rand(1, 5), true));
 
-    public function sendPasswordResetNotification($token)
-    {
-        $class = config('usora.password_reset_notification_class');
-
-        (new AnonymousNotifiable())->route(
-            config('usora.password_reset_notification_channel'),
-            $this->getEmailForPasswordReset()
-        )
-            ->notify(new $class($token));
-
-    }
-
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getAuthIdentifier();
-    }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [
-            'user' => [
-                'id' => $this->getId(),
-            ],
-        ];
+        $this->setPianoPlayingSinceYear(rand(1900, 2050));
+        $this->setPianoGearPhoto($faker->imageUrl());
+        $this->setPianoGearPianoBrands($faker->words(rand(1, 5), true));
+        $this->setPianoGearKeyboardBrands($faker->words(rand(1, 5), true));
     }
 }
