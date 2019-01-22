@@ -65,12 +65,9 @@ class UserJsonController extends Controller
             throw new NotFoundHttpException();
         }
 
-        $searchTerm = $request->get('search_term', '');
+        $queryBuilder = $this->userRepository->createQueryBuilder('user');
 
-        $queryBuilder =
-            $this->userRepository->createQueryBuilder('user');
-
-        if (!empty($searchTerm)) {
+        if (!empty($request->get('search_term'))) {
             $queryBuilder->where(
                 $queryBuilder->expr()
                     ->orX(
@@ -86,7 +83,7 @@ class UserJsonController extends Controller
                             ->like('user.phoneNumber', ':term')
                     )
             )
-                ->setParameter('term', '%' . addcslashes($searchTerm, '%_') . '%');
+                ->setParameter('term', '%' . $request->get('search_term') . '%');
         }
 
         $queryBuilder->setMaxResults($request->get('per_page', 25))

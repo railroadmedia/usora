@@ -5,6 +5,7 @@ namespace Railroad\Usora\DataFixtures;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Faker\Generator;
+use Faker\ORM\Doctrine\Populator;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Entities\UserField;
 
@@ -25,20 +26,10 @@ class UserFixtureLoader implements FixtureInterface
 
     public function load(ObjectManager $manager)
     {
-        $count = 20;
-        $interval = 1;
+        $populator = new Populator($this->faker, $manager);
 
-        while ($interval <= $count) {
-            $user = new User();
+        $populator->addEntity(User::class, 3);
 
-            $user->fillWithFakeData($this->faker, $interval);
-
-            $manager->persist($user);
-
-            $interval++;
-        }
-
-        $manager->flush();
-        $manager->clear();
+        $populator->execute();
     }
 }

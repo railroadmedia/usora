@@ -4,7 +4,9 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Faker\ORM\Doctrine\Populator;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Tests\UsoraTestCase;
 
 class UserJsonControllerTest extends UsoraTestCase
@@ -13,9 +15,29 @@ class UserJsonControllerTest extends UsoraTestCase
     {
         parent::setUp();
 
+        $populator = new Populator($this->faker, $this->entityManager);
+
+        $populator->addEntity(
+            User::class,
+            1,
+            [
+                'email' => 'test_email_123@email.com',
+            ]
+        );
+        $populator->execute();
+
+        $populator->addEntity(
+            User::class,
+            4,
+            [
+                'displayName' => 'test12345',
+            ]
+        );
+        $populator->execute();
+
         $purger = new ORMPurger();
         $executor = new ORMExecutor($this->entityManager, $purger);
-        $executor->execute([app(UserFixtureLoader::class)]);
+        $executor->execute([app(UserFixtureLoader::class)], true);
     }
 
     public function test_users_index_with_permission()
@@ -79,7 +101,7 @@ class UserJsonControllerTest extends UsoraTestCase
             'per_page' => 3,
             'order_by_column' => 'displayName',
             'order_by_direction' => 'asc',
-            'search_term' => 'user',
+            'search_term' => 'test12345',
         ];
 
         $responsePageTwo = $this->call(
@@ -93,9 +115,8 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $dataPageTwo = $responsePageTwo->decodeResponseJson()['data'];
 
-
         // assert response length
-        $this->assertEquals($request['per_page'], count($dataPageTwo));
+        $this->assertEquals(1, count($dataPageTwo));
 
         // assert ascending order of display_name column
         for ($i = 0; $i < count($dataPageTwo) - 1; $i++) {
@@ -133,7 +154,7 @@ class UserJsonControllerTest extends UsoraTestCase
             'per_page' => 3,
             'order_by_column' => 'displayName',
             'order_by_direction' => 'asc',
-            'search_term' => 'test+1@test',
+            'search_term' => 'test_email_123',
         ];
 
         $responsePage = $this->call(
@@ -167,7 +188,7 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert the user data is subset of response
         $this->assertArraySubset(
             [
-                'email' => 'test+1@test.com',
+                'email' => 'test_email_123@email.com',
             ],
             $response->decodeResponseJson()['data']['attributes']
         );
