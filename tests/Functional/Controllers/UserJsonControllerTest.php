@@ -223,7 +223,12 @@ class UserJsonControllerTest extends UsoraTestCase
         $response = $this->call(
             'PUT',
             'usora/json-api/user/store',
-            $userData
+            [
+                'data' => [
+                    'type' => 'address',
+                    'attributes' => $userData,
+                ],
+            ]
         );
 
         // assert response status code

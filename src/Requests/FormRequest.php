@@ -24,6 +24,22 @@ class FormRequest extends LaravelFormRequest
         return true;
     }
 
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        $attributePrettyNames = [];
+
+        foreach ($this->rules() as $attribute => $rules) {
+            $attributePrettyNames[$attribute] = str_replace('_', ' ', explode('.', $attribute)[2]);
+        }
+
+        return $attributePrettyNames;
+    }
+
     /** Get the failed validation response in json format
      *
      * @param Validator $validator

@@ -1,13 +1,11 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Fluent;
-
 return [
+    // doctrine dev mode toggle
     'development_mode' => true,
 
     // database
+    'database_connection_name' => 'my_connection',
     'database_name' => 'mydb',
     'database_user' => 'root',
     'database_password' => 'root',
@@ -15,18 +13,18 @@ return [
     'database_driver' => 'pdo_mysql',
     'database_in_memory' => false,
 
+    'data_mode' => 'host', // 'host' or 'client', hosts do the db migrations, clients do not
+
     // cache
     'redis_host' => 'redis',
     'redis_port' => 6379,
 
-    // host does the db migrations, clients do not
-    'data_mode' => 'host', // 'host' or 'client'
-
+    // entities
     'entities' => [
         [
             'path' => __DIR__ . '/../src/Entities',
-            'namespace' => 'Railroad\Usora\Entities'
-        ]
+            'namespace' => 'Railroad\Usora\Entities',
+        ],
     ],
 
     // tables
@@ -38,8 +36,7 @@ return [
     ],
 
     // user field columns
-    'user_field_definitions' => [
-    ],
+    'user_field_definitions' => [],
 
     // routes
     'autoload_all_routes' => true,
@@ -70,13 +67,4 @@ return [
     'email_change_notification_class' => \Railroad\Usora\Notifications\EmailChange::class,
     'email_change_notification_channel' => 'mail',
     'email_change_token_ttl' => 24, // hours unit
-
-    // if you have any of these middleware classes in your global http kernel, they must be removed from this array
-    'authentication_controller_middleware' => [
-        \Illuminate\Cookie\Middleware\EncryptCookies::class,
-        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
-        \Railroad\Usora\Middleware\ReFlashSession::class,
-    ],
 ];

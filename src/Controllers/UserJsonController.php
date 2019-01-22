@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -9,12 +10,14 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserJsonCreateRequest;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
 use Railroad\Usora\Services\ResponseService;
+use ReflectionException;
 use Spatie\Fractal\Fractal;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -39,6 +42,10 @@ class UserJsonController extends Controller
      * @var Hasher
      */
     private $hasher;
+    /**
+     * @var JsonApiHydrator
+     */
+    private $jsonApiHydrator;
 
     /**
      * UserController constructor.
@@ -46,12 +53,19 @@ class UserJsonController extends Controller
      * @param EntityManager $entityManager
      * @param PermissionService $permissionService
      * @param Hasher $hasher
+     * @param JsonApiHydrator $jsonApiHydrator
      */
-    public function __construct(EntityManager $entityManager, PermissionService $permissionService, Hasher $hasher)
-    {
+    public function __construct(
+        EntityManager $entityManager,
+        PermissionService $permissionService,
+        Hasher $hasher,
+        JsonApiHydrator $jsonApiHydrator
+    ) {
         $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
         $this->hasher = $hasher;
+        $this->jsonApiHydrator = $jsonApiHydrator;
+
         $this->userRepository = $this->entityManager->getRepository(User::class);
     }
 
@@ -120,6 +134,8 @@ class UserJsonController extends Controller
      * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
+     * @throws DBALException
+     * @throws ReflectionException
      */
     public function store(UserJsonCreateRequest $request)
     {
@@ -128,9 +144,10 @@ class UserJsonController extends Controller
         }
 
         $user = new User();
-        $user->setEmail($request->get('email'));
-        $user->setDisplayName($request->get('display_name'));
-        $user->setPassword($this->hasher->make($request->get('password')));
+
+        $this->jsonApiHydrator->hydrate($user, $request->onlyAllowed());
+
+        $user->setPassword($this->hasher->make($user->getPassword()));
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
