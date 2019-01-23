@@ -103,14 +103,14 @@ class UserJsonController extends Controller
         $queryBuilder->setMaxResults($request->get('per_page', 25))
             ->setFirstResult(($request->get('page', 1) - 1) * $request->get('per_page', 25))
             ->orderBy(
-                'user.' . $request->get('order_by_column', 'createdAt'),
-                $request->get('order_by_direction', 'desc')
+                'user.' . trim($request->get('sort', 'createdAt'), '-'),
+                substr($request->get('sort', 'createdAt'), 0, 1) === '-' ? 'desc' : 'asc'
             );
 
         $users =
             $queryBuilder->getQuery()
                 ->getResult();
-
+        
         return ResponseService::user($users, $queryBuilder);
     }
 
@@ -147,8 +147,6 @@ class UserJsonController extends Controller
 
         $this->jsonApiHydrator->hydrate($user, $request->onlyAllowed());
 
-        $user->setPassword($this->hasher->make($user->getPassword()));
-
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
@@ -170,14 +168,16 @@ class UserJsonController extends Controller
         }
 
         $user = $this->userRepository->find($id);
-        $user->setDisplayName($request->get('display_name'));
 
-        if ($this->permissionService->can(auth()->id(), 'update-users')) {
-            $user->setEmail($request->get('email'));
-        }
+        $newAttributes = $request->onlyAllowed();
 
-        if ($this->permissionService->can(auth()->id(), 'update-users') && !empty($request->get('password'))) {
-            $user->setPassword($this->hasher->make($request->get('password')));
+        $this->jsonApiHydrator->hydrate($user, $newAttributes);
+
+        // regular users are not allowed to change their emails here
+        if ($this->permissionService->can(auth()->id(), 'update-users-email-without-confirmation') &&
+            !empty($request->input('data.attributes.email'))) {
+
+            $user->setEmail($request->input('data.attributes.email'));
         }
 
         $this->entityManager->persist($user);

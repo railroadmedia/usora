@@ -19,7 +19,7 @@ trait BasicUserInformationProperties
     protected $lastName;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="gender")
      * @var string
      */
     protected $gender;
@@ -49,7 +49,7 @@ trait BasicUserInformationProperties
     protected $birthday;
 
     /**
-     * @ORM\Column(type="bigint")
+     * @ORM\Column(type="phone_number")
      * @var integer
      */
     protected $phoneNumber;
@@ -61,13 +61,13 @@ trait BasicUserInformationProperties
     protected $biography;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="url")
      * @var string
      */
     protected $profilePictureUrl;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="timezone")
      * @var string
      */
     protected $timezone;
@@ -203,7 +203,7 @@ trait BasicUserInformationProperties
      */
     public function setPhoneNumber($phoneNumber)
     {
-        $this->phoneNumber = $phoneNumber;
+        $this->phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
     }
 
     /**

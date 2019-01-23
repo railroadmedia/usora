@@ -37,7 +37,7 @@ trait UserNotificationSettingsProperties
     /**
      * @return bool
      */
-    public function isNotifyOnLessonCommentReply()
+    public function getNotifyOnLessonCommentReply()
     {
         return $this->notifyOnLessonCommentReply;
     }
@@ -53,7 +53,7 @@ trait UserNotificationSettingsProperties
     /**
      * @return bool
      */
-    public function isNotifyWeeklyUpdate()
+    public function getNotifyWeeklyUpdate()
     {
         return $this->notifyWeeklyUpdate;
     }
@@ -69,7 +69,7 @@ trait UserNotificationSettingsProperties
     /**
      * @return bool
      */
-    public function isNotifyOnForumPostLike()
+    public function getNotifyOnForumPostLike()
     {
         return $this->notifyOnForumPostLike;
     }
@@ -85,7 +85,7 @@ trait UserNotificationSettingsProperties
     /**
      * @return bool
      */
-    public function isNotifyOnForumFollowedThreadReply()
+    public function getNotifyOnForumFollowedThreadReply()
     {
         return $this->notifyOnForumFollowedThreadReply;
     }
@@ -101,7 +101,7 @@ trait UserNotificationSettingsProperties
     /**
      * @return bool
      */
-    public function isNotifyOnLessonCommentLike()
+    public function getNotifyOnLessonCommentLike()
     {
         return $this->notifyOnLessonCommentLike;
     }

@@ -2,9 +2,7 @@
 
 namespace Railroad\Usora\Entities;
 
-use Carbon\Carbon;
 use Doctrine\ORM\Mapping as ORM;
-use Faker\Generator;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
@@ -114,7 +112,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->password = Hash::make($password);
     }
 
     /**
@@ -163,59 +161,5 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     public function setDisplayName($displayName)
     {
         $this->displayName = $displayName;
-    }
-
-    /**
-     * @param Generator $faker
-     * @param string $testDataIdKey
-     */
-    public function fillWithFakeData(Generator $faker, $testDataIdKey = '')
-    {
-        $this->setEmail('test+' . $testDataIdKey . '@test.com');
-        $this->setDisplayName('testuser' . $testDataIdKey);
-        $this->setPassword(Hash::make('Password' . $testDataIdKey . '#'));
-        $this->setSessionSalt('salt' . $testDataIdKey);
-        $this->setDisplayName('user' . $testDataIdKey);
-
-        $this->setFirstName($faker->firstName);
-        $this->setLastName($faker->lastName);
-        $this->setGender($faker->randomElement(['male', 'female', 'other']));
-        $this->setCountry($faker->country);
-        $this->setRegion($faker->word);
-        $this->setCity($faker->city);
-        $this->setBirthday(Carbon::instance($faker->dateTime));
-        $this->setPhoneNumber($faker->phoneNumber);
-        $this->setBiography($faker->paragraphs(5, true));
-        $this->setProfilePictureUrl($faker->imageUrl());
-        $this->setTimezone($faker->randomElement(timezone_identifiers_list()));
-        $this->setPermissionLevel($faker->randomElement([null, 'moderator', 'administrator']));
-
-        $this->setNotifyOnLessonCommentReply($faker->boolean);
-        $this->setNotifyWeeklyUpdate($faker->boolean);
-        $this->setNotifyOnForumPostLike($faker->boolean);
-        $this->setNotifyOnForumFollowedThreadReply($faker->boolean);
-        $this->setNotifyOnLessonCommentLike($faker->boolean);
-
-        $this->setLegacyDrumeoWordpressId(rand());
-        $this->setLegacyDrumeoIpbId(rand());
-
-        $this->setDrumsPlayingSinceYear(rand(1900, 2050));
-        $this->setDrumsGearPhoto($faker->imageUrl());
-        $this->setDrumsGearCymbalBrands($faker->words(rand(1, 5), true));
-        $this->setDrumsGearSetBrands($faker->words(rand(1, 5), true));
-        $this->setDrumsGearHardwareBrands($faker->words(rand(1, 5), true));
-        $this->setDrumsGearStickBrands($faker->words(rand(1, 5), true));
-
-        $this->setGuitarPlayingSinceYear(rand(1900, 2050));
-        $this->setGuitarGearPhoto($faker->imageUrl());
-        $this->setGuitarGearGuitarBrands($faker->words(rand(1, 5), true));
-        $this->setGuitarGearAmpBrands($faker->words(rand(1, 5), true));
-        $this->setGuitarGearPedalBrands($faker->words(rand(1, 5), true));
-        $this->setGuitarGearStringBrands($faker->words(rand(1, 5), true));
-
-        $this->setPianoPlayingSinceYear(rand(1900, 2050));
-        $this->setPianoGearPhoto($faker->imageUrl());
-        $this->setPianoGearPianoBrands($faker->words(rand(1, 5), true));
-        $this->setPianoGearKeyboardBrands($faker->words(rand(1, 5), true));
     }
 }

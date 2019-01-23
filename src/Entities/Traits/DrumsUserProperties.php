@@ -24,7 +24,7 @@ trait DrumsUserProperties
     protected $drumsPlayingSinceYear;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="url")
      * @var string
      */
     protected $drumsGearPhoto;

@@ -7,13 +7,17 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Faker\ORM\Doctrine\Populator;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Tests\Hydrators\UserFakeDataHydrator;
 use Railroad\Usora\Tests\UsoraTestCase;
+use Railroad\Usora\Transformers\UserTransformer;
 
 class UserJsonControllerTest extends UsoraTestCase
 {
     protected function setUp()
     {
         parent::setUp();
+
+        $this->fakeDataHydrator = new UserFakeDataHydrator($this->entityManager);
 
         $populator = new Populator($this->faker, $this->entityManager);
 
@@ -26,14 +30,16 @@ class UserJsonControllerTest extends UsoraTestCase
         );
         $populator->execute();
 
-        $populator->addEntity(
-            User::class,
-            4,
-            [
-                'displayName' => 'test12345',
-            ]
-        );
-        $populator->execute();
+        for ($x = 0; $x < 3; $x++) {
+            $populator->addEntity(
+                User::class,
+                1,
+                [
+                    'displayName' => 'test' . $x,
+                ]
+            );
+            $populator->execute();
+        }
 
         $purger = new ORMPurger();
         $executor = new ORMExecutor($this->entityManager, $purger);
@@ -47,8 +53,7 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $request = [
             'per_page' => 3,
-            'order_by_column' => 'displayName',
-            'order_by_direction' => 'asc',
+            'sort' => 'displayName',
         ];
 
         $responsePageTwo = $this->call(
@@ -69,7 +74,9 @@ class UserJsonControllerTest extends UsoraTestCase
         for ($i = 0; $i < count($dataPageTwo) - 1; $i++) {
             $current = $dataPageTwo[$i];
             $next = $dataPageTwo[$i + 1];
+
             $cmp = strcasecmp($current['attributes']['display_name'], $next['attributes']['display_name']);
+
             $this->assertLessThanOrEqual(0, $cmp);
         }
 
@@ -99,9 +106,8 @@ class UserJsonControllerTest extends UsoraTestCase
 
         $request = [
             'per_page' => 3,
-            'order_by_column' => 'displayName',
-            'order_by_direction' => 'asc',
-            'search_term' => 'test12345',
+            'sort' => 'displayName',
+            'search_term' => 'test',
         ];
 
         $responsePageTwo = $this->call(
@@ -211,11 +217,13 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_users_store_with_permission()
     {
-        $userData = [
-            'display_name' => $this->faker->words(4, true),
-            'email' => $this->faker->email,
-            'password' => 'my-password',
-        ];
+        $attributes = $this->fakeDataHydrator->getAttributeArray(User::class, new UserTransformer());
+
+        $attributes['password'] = 'password12345';
+        $attributes['email'] = 'test_email@test.com';
+
+        unset($attributes['created_at']);
+        unset($attributes['updated_at']);
 
         $this->permissionServiceMock->method('can')
             ->willReturn(true);
@@ -225,42 +233,45 @@ class UserJsonControllerTest extends UsoraTestCase
             'usora/json-api/user/store',
             [
                 'data' => [
-                    'type' => 'address',
-                    'attributes' => $userData,
+                    'type' => 'user',
+                    'attributes' => $attributes,
                 ],
             ]
         );
-
         // assert response status code
         $this->assertEquals(201, $response->getStatusCode());
 
         // assert the users password was encrypted and saved, and that they can login
-        $this->assertTrue(auth()->attempt(['email' => $userData['email'], 'password' => $userData['password']]));
-
-        unset($userData['password']);
+        $this->assertTrue(auth()->attempt(['email' => $attributes, 'password' => $attributes['password']]));
 
         // assert the user data is subset of response
-        $this->assertArraySubset($userData, $response->decodeResponseJson()['data']['attributes']);
+        unset($attributes['id']);
+        unset($attributes['password']);
+
+        $this->assertArraySubset($attributes, $response->decodeResponseJson()['data']['attributes']);
 
         // assert the users data was saved in the db
         $this->assertDatabaseHas(
             config('usora.tables.users'),
-            $userData
+            $attributes
         );
     }
 
     public function test_users_store_without_permission()
     {
-        $userData = [
-            'display_name' => $this->faker->words(4, true),
-            'email' => $this->faker->email,
-            'password' => 'my-password',
-        ];
+        $attributes = $this->fakeDataHydrator->getAttributeArray(User::class, new UserTransformer());
+
+        $attributes['password'] = 'password12345';
 
         $response = $this->call(
             'PUT',
             'usora/json-api/user/store',
-            $userData
+            [
+                'data' => [
+                    'type' => 'user',
+                    'attributes' => $attributes,
+                ],
+            ]
         );
 
         // assert response status is not found
@@ -270,14 +281,14 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertDatabaseMissing(
             config('usora.tables.users'),
             [
-                'display_name' => $userData['display_name'],
-                'email' => $userData['email'],
+                'display_name' => $attributes['display_name'],
+                'email' => $attributes['email'],
             ]
         );
 
         $credentials = [
-            'email' => $userData['email'],
-            'password' => $userData['password'],
+            'email' => $attributes['email'],
+            'password' => $attributes['password'],
         ];
 
         // assert the users data can not be used to login
@@ -299,15 +310,15 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertEquals(
             [
                 [
-                    "source" => "email",
+                    "source" => "data.attributes.email",
                     "detail" => "The email field is required.",
                 ],
                 [
-                    "source" => "display_name",
+                    "source" => "data.attributes.display_name",
                     "detail" => "The display name field is required.",
                 ],
                 [
-                    "source" => "password",
+                    "source" => "data.attributes.password",
                     "detail" => "The password field is required.",
                 ],
             ],
@@ -315,22 +326,25 @@ class UserJsonControllerTest extends UsoraTestCase
         );
     }
 
-    public function test_user_update_with_owner()
+    public function test_user_update_with_owner_only()
     {
         $userId = 1;
 
         $this->authManager->guard()
             ->onceUsingId($userId);
 
-        $newDisplayName = $this->faker->words(4, true);
-        $newEmail = $this->faker->email;
+        $newAttributes = $this->fakeDataHydrator->getAttributeArray(User::class, new UserTransformer());
+
+        unset($newAttributes['created_at']);
+        unset($newAttributes['updated_at']);
+        unset($newAttributes['id']);
 
         // assert the new display name is different from existing
         $this->assertDatabaseMissing(
             config('usora.tables.users'),
             [
                 'id' => $userId,
-                'display_name' => $newDisplayName,
+                'display_name' => $newAttributes['display_name'],
             ]
         );
 
@@ -338,17 +352,31 @@ class UserJsonControllerTest extends UsoraTestCase
             'PATCH',
             'usora/json-api/user/update/' . $userId,
             [
-                'display_name' => $newDisplayName,
-                'email' => $newEmail,
+                'type' => 'user',
+                'id' => $userId,
+                'data' => [
+                    'attributes' => $newAttributes,
+                ],
             ]
         );
 
         // assert response status code
         $this->assertEquals(200, $response->getStatusCode());
 
+        // assert the new email field was not saved in the db
+        $this->assertDatabaseMissing(
+            config('usora.tables.users'),
+            [
+                'id' => $userId,
+                'email' => $newAttributes['email'],
+            ]
+        );
+
+        unset($newAttributes['email']);
+
         // assert the user data is subset of response
         $this->assertArraySubset(
-            ['display_name' => $newDisplayName],
+            $newAttributes,
             $response->decodeResponseJson()['data']['attributes']
         );
 
@@ -357,21 +385,40 @@ class UserJsonControllerTest extends UsoraTestCase
             config('usora.tables.users'),
             [
                 'id' => $userId,
-                'display_name' => $newDisplayName,
-            ]
-        );
-
-        // assert the new email field was not saved in the db
-        $this->assertDatabaseMissing(
-            config('usora.tables.users'),
-            [
-                'id' => $userId,
-                'email' => $newEmail,
+                'display_name' => $newAttributes['display_name'],
             ]
         );
     }
 
-    public function test_user_update_with_permission()
+    public function test_user_update_no_permission_non_matching_logged_in_id()
+    {
+        $this->authManager->guard()
+            ->onceUsingId(1);
+
+        $response = $this->call(
+            'PATCH',
+            'usora/json-api/user/update/' . 2,
+            [
+                'type' => 'user',
+                'id' => 2,
+                'data' => [
+                    'attributes' => ['display_name' => 'test123'],
+                ],
+            ]
+        );
+
+        $this->assertEquals(404, $response->getStatusCode());
+
+        $this->assertDatabaseMissing(
+            config('usora.tables.users'),
+            [
+                'id' => 2,
+                'display_name' => 'test123',
+            ]
+        );
+    }
+
+    public function test_user_update_with_permission_to_edit_any_user()
     {
         $userIdToUpdate = 1;
         $userIdLoggedIn = 2;
@@ -380,53 +427,46 @@ class UserJsonControllerTest extends UsoraTestCase
             ->onceUsingId($userIdLoggedIn);
 
         $this->permissionServiceMock->method('can')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(true, true);
 
-        $newDisplayName = $this->faker->words(4, true);
-        $newEmail = $this->faker->email;
+        $this->authManager->guard()
+            ->onceUsingId($userIdLoggedIn);
 
-        // assert the new display name is different from existing
-        $this->assertDatabaseMissing(
-            config('usora.tables.users'),
-            [
-                'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName,
-            ]
-        );
+        $newAttributes = ['email' => 'new_test_email@test.com'];
 
         $response = $this->call(
             'PATCH',
             'usora/json-api/user/update/' . $userIdToUpdate,
             [
-                'display_name' => $newDisplayName,
-                'email' => $newEmail,
+                'type' => 'user',
+                'id' => $userIdToUpdate,
+                'data' => [
+                    'attributes' => $newAttributes,
+                ],
             ]
         );
 
         // assert response status code
         $this->assertEquals(200, $response->getStatusCode());
 
-        // assert the user data is subset of response
-        $this->assertArraySubset(
-            ['display_name' => $newDisplayName],
-            $response->decodeResponseJson()['data']['attributes']
-        );
-
-        // assert the new display name was saved in the db
         $this->assertDatabaseHas(
             config('usora.tables.users'),
             [
                 'id' => $userIdToUpdate,
-                'display_name' => $newDisplayName,
-                'email' => $newEmail,
+                'email' => $newAttributes['email'],
             ]
+        );
+
+        // assert the user data is subset of response
+        $this->assertArraySubset(
+            $newAttributes,
+            $response->decodeResponseJson()['data']['attributes']
         );
     }
 
     public function test_user_update_without_permission()
     {
         $userIdToUpdate = 1;
-
         $userIdLoggedIn = 2;
 
         $this->authManager->guard()
@@ -438,7 +478,11 @@ class UserJsonControllerTest extends UsoraTestCase
             'PATCH',
             'usora/json-api/user/update/' . $userIdToUpdate,
             [
-                'display_name' => $newDisplayName,
+                'type' => 'user',
+                'id' => $userIdToUpdate,
+                'data' => [
+                    'attributes' => ['display_name' => $newDisplayName],
+                ],
             ]
         );
 
@@ -457,10 +501,21 @@ class UserJsonControllerTest extends UsoraTestCase
 
     public function test_user_update_validation_fail()
     {
+        $userIdLoggedIn = 2;
+
+        $this->authManager->guard()
+            ->onceUsingId($userIdLoggedIn);
+
         $response = $this->call(
             'PATCH',
-            'usora/json-api/user/update/' . rand(),
-            ['display_name' => 1]
+            'usora/json-api/user/update/' . $userIdLoggedIn,
+            [
+                'type' => 'user',
+                'id' => 2,
+                'data' => [
+                    'attributes' => ['display_name' => 'a'],
+                ],
+            ]
         );
 
         // assert response status code
@@ -470,8 +525,8 @@ class UserJsonControllerTest extends UsoraTestCase
         $this->assertEquals(
             [
                 [
-                    "source" => "display_name",
-                    "detail" => "The display name must be a string.",
+                    'source' => 'data.attributes.display_name',
+                    'detail' => 'The display name must be at least 2 characters.',
                 ],
             ],
             $response->decodeResponseJson()['errors']

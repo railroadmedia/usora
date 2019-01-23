@@ -11,7 +11,7 @@ trait GuitarUserProperties
     protected $guitarPlayingSinceYear;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="url")
      * @var string
      */
     protected $guitarGearPhoto;

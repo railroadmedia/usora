@@ -116,6 +116,7 @@
       <path value="$PROJECT_DIR$/vendor/spatie/fractalistic" />
       <path value="$PROJECT_DIR$/vendor/railroad/doctrine" />
       <path value="$PROJECT_DIR$/../doctrine" />
+      <path value="$PROJECT_DIR$/vendor/railroad/doctrine-array-hydrator" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

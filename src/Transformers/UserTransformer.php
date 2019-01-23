@@ -2,20 +2,25 @@
 
 namespace Railroad\Usora\Transformers;
 
-use Carbon\Carbon;
+use Doctrine\ORM\EntityManager;
+use Illuminate\Support\Collection;
 use League\Fractal\TransformerAbstract;
+use Railroad\Doctrine\Serializers\BasicEntitySerializer;
 use Railroad\Usora\Entities\User;
 
 class UserTransformer extends TransformerAbstract
 {
     public function transform(User $user)
     {
-        return [
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'display_name' => $user->getDisplayName(),
-            'created_at' => Carbon::instance($user->getCreatedAt())->toDateTimeString(),
-            'updated_at' => Carbon::instance($user->getUpdatedAt())->toDateTimeString(),
-        ];
+        $entityManager = app()->make(EntityManager::class);
+        $serializer = new BasicEntitySerializer();
+
+        return (new Collection(
+            $serializer->serializeToUnderScores(
+                $user,
+                $entityManager->getClassMetadata(get_class($user))
+            )
+        ))->except(['password', 'remember_token', 'session_salt'])
+            ->toArray();
     }
 }

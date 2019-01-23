@@ -17,6 +17,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use Railroad\Doctrine\Hydrators\FakeDataHydrator;
 use Railroad\Doctrine\Providers\DoctrineServiceProvider;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Faker\Factory;
@@ -77,6 +78,11 @@ class UsoraTestCase extends TestCase
      */
     protected $entityManager;
 
+    /**
+     * @var FakeDataHydrator
+     */
+    protected $fakeDataHydrator;
+
     protected function setUp()
     {
         parent::setUp();
@@ -96,6 +102,7 @@ class UsoraTestCase extends TestCase
         $this->artisan('cache:clear', []);
 
         $this->faker = Factory::create();
+        $this->fakeDataHydrator = new FakeDataHydrator($this->entityManager);
 
         $this->authManager = $this->app->make(AuthManager::class);
         $this->hasher = $this->app->make(BcryptHasher::class);

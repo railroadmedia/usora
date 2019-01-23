@@ -11,7 +11,7 @@ trait PianoUserProperties
     protected $pianoPlayingSinceYear;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="url")
      * @var string
      */
     protected $pianoGearPhoto;
