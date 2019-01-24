@@ -4,8 +4,9 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Faker\ORM\Doctrine\Populator;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Tests\UsoraTestCase;
 
 class APIControllerTest extends UsoraTestCase
@@ -14,23 +15,36 @@ class APIControllerTest extends UsoraTestCase
     {
         parent::setUp();
 
+        $populator = new Populator($this->faker, $this->entityManager);
+
+        $populator->addEntity(
+            User::class,
+            1,
+            [
+                'email' => 'login_user_test@email.com',
+                'password' => 'Password12345!@',
+            ]
+        );
+        $populator->execute();
+
         $purger = new ORMPurger();
         $executor = new ORMExecutor($this->entityManager, $purger);
-        $executor->execute([app(UserFixtureLoader::class)]);
+        $executor->execute([app(UserFixtureLoader::class)], true);
     }
 
     public function test_login_token()
     {
-        $rawPassword = 'Password1#';
+        $rawPassword = 'Password12345!@';
 
         $response = $this->call(
             'PUT',
             'usora/api/login',
             [
-                'email' => 'test+1@test.com',
+                'email' => 'login_user_test@email.com',
                 'password' => $rawPassword,
             ]
         );
+
         $response->assertJson(['success' => 'true']);
 
         $this->assertArrayHasKey('token', $response->decodeResponseJson());
@@ -60,13 +74,13 @@ class APIControllerTest extends UsoraTestCase
 
     public function test_logout()
     {
-        $rawPassword = 'Password1#';
+        $rawPassword = 'Password12345!@';
 
         $login = $this->call(
             'PUT',
             'usora/api/login',
             [
-                'email' => 'test+1@test.com',
+                'email' => 'login_user_test@email.com',
                 'password' => $rawPassword,
             ]
         );
@@ -77,7 +91,7 @@ class APIControllerTest extends UsoraTestCase
             'PUT',
             'usora/api/logout',
             [
-                'token' => $token
+                'token' => $token,
             ]
         );
 
@@ -86,13 +100,13 @@ class APIControllerTest extends UsoraTestCase
 
     public function test_get_auth_user()
     {
-        $rawPassword = 'Password1#';
+        $rawPassword = 'Password12345!@';
 
         $response = $this->call(
             'PUT',
             'usora/api/login',
             [
-                'email' => 'test+1@test.com',
+                'email' => 'login_user_test@email.com',
                 'password' => $rawPassword,
             ]
         );
@@ -103,10 +117,10 @@ class APIControllerTest extends UsoraTestCase
             'PUT',
             'usora/api/me',
             [
-                'token' => $token
+                'token' => $token,
             ]
         );
 
-        $this->assertArraySubset(['email' => 'test+1@test.com'], $result->decodeResponseJson());
+        $this->assertArraySubset(['email' => 'login_user_test@email.com'], $result->decodeResponseJson());
     }
 }

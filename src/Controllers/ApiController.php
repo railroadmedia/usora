@@ -4,7 +4,7 @@ namespace Railroad\Usora\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use JMS\Serializer\SerializerBuilder;
+use Railroad\Usora\Services\ResponseService;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\JWTAuth;
 
@@ -15,11 +15,6 @@ class ApiController extends Controller
     private $jwtAuth;
 
     /**
-     * @var \JMS\Serializer\Serializer
-     */
-    private $serializer;
-
-    /**
      * ApiController constructor.
      *
      * @param bool $loginAfterSignUp
@@ -27,9 +22,6 @@ class ApiController extends Controller
     public function __construct(JWTAuth $jwtAuth)
     {
         $this->jwtAuth = $jwtAuth;
-        $this->serializer =
-            SerializerBuilder::create()
-                ->build();
     }
 
     /**
@@ -101,7 +93,7 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Spatie\Fractal\Fractal
      * @throws JWTException
      */
     public function getAuthUser(Request $request)
@@ -128,6 +120,6 @@ class ApiController extends Controller
         }
 
         // the token is valid and we have found the user via the sub claim
-        return response($this->serializer->serialize($user, 'json'));
+        return ResponseService::userArray($user);
     }
 }

@@ -111,7 +111,7 @@ class UserJsonController extends Controller
             $queryBuilder->getQuery()
                 ->getResult();
         
-        return ResponseService::user($users, $queryBuilder);
+        return ResponseService::userJson($users, $queryBuilder);
     }
 
     /**
@@ -126,7 +126,7 @@ class UserJsonController extends Controller
 
         $user = $this->userRepository->find($id);
 
-        return ResponseService::user($user);
+        return ResponseService::userJson($user);
     }
 
     /**
@@ -150,7 +150,7 @@ class UserJsonController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return ResponseService::user($user)
+        return ResponseService::userJson($user)
             ->respond(201);
     }
 
@@ -187,7 +187,7 @@ class UserJsonController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return ResponseService::user($user)
+        return ResponseService::userJson($user)
             ->respond(200);
     }
 
