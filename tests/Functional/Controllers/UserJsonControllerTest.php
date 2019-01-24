@@ -75,7 +75,7 @@ class UserJsonControllerTest extends UsoraTestCase
             $current = $dataPageTwo[$i];
             $next = $dataPageTwo[$i + 1];
 
-            $cmp = strcasecmp($current['attributes']['display_name'], $next['attributes']['display_name']);
+            $cmp = strcmp($current['attributes']['display_name'], $next['attributes']['display_name']);
 
             $this->assertLessThanOrEqual(0, $cmp);
         }
