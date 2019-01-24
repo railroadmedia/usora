@@ -14,6 +14,8 @@ class UserFakeDataHydrator extends FakeDataHydrator
          */
         $defaultEntity = parent::fill($entity, $customColumnFormatters);
 
+        $defaultEntity->setDisplayName($this->faker->userName);
+
         $defaultEntity->setDrumsPlayingSinceYear(rand(1900, 2019));
         $defaultEntity->setPianoPlayingSinceYear(rand(1900, 2019));
         $defaultEntity->setGuitarPlayingSinceYear(rand(1900, 2019));
