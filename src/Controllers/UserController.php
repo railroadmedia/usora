@@ -13,6 +13,7 @@ use Illuminate\Routing\Controller;
 use Railroad\DoctrineArrayHydrator\ArrayHydrator;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
 use Railroad\Usora\Requests\UserUpdateRequest;
@@ -49,13 +50,12 @@ class UserController extends Controller
      * @param Hasher $hasher
      */
     public function __construct(
-        EntityManager $entityManager,
-        PermissionService $permissionService,
-        ArrayHydrator $arrayHydrator
+        UsoraEntityManager $entityManager,
+        PermissionService $permissionService
     ) {
         $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
-        $this->arrayHydrator = $arrayHydrator;
+        $this->arrayHydrator = new ArrayHydrator($this->entityManager);
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
     }

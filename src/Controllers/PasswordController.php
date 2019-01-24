@@ -14,6 +14,7 @@ use Illuminate\Support\MessageBag;
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 
 class PasswordController extends Controller
@@ -45,7 +46,7 @@ class PasswordController extends Controller
      * @param Hasher $hasher
      * @param PermissionService $permissionService
      */
-    public function __construct(EntityManager $entityManager, Hasher $hasher, PermissionService $permissionService)
+    public function __construct(UsoraEntityManager $entityManager, Hasher $hasher, PermissionService $permissionService)
     {
         $this->entityManager = $entityManager;
         $this->hasher = $hasher;

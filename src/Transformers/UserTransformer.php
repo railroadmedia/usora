@@ -7,12 +7,13 @@ use Illuminate\Support\Collection;
 use League\Fractal\TransformerAbstract;
 use Railroad\Doctrine\Serializers\BasicEntitySerializer;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Managers\UsoraEntityManager;
 
 class UserTransformer extends TransformerAbstract
 {
     public function transform(User $user)
     {
-        $entityManager = app()->make(EntityManager::class);
+        $entityManager = app()->make(UsoraEntityManager::class);
         $serializer = new BasicEntitySerializer();
 
         return (new Collection(

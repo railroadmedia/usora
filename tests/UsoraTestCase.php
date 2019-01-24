@@ -21,6 +21,7 @@ use Railroad\Doctrine\Providers\DoctrineServiceProvider;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\UserRepository;
 
@@ -86,7 +87,7 @@ class UsoraTestCase extends TestCase
         parent::setUp();
 
         // Run the schema update tool using our entity metadata
-        $this->entityManager = app(EntityManager::class);
+        $this->entityManager = app(UsoraEntityManager::class);
 
         $this->entityManager->getMetadataFactory()
             ->getCacheDriver()
@@ -170,18 +171,16 @@ class UsoraTestCase extends TestCase
         config()->set('usora.database_driver', 'pdo_sqlite');
         config()->set('usora.database_in_memory', true);
 
-        config()->set('doctrine.redis_host', $defaultConfig['redis_host']);
-        config()->set('doctrine.redis_port', $defaultConfig['redis_port']);
-        config()->set('doctrine.development_mode', $defaultConfig['development_mode'] ?? true);
-        config()->set('doctrine.database_driver', 'pdo_sqlite');
-        config()->set('doctrine.database_user', 'root');
-        config()->set('doctrine.database_password', 'root');
-        config()->set('doctrine.database_in_memory', true);
+        config()->set('usora.redis_host', $defaultConfig['redis_host']);
+        config()->set('usora.redis_port', $defaultConfig['redis_port']);
+        config()->set('usora.development_mode', $defaultConfig['development_mode'] ?? true);
+        config()->set('usora.database_driver', 'pdo_sqlite');
+        config()->set('usora.database_user', 'root');
+        config()->set('usora.database_password', 'root');
+        config()->set('usora.database_in_memory', true);
 
         // if new packages entities are required for testing, their entity directory/namespace config should be merged here
-        config()->set('doctrine.entities', $defaultConfig['entities']);
-
-        $app->register(DoctrineServiceProvider::class);
+        config()->set('usora.entities', $defaultConfig['entities']);
 
         config()->set('usora.autoload_all_routes', true);
         config()->set('usora.route_middleware_public_groups', []);

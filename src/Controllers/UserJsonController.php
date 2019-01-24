@@ -13,6 +13,7 @@ use Illuminate\Routing\Controller;
 use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserJsonCreateRequest;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
@@ -56,15 +57,14 @@ class UserJsonController extends Controller
      * @param JsonApiHydrator $jsonApiHydrator
      */
     public function __construct(
-        EntityManager $entityManager,
+        UsoraEntityManager $entityManager,
         PermissionService $permissionService,
-        Hasher $hasher,
-        JsonApiHydrator $jsonApiHydrator
+        Hasher $hasher
     ) {
         $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
         $this->hasher = $hasher;
-        $this->jsonApiHydrator = $jsonApiHydrator;
+        $this->jsonApiHydrator = new JsonApiHydrator($this->entityManager);
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
     }

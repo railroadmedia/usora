@@ -29,14 +29,10 @@ return [
 
     // tables
     'tables' => [
-        'email_changes' => 'usora_email_changes',
         'users' => 'usora_users',
+        'email_changes' => 'usora_email_changes',
         'password_resets' => 'usora_password_resets',
-        'user_fields' => 'usora_user_fields',
     ],
-
-    // user field columns
-    'user_field_definitions' => [],
 
     // routes
     'autoload_all_routes' => true,

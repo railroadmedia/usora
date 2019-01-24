@@ -14,6 +14,7 @@ use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Guards\SaltedSessionGuard;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Services\ClientRelayService;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,7 +49,7 @@ class AuthenticationController extends Controller
      * @param EntityManager $entityManager
      * @param Hasher $hasher
      */
-    public function __construct(EntityManager $entityManager, Hasher $hasher)
+    public function __construct(UsoraEntityManager $entityManager, Hasher $hasher)
     {
         $this->hasher = $hasher;
         $this->entityManager = $entityManager;

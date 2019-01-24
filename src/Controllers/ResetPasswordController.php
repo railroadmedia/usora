@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 
 class ResetPasswordController extends Controller
@@ -30,7 +31,7 @@ class ResetPasswordController extends Controller
      *
      * @param UserRepository $userRepository
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(UsoraEntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
 

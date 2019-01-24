@@ -2,10 +2,33 @@
 
 namespace Railroad\Usora\Providers;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Cache\RedisCache;
+use Doctrine\Common\EventManager;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
+use Gedmo\DoctrineExtensions;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use MikeMcLin\WpPassword\WpPasswordProvider;
+use Railroad\Doctrine\TimestampableListener;
+use Railroad\Doctrine\Types\Carbon\CarbonDateTimeTimezoneType;
+use Railroad\Doctrine\Types\Carbon\CarbonDateTimeType;
+use Railroad\Doctrine\Types\Carbon\CarbonDateType;
+use Railroad\Doctrine\Types\Carbon\CarbonTimeType;
+use Railroad\Doctrine\Types\Domain\GenderType;
+use Railroad\Doctrine\Types\Domain\PhoneNumberType;
+use Railroad\Doctrine\Types\Domain\TimezoneType;
+use Railroad\Doctrine\Types\Domain\UrlType;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Routes\RouteRegistrar;
+use Redis;
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
 class UsoraServiceProvider extends ServiceProvider
@@ -64,9 +87,118 @@ class UsoraServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // laravel auth integration
         $this->app->register(AuthenticationServiceProvider::class);
+
+        // wordpress password hash support
         $this->app->register(WpPasswordProvider::class);
 
+        // jwt
         $this->app->register(LaravelServiceProvider::class);
+
+        // doctrine
+        Type::overrideType('datetime', CarbonDateTimeType::class);
+        Type::overrideType('datetimetz', CarbonDateTimeTimezoneType::class);
+        Type::overrideType('date', CarbonDateType::class);
+        Type::overrideType('time', CarbonTimeType::class);
+
+        !Type::hasType('url') ? Type::addType('url', UrlType::class) : null;
+        !Type::hasType('phone_number') ? Type::addType('phone_number', PhoneNumberType::class) : null;
+        !Type::hasType('timezone') ? Type::addType('timezone', TimezoneType::class) : null;
+        !Type::hasType('gender') ? Type::addType('gender', GenderType::class) : null;
+
+        // set proxy dir to temp folder on server
+        $proxyDir = sys_get_temp_dir();
+
+        // setup redis
+        $redis = new Redis();
+        $redis->connect(
+            config('usora.redis_host'),
+            config('usora.redis_port')
+        );
+        $redisCache = new RedisCache();
+        $redisCache->setRedis($redis);
+
+        // redis cache instance is referenced in laravel container to be reused when needed
+        app()->instance(RedisCache::class, $redisCache);
+
+        AnnotationRegistry::registerLoader('class_exists');
+
+        $annotationReader = new AnnotationReader();
+
+        $cachedAnnotationReader = new CachedReader(
+            $annotationReader, $redisCache
+        );
+
+        $driverChain = new MappingDriverChain();
+
+        DoctrineExtensions::registerAbstractMappingIntoDriverChainORM(
+            $driverChain,
+            $cachedAnnotationReader
+        );
+
+        foreach (config('usora.entities') as $driverConfig) {
+            $annotationDriver = new AnnotationDriver(
+                $cachedAnnotationReader, $driverConfig['path']
+            );
+
+            $driverChain->addDriver(
+                $annotationDriver,
+                $driverConfig['namespace']
+            );
+        }
+
+        // driver chain instance is referenced in laravel container to be reused when needed
+        app()->instance(MappingDriverChain::class, $driverChain);
+
+        $timestampableListener = new TimestampableListener();
+        $timestampableListener->setAnnotationReader($cachedAnnotationReader);
+
+        $eventManager = new EventManager();
+        $eventManager->addEventSubscriber($timestampableListener);
+
+        $ormConfiguration = new Configuration();
+        $ormConfiguration->setMetadataCacheImpl($redisCache);
+        $ormConfiguration->setQueryCacheImpl($redisCache);
+        $ormConfiguration->setResultCacheImpl($redisCache);
+        $ormConfiguration->setProxyDir($proxyDir);
+        $ormConfiguration->setProxyNamespace('DoctrineProxies');
+        $ormConfiguration->setAutoGenerateProxyClasses(
+            config('usora.development_mode')
+        );
+        $ormConfiguration->setMetadataDriverImpl($driverChain);
+        $ormConfiguration->setNamingStrategy(
+            new UnderscoreNamingStrategy(CASE_LOWER)
+        );
+
+        // orm configuration instance is referenced in laravel container to be reused when needed
+        app()->instance(Configuration::class, $ormConfiguration);
+
+        if (config('usora.database_in_memory') !== true) {
+            $databaseOptions = [
+                'driver' => config('usora.database_driver'),
+                'dbname' => config('usora.database_name'),
+                'user' => config('usora.database_user'),
+                'password' => config('usora.database_password'),
+                'host' => config('usora.database_host'),
+            ];
+        } else {
+            $databaseOptions = [
+                'driver' => config('usora.database_driver'),
+                'user' => config('usora.database_user'),
+                'password' => config('usora.database_password'),
+                'memory' => true,
+            ];
+        }
+
+        // register the default entity manager
+        $entityManager = UsoraEntityManager::create(
+            $databaseOptions,
+            $ormConfiguration,
+            $eventManager
+        );
+
+        // register the entity manager as a singleton
+        app()->instance(UsoraEntityManager::class, $entityManager);
     }
 }

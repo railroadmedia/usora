@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Railroad\Usora\Entities\EmailChange;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
+use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\EmailChangeRepository;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\EmailChangeRequest;
@@ -41,7 +42,7 @@ class EmailChangeController extends Controller
      *
      * @param EntityManager $entityManager
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(UsoraEntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
 
