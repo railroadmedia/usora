@@ -4,11 +4,12 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Faker\ORM\Doctrine\Populator;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
-
 use Railroad\Usora\Tests\UsoraTestCase;
+use ReflectionClass;
 
 class AuthenticationControllerTest extends UsoraTestCase
 {
@@ -16,9 +17,21 @@ class AuthenticationControllerTest extends UsoraTestCase
     {
         parent::setUp();
 
+        $populator = new Populator($this->faker, $this->entityManager);
+
+        $populator->addEntity(
+            User::class,
+            1,
+            [
+                'email' => 'login_user_test@email.com',
+                'password' => 'Password12345!@',
+            ]
+        );
+        $populator->execute();
+
         $purger = new ORMPurger();
         $executor = new ORMExecutor($this->entityManager, $purger);
-        $executor->execute([app(UserFixtureLoader::class)]);
+        $executor->execute([app(UserFixtureLoader::class)], true);
     }
 
     public function test_authenticate_via_credentials_validation_failed()
@@ -64,7 +77,7 @@ class AuthenticationControllerTest extends UsoraTestCase
         $response = $this->call(
             'POST',
             'usora/authenticate/with-credentials',
-            ['email' => 'test+1@test.com', 'password' => 'Password1#']
+            ['email' => 'login_user_test@email.com', 'password' => 'Password12345!@']
         );
 
         $this->assertEquals(
@@ -73,6 +86,7 @@ class AuthenticationControllerTest extends UsoraTestCase
                 ->guard()
                 ->id()
         );
+
         $response->assertRedirect(config('usora.login_success_redirect_path'));
     }
 
@@ -100,6 +114,7 @@ class AuthenticationControllerTest extends UsoraTestCase
         );
 
         $response->assertSeeText('');
+
         $this->assertEmpty(
             $this->app->make('auth')
                 ->guard()
@@ -116,8 +131,10 @@ class AuthenticationControllerTest extends UsoraTestCase
         $response = $this->call(
             'GET',
             'usora/authenticate/with-verification-token',
-            ['uid' => 1, 'vt' => $this->hasher->make(1 . $user->getPassword() . 'salt1')]
+            ['uid' => 1, 'vt' => $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt())]
         );
+
+        $response->assertSeeText('');
 
         $this->assertEquals(
             1,
@@ -270,6 +287,7 @@ class AuthenticationControllerTest extends UsoraTestCase
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \ReflectionException
      */
     public function test_authentication_via_credentials_wordpress_hash()
     {
@@ -278,8 +296,13 @@ class AuthenticationControllerTest extends UsoraTestCase
         $user = new User();
         $user->setEmail('wptest+1@test.com');
         $user->setDisplayName('wptestuser1');
-        $user->setPassword(WpPassword::make($rawPassword));
         $user->setSessionSalt('wpsalt1');
+
+        // we must use reflection to set a custom password hash since the regular hashing is built in to the setter
+        $reflectionClass = new ReflectionClass($user);
+        $reflectionProperty = $reflectionClass->getProperty('password');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($user, WpPassword::make($rawPassword));
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -299,6 +322,7 @@ class AuthenticationControllerTest extends UsoraTestCase
                 ->guard()
                 ->id()
         );
+
         $response->assertRedirect(config('usora.login_success_redirect_path'));
     }
 }

@@ -2,12 +2,13 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
-use Illuminate\Notifications\AnonymousNotifiable;
-use Railroad\Usora\DataFixtures\UserFixtureLoader;
-
-use Railroad\Usora\Tests\UsoraTestCase;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Faker\ORM\Doctrine\Populator;
+use Illuminate\Notifications\AnonymousNotifiable;
+use Railroad\Usora\DataFixtures\UserFixtureLoader;
+use Railroad\Usora\Entities\User;
+use Railroad\Usora\Tests\UsoraTestCase;
 
 class ForgotPasswordControllerTest extends UsoraTestCase
 {
@@ -15,9 +16,21 @@ class ForgotPasswordControllerTest extends UsoraTestCase
     {
         parent::setUp();
 
+        $populator = new Populator($this->faker, $this->entityManager);
+
+        $populator->addEntity(
+            User::class,
+            1,
+            [
+                'email' => 'login_user_test@email.com',
+                'password' => 'Password12345!@',
+            ]
+        );
+        $populator->execute();
+
         $purger = new ORMPurger();
         $executor = new ORMExecutor($this->entityManager, $purger);
-        $executor->execute([app(UserFixtureLoader::class)]);
+        $executor->execute([app(UserFixtureLoader::class)], true);
     }
 
     public function test_send_reset_link_email_validation_failed()
@@ -33,10 +46,10 @@ class ForgotPasswordControllerTest extends UsoraTestCase
 
     public function test_send_reset_link_email()
     {
-        $this->call(
+        $response = $this->call(
             'POST',
             'usora/password/send-reset-email',
-            ['email' => 'test+1@test.com']
+            ['email' => 'login_user_test@email.com']
         );
 
         $this->notificationFake->assertSentTo(

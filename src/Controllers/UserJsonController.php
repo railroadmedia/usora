@@ -169,6 +169,10 @@ class UserJsonController extends Controller
 
         $user = $this->userRepository->find($id);
 
+        if (empty($user)) {
+            throw new NotFoundHttpException();
+        }
+
         $newAttributes = $request->onlyAllowed();
 
         $this->jsonApiHydrator->hydrate($user, $newAttributes);

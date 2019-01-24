@@ -38,9 +38,8 @@ class EmailChangeController extends Controller
      *
      * @param EntityManager $entityManager
      */
-    public function __construct(
-        EntityManager $entityManager
-    ) {
+    public function __construct(EntityManager $entityManager)
+    {
         $this->entityManager = $entityManager;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
@@ -52,6 +51,8 @@ class EmailChangeController extends Controller
      *
      * @param  EmailChangeRequest $request
      * @return RedirectResponse
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function request(EmailChangeRequest $request)
     {
@@ -174,6 +175,10 @@ class EmailChangeController extends Controller
         return hash_hmac('sha256', Str::random(40), $hash);
     }
 
+    /**
+     * @param $token
+     * @param $email
+     */
     public function sendEmailChangeNotification($token, $email)
     {
         $class = config('usora.email_change_notification_class');

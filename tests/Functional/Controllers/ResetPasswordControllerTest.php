@@ -2,16 +2,14 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
-use Carbon\Carbon;
-use Illuminate\Auth\Passwords\TokenRepositoryInterface;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Faker\ORM\Doctrine\Populator;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Support\Str;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
-
 use Railroad\Usora\Tests\UsoraTestCase;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class ResetPasswordControllerTest extends UsoraTestCase
 {
@@ -25,9 +23,22 @@ class ResetPasswordControllerTest extends UsoraTestCase
         parent::setUp();
 
         $this->passwordBroker = $this->app->make(PasswordBroker::class);
+
+        $populator = new Populator($this->faker, $this->entityManager);
+
+        $populator->addEntity(
+            User::class,
+            1,
+            [
+                'email' => 'login_user_test@email.com',
+                'password' => 'Password12345!@',
+            ]
+        );
+        $populator->execute();
+
         $purger = new ORMPurger();
         $executor = new ORMExecutor($this->entityManager, $purger);
-        $executor->execute([app(UserFixtureLoader::class)]);
+        $executor->execute([app(UserFixtureLoader::class)], true);
     }
 
     public function test_reset_password_validation_failed()
@@ -54,7 +65,12 @@ class ResetPasswordControllerTest extends UsoraTestCase
         $response = $this->call(
             'POST',
             'usora/password/reset',
-            ['email' => 'test+1@test.com', 'password' => $password, 'password_confirmation' => $password, 'token' => '123']
+            [
+                'email' => 'test+1@test.com',
+                'password' => $password,
+                'password_confirmation' => $password,
+                'token' => '123',
+            ]
         );
 
         $this->assertFalse(auth()->attempt(['email' => 'test+1@test.com', 'password' => $password]));
@@ -68,9 +84,11 @@ class ResetPasswordControllerTest extends UsoraTestCase
 
         $user =
             $this->entityManager->getRepository(User::class)
-                ->find(1);
+                ->findOneBy(['email' => 'login_user_test@email.com']);
 
         $token = $this->passwordBroker->createToken($user);
+
+        $this->assertTrue(auth()->attempt(['email' => $user->getEmail(), 'password' => 'Password12345!@']));
 
         $response = $this->call(
             'POST',
@@ -83,7 +101,7 @@ class ResetPasswordControllerTest extends UsoraTestCase
             ]
         );
 
-        $this->assertFalse(auth()->attempt(['email' => $user->getEmail(), 'password' => $user->getPassword()]));
+        $this->assertFalse(auth()->attempt(['email' => $user->getEmail(), 'password' => 'Password12345!@']));
 
         $this->assertTrue(auth()->attempt(['email' => $user->getEmail(), 'password' => $newPassword]));
 

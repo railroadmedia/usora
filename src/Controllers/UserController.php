@@ -7,6 +7,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Railroad\DoctrineArrayHydrator\ArrayHydrator;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
@@ -32,9 +33,9 @@ class UserController extends Controller
     private $permissionService;
 
     /**
-     * @var Hasher
+     * @var ArrayHydrator
      */
-    private $hasher;
+    private $arrayHydrator;
 
     /**
      * UserController constructor.
@@ -43,11 +44,14 @@ class UserController extends Controller
      * @param PermissionService $permissionService
      * @param Hasher $hasher
      */
-    public function __construct(EntityManager $entityManager, PermissionService $permissionService, Hasher $hasher)
-    {
+    public function __construct(
+        EntityManager $entityManager,
+        PermissionService $permissionService,
+        ArrayHydrator $arrayHydrator
+    ) {
         $this->entityManager = $entityManager;
         $this->permissionService = $permissionService;
-        $this->hasher = $hasher;
+        $this->arrayHydrator = $arrayHydrator;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
     }
@@ -64,9 +68,8 @@ class UserController extends Controller
         }
 
         $user = new User();
-        $user->setEmail($request->get('email'));
-        $user->setDisplayName($request->get('display_name'));
-        $user->setPassword($this->hasher->make($request->get('password')));
+
+        $this->arrayHydrator->hydrate($user, $request->onlyAllowed());
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -96,12 +99,21 @@ class UserController extends Controller
 
         $user = $this->userRepository->find($id);
 
-        if (!is_null($user)) {
-            $user->setDisplayName($request->get('display_name'));
-
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+        if (empty($user)) {
+            throw new NotFoundHttpException();
         }
+
+        $this->arrayHydrator->hydrate($user, $request->onlyAllowed());
+
+        // regular users are not allowed to change their emails here
+        if ($this->permissionService->can(auth()->id(), 'update-users-email-without-confirmation') &&
+            !empty($request->input('data.attributes.email'))) {
+
+            $user->setEmail($request->input('data.attributes.email'));
+        }
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         $message = ['success' => true];
 

@@ -23,20 +23,14 @@ class ResetPasswordController extends Controller
     private $userRepository;
 
     /**
-     * @var Hasher
-     */
-    private $hasher;
-
-    /**
      * CookieController constructor.
      *
      * @param UserRepository $userRepository
      * @param Hasher $hasher
      */
-    public function __construct(EntityManager $entityManager, Hasher $hasher)
+    public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->hasher = $hasher;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
     }
@@ -68,8 +62,8 @@ class ResetPasswordController extends Controller
                     ),
                     function ($user, $password) {
 
-                        $hashedPassword = $this->hasher->make($password);
-                        $user->setPassword($hashedPassword);
+                        $user->setPassword($password);
+
                         $this->entityManager->persist($user);
                         $this->entityManager->flush();
 

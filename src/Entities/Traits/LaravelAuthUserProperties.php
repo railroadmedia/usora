@@ -2,6 +2,8 @@
 
 namespace Railroad\Usora\Entities\Traits;
 
+use Illuminate\Notifications\AnonymousNotifiable;
+
 trait LaravelAuthUserProperties
 {
     /**

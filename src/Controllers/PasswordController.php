@@ -71,6 +71,9 @@ class PasswordController extends Controller
             ]
         );
 
+        /**
+         * @var $user User
+         */
         $user = auth()->user();
 
         if (!auth()->attempt(['email' => $user->getEmail(), 'password' => $request->get('current_password')])) {
@@ -81,8 +84,7 @@ class PasswordController extends Controller
                 );
         }
 
-        $hashedPassword = $this->hasher->make($request->get('new_password'));
-        $user->setPassword($hashedPassword);
+        $user->setPassword($request->get('new_password'));
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
