@@ -12,10 +12,7 @@ class UserJsonUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'data.attributes.email' => 'email|unique:' .
-                config('usora.') .
-                config('usora.tables.users') .
-                ',email',
+            'data.attributes.email' => 'email|unique:' . config('usora.') . config('usora.tables.users') . ',email',
             'data.attributes.display_name' => 'string|max:255|min:2|unique:' .
                 config('usora.tables.users') .
                 ',display_name',

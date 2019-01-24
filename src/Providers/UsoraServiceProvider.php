@@ -6,7 +6,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Railroad\Usora\Routes\RouteRegistrar;
-use Redis;
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
 class UsoraServiceProvider extends ServiceProvider

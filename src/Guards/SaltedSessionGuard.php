@@ -2,8 +2,10 @@
 
 namespace Railroad\Usora\Guards;
 
+use Doctrine\ORM\ORMException;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Support\Str;
 use Railroad\Usora\Providers\UserServiceProvider;
@@ -23,7 +25,7 @@ class SaltedSessionGuard extends SessionGuard
     protected $user;
 
     /**
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Authenticatable|null
      */
     public function user()
     {
@@ -62,6 +64,7 @@ class SaltedSessionGuard extends SessionGuard
      * Copied from laravel SessionGuard
      *
      * @return void
+     * @throws ORMException
      */
     public function logout()
     {

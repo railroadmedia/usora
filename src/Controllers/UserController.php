@@ -2,7 +2,10 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +16,7 @@ use Railroad\Usora\Entities\User;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
 use Railroad\Usora\Requests\UserUpdateRequest;
+use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller
@@ -59,7 +63,10 @@ class UserController extends Controller
     /**
      * @param UserCreateRequest $request
      * @return RedirectResponse
-     * @throws \Doctrine\ORM\ORMException
+     * @throws DBALException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws ReflectionException
      */
     public function store(UserCreateRequest $request)
     {
@@ -89,7 +96,10 @@ class UserController extends Controller
      * @param UserUpdateRequest $request
      * @param integer $id
      * @return RedirectResponse
-     * @throws \Doctrine\ORM\ORMException
+     * @throws DBALException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws ReflectionException
      */
     public function update(UserUpdateRequest $request, $id)
     {
@@ -130,7 +140,7 @@ class UserController extends Controller
      * @param Request $request
      * @param integer $id
      * @return RedirectResponse
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     public function delete(Request $request, $id)
     {

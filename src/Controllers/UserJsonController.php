@@ -110,7 +110,7 @@ class UserJsonController extends Controller
         $users =
             $queryBuilder->getQuery()
                 ->getResult();
-        
+
         return ResponseService::userJson($users, $queryBuilder);
     }
 
@@ -158,8 +158,10 @@ class UserJsonController extends Controller
      * @param UserJsonUpdateRequest $request
      * @param integer $id
      * @return JsonResponse
+     * @throws DBALException
      * @throws ORMException
      * @throws OptimisticLockException
+     * @throws ReflectionException
      */
     public function update(UserJsonUpdateRequest $request, $id)
     {

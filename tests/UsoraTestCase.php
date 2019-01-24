@@ -4,7 +4,6 @@ namespace Railroad\Usora\Tests;
 
 use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Foundation\Application;
@@ -24,7 +23,6 @@ use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\UserRepository;
-
 
 class UsoraTestCase extends TestCase
 {
@@ -95,8 +93,16 @@ class UsoraTestCase extends TestCase
             ->deleteAll();
 
         // make sure laravel is using the same connection
-        DB::connection()->setPdo($this->entityManager->getConnection()->getWrappedConnection());
-        DB::connection()->setReadPdo($this->entityManager->getConnection()->getWrappedConnection());
+        DB::connection()
+            ->setPdo(
+                $this->entityManager->getConnection()
+                    ->getWrappedConnection()
+            );
+        DB::connection()
+            ->setReadPdo(
+                $this->entityManager->getConnection()
+                    ->getWrappedConnection()
+            );
 
         $this->artisan('migrate:fresh', []);
         $this->artisan('cache:clear', []);
@@ -113,9 +119,10 @@ class UsoraTestCase extends TestCase
 
         Carbon::setTestNow(Carbon::now());
 
-        $this->permissionServiceMock = $this->getMockBuilder(PermissionService::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->permissionServiceMock =
+            $this->getMockBuilder(PermissionService::class)
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->app->instance(PermissionService::class, $this->permissionServiceMock);
     }

@@ -4,9 +4,7 @@ namespace Railroad\Usora\Tests\Functional;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Illuminate\Support\Facades\Route;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
-
 use Railroad\Usora\Tests\UsoraTestCase;
 
 class UserControllerTest extends UsoraTestCase

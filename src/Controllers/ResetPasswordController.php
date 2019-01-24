@@ -4,12 +4,14 @@ namespace Railroad\Usora\Controllers;
 
 use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Repositories\UserRepository;
 
 class ResetPasswordController extends Controller
 {
@@ -17,6 +19,7 @@ class ResetPasswordController extends Controller
      * @var EntityManager
      */
     private $entityManager;
+
     /**
      * @var UserRepository
      */
@@ -26,7 +29,6 @@ class ResetPasswordController extends Controller
      * CookieController constructor.
      *
      * @param UserRepository $userRepository
-     * @param Hasher $hasher
      */
     public function __construct(EntityManager $entityManager)
     {
@@ -38,8 +40,8 @@ class ResetPasswordController extends Controller
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @param  Request $request
+     * @return RedirectResponse
      */
     public function reset(Request $request)
     {
@@ -92,7 +94,7 @@ class ResetPasswordController extends Controller
     /**
      * Get the broker to be used during password reset.
      *
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
+     * @return PasswordBroker
      */
     public function broker()
     {

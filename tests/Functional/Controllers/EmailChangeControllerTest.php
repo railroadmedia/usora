@@ -2,18 +2,16 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
-use Carbon\Carbon;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Railroad\Usora\DataFixtures\EmailChangeFixtureLoader;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Events\EmailChangeRequest;
-
 use Railroad\Usora\Tests\UsoraTestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Notifications\AnonymousNotifiable;
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class EmailChangeControllerTest extends UsoraTestCase
 {
@@ -35,8 +33,8 @@ class EmailChangeControllerTest extends UsoraTestCase
             'email' => 'test+1@test.com',
         ];
 
-
-        $this->authManager->guard()->onceUsingId(1);
+        $this->authManager->guard()
+            ->onceUsingId(1);
 
         $newEmail = $this->faker->email;
 
@@ -73,14 +71,13 @@ class EmailChangeControllerTest extends UsoraTestCase
             [
                 'user_id' => 1,
                 'email' => $newEmail,
-                'token' => $token
+                'token' => $token,
             ]
         );
 
         // assert the email was sent and contains the confirmation token
         Notification::assertSentTo(
-            (new AnonymousNotifiable)
-                ->route(config('usora.email_change_notification_channel'), $newEmail),
+            (new AnonymousNotifiable)->route(config('usora.email_change_notification_channel'), $newEmail),
             config('usora.email_change_notification_class'),
             function ($notification) use ($token) {
                 return $notification->token === $token;
@@ -112,7 +109,6 @@ class EmailChangeControllerTest extends UsoraTestCase
             'updated_at' => time(),
         ];
 
-
         $response = $this->call(
             'POST',
             'usora/email-change/request',
@@ -139,7 +135,7 @@ class EmailChangeControllerTest extends UsoraTestCase
             config('usora.tables.users'),
             [
                 'id' => 1,
-                'email' => $newEmail
+                'email' => $newEmail,
             ]
         );
 

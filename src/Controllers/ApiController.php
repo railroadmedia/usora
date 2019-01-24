@@ -2,22 +2,29 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Usora\Services\ResponseService;
+use Spatie\Fractal\Fractal;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\JWTAuth;
 
 class ApiController extends Controller
 {
-    public $loginAfterSignUp = true;
-
+    /**
+     * @var JWTAuth
+     */
     private $jwtAuth;
+
+    public $loginAfterSignUp = true;
 
     /**
      * ApiController constructor.
      *
-     * @param bool $loginAfterSignUp
+     * @param JWTAuth $jwtAuth
      */
     public function __construct(JWTAuth $jwtAuth)
     {
@@ -26,7 +33,7 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function login(Request $request)
     {
@@ -54,7 +61,7 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function logout(Request $request)
     {
@@ -93,7 +100,7 @@ class ApiController extends Controller
 
     /**
      * @param Request $request
-     * @return \Spatie\Fractal\Fractal
+     * @return Fractal
      * @throws JWTException
      */
     public function getAuthUser(Request $request)
@@ -105,15 +112,15 @@ class ApiController extends Controller
                 return response()->json(['user_not_found'], 404);
             }
 
-        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+        } catch (TokenExpiredException $e) {
 
             return response()->json(['token_expired'], $e->getStatusCode());
 
-        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+        } catch (TokenInvalidException $e) {
 
             return response()->json(['token_invalid'], $e->getStatusCode());
 
-        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+        } catch (JWTException $e) {
 
             return response()->json(['token_absent'], $e->getStatusCode());
 

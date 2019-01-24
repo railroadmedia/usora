@@ -22,6 +22,7 @@ class ResponseService extends FractalResponseService
         return self::create($entityOrEntities, 'user', new UserTransformer(), new JsonApiSerializer(), $queryBuilder)
             ->parseIncludes($includes);
     }
+
     /**
      * @param $entityOrEntities
      * @param QueryBuilder|null $queryBuilder

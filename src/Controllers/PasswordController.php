@@ -3,8 +3,11 @@
 namespace Railroad\Usora\Controllers;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
@@ -19,6 +22,7 @@ class PasswordController extends Controller
      * @var EntityManager
      */
     private $entityManager;
+
     /**
      * @var UserRepository
      */
@@ -28,6 +32,7 @@ class PasswordController extends Controller
      * @var Hasher
      */
     private $hasher;
+
     /**
      * @var PermissionService
      */
@@ -52,9 +57,11 @@ class PasswordController extends Controller
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @param  Request $request
+     * @return RedirectResponse
      * @throws NotAllowedException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function update(Request $request)
     {

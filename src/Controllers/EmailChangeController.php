@@ -4,6 +4,8 @@ namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\AnonymousNotifiable;
@@ -13,7 +15,8 @@ use Illuminate\Support\Str;
 use Railroad\Usora\Entities\EmailChange;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
-use Railroad\Usora\Requests\EmailChangeConfirmationRequest;
+use Railroad\Usora\Repositories\EmailChangeRepository;
+use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\EmailChangeRequest;
 
 class EmailChangeController extends Controller
@@ -24,12 +27,12 @@ class EmailChangeController extends Controller
     private $entityManager;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var EmailChangeRepository
      */
     private $emailChangeRepository;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectRepository|\Doctrine\ORM\EntityRepository
+     * @var UserRepository
      */
     private $userRepository;
 
@@ -51,8 +54,8 @@ class EmailChangeController extends Controller
      *
      * @param  EmailChangeRequest $request
      * @return RedirectResponse
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function request(EmailChangeRequest $request)
     {
@@ -100,8 +103,10 @@ class EmailChangeController extends Controller
     /**
      * Perform an email change confirmation action.
      *
-     * @param  EmailChangeConfirmationRequest $request
+     * @param Request $request
      * @return RedirectResponse
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function confirm(Request $request)
     {

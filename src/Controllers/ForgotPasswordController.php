@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -10,13 +11,6 @@ use Illuminate\Support\MessageBag;
 
 class ForgotPasswordController extends Controller
 {
-    /**
-     * ForgotPasswordController constructor.
-     */
-    public function __construct()
-    {
-    }
-
     /**
      * Send a reset link to the given user.
      *
@@ -58,7 +52,7 @@ class ForgotPasswordController extends Controller
     /**
      * Get the broker to be used during password reset.
      *
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
+     * @return PasswordBroker
      */
     public function broker()
     {
