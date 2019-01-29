@@ -1,5 +1,50 @@
-Usora
-====================
+# Usora
+
+## How To Install
+
+1. composer require railroad/usora
+
+2. In your auth.php file, set your web guard to use usora (or whichever guard you wish to use):
+
+```php
+'guards' => [
+    'web' => [
+        'driver' => 'usora',
+        'provider' => 'usora',
+    ],
+],
+```
+
+3. In your auth.php file, set add the usora provider:
+
+```php
+'providers' => [
+    'usora' => [
+        'driver' => 'usora',
+    ],
+],
+```
+
+4. In your auth.php file, set the password reset configuration:
+
+```php
+'passwords' => [
+    'users' => [
+        'provider' => 'usora',
+        'table' => 'my_database.usora_password_resets',
+        'expire' => 60,
+    ],
+],
+``` 
+
+4. In your auth.php file, make sure the default guard is set to the web guard (or whichever guard you configured to use usora) and your default password configuration key is set:
+
+```php
+'defaults' => [
+    'guard' => 'web',
+    'passwords' => 'users',
+],
+```
 
 Usora is a user management system including auth, user settings, user information, and single sign on.
 
