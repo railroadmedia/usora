@@ -227,7 +227,7 @@ trait BasicUserInformationProperties
      */
     public function getProfilePictureUrl()
     {
-        return $this->profilePictureUrl;
+        return $this->profilePictureUrl ?? config('usora.default_profile_picture_url');
     }
 
     /**

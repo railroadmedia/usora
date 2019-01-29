@@ -40,7 +40,7 @@ class SaltedSessionGuard extends SessionGuard
             $user = $this->provider->retrieveById($id);
             $this->user = $user;
 
-            if ($user['session_salt'] === $salt) {
+            if ($user->getSessionSalt() === $salt) {
                 return parent::user();
             }
         }
@@ -50,13 +50,13 @@ class SaltedSessionGuard extends SessionGuard
     {
         parent::login($user, $remember);
 
-        if (self::$updateSalt && empty($user['session_salt'])) {
+        if (self::$updateSalt && empty($user->getSessionSalt())) {
             $salt = Str::random(60);
 
             $this->session->put($this->getSaltName(), $salt);
             $this->provider->updateSessionSalt($user, $salt);
         } else {
-            $this->session->put($this->getSaltName(), $user['session_salt']);
+            $this->session->put($this->getSaltName(), $user->getSessionSalt());
         }
     }
 
@@ -69,6 +69,14 @@ class SaltedSessionGuard extends SessionGuard
     public function logout()
     {
         $user = $this->user();
+
+        if (empty($user)) {
+            $this->user = null;
+
+            $this->loggedOut = true;
+
+            return;
+        }
 
         $this->provider->updateSessionSalt($user, '');
 

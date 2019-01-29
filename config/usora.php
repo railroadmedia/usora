@@ -27,6 +27,9 @@ return [
         ],
     ],
 
+    // users
+    'default_profile_picture_url' => 'https://picsum.photos/250/250',
+
     // tables
     'tables' => [
         'users' => 'usora_users',
