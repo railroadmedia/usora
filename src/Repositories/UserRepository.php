@@ -11,6 +11,10 @@ use Railroad\Usora\Managers\UsoraEntityManager;
 /**
  * Class UserRepository
  *
+ * @method User findOneBy(array $criteria, array $orderBy = null)
+ * @method User[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method User[] findAll()
+ *
  * @package Railroad\Usora\Repositories
  */
 class UserRepository extends EntityRepository

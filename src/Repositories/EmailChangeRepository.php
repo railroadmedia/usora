@@ -9,12 +9,16 @@ use Railroad\Usora\Managers\UsoraEntityManager;
 /**
  * Class EmailChangeRepository
  *
+ * @method EmailChange findOneBy(array $criteria, array $orderBy = null)
+ * @method EmailChange[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method EmailChange[] findAll()
+ *
  * @package Railroad\Usora\Repositories
  */
 class EmailChangeRepository extends EntityRepository
 {
     /**
-     * UserRepository constructor.
+     * EmailChangeRepository constructor.
      *
      * @param UsoraEntityManager $em
      */
