@@ -8,6 +8,12 @@ trait PianoUserProperties
      * @ORM\Column(type="integer")
      * @var integer
      */
+    protected $legacyPianoteId;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @var integer
+     */
     protected $pianoPlayingSinceYear;
 
     /**
@@ -27,6 +33,22 @@ trait PianoUserProperties
      * @var string
      */
     protected $pianoGearKeyboardBrands;
+
+    /**
+     * @return int
+     */
+    public function getLegacyPianoteId()
+    {
+        return $this->legacyPianoteId;
+    }
+
+    /**
+     * @param int $legacyPianoteId
+     */
+    public function setLegacyPianoteId($legacyPianoteId)
+    {
+        $this->legacyPianoteId = $legacyPianoteId;
+    }
 
     /**
      * @return int

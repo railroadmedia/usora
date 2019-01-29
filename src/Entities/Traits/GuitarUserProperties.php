@@ -8,6 +8,12 @@ trait GuitarUserProperties
      * @ORM\Column(type="integer")
      * @var integer
      */
+    protected $legacyGuitareoId;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @var integer
+     */
     protected $guitarPlayingSinceYear;
 
     /**
@@ -39,6 +45,22 @@ trait GuitarUserProperties
      * @var string
      */
     protected $guitarGearStringBrands;
+
+    /**
+     * @return int
+     */
+    public function getLegacyGuitareoId()
+    {
+        return $this->legacyGuitareoId;
+    }
+
+    /**
+     * @param int $legacyGuitareoId
+     */
+    public function setLegacyGuitareoId(int $legacyGuitareoId)
+    {
+        $this->legacyGuitareoId = $legacyGuitareoId;
+    }
 
     /**
      * @return int

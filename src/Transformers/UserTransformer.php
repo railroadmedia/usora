@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Transformers;
 
-use Doctrine\ORM\EntityManager;
 use Illuminate\Support\Collection;
 use League\Fractal\TransformerAbstract;
 use Railroad\Doctrine\Serializers\BasicEntitySerializer;
@@ -21,7 +20,18 @@ class UserTransformer extends TransformerAbstract
                 $user,
                 $entityManager->getClassMetadata(get_class($user))
             )
-        ))->except(['password', 'remember_token', 'session_salt'])
+        ))->except(
+            [
+                'password',
+                'remember_token',
+                'session_salt',
+                'legacy_drumeo_id',
+                'legacy_drumeo_wordpress_id',
+                'legacy_drumeo_ipb_id',
+                'legacy_guitareo_id',
+                'legacy_pianote_id',
+            ]
+        )
             ->toArray();
     }
 }

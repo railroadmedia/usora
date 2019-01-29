@@ -34,9 +34,6 @@ class UserJsonCreateRequest extends FormRequest
             'data.attributes.timezone' => 'string|in:' . implode(',', timezone_identifiers_list()),
             'data.attributes.permission_level' => 'string',
 
-            'data.attributes.legacy_drumeo_wordpress_id' => 'nullable|integer',
-            'data.attributes.legacy_drumeo_ipb_id' => 'nullable|integer',
-
             'data.attributes.notify_on_lesson_comment_reply' => 'nullable|boolean',
             'data.attributes.notify_weekly_update' => 'nullable|boolean',
             'data.attributes.notify_on_forum_post_like' => 'nullable|boolean',
@@ -86,8 +83,6 @@ class UserJsonCreateRequest extends FormRequest
                 'data.attributes.profile_picture_url',
                 'data.attributes.timezone',
                 'data.attributes.permission_level',
-                'data.attributes.legacy_drumeo_wordpress_id',
-                'data.attributes.legacy_drumeo_ipb_id',
                 'data.attributes.notify_on_lesson_comment_reply',
                 'data.attributes.notify_weekly_update',
                 'data.attributes.notify_on_forum_post_like',

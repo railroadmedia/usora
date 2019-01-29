@@ -41,9 +41,6 @@ class UserCreateRequest extends FormRequest
             'timezone' => 'string|in:' . implode(',', timezone_identifiers_list()),
             'permission_level' => 'string',
 
-            'legacy_drumeo_wordpress_id' => 'nullable|integer',
-            'legacy_drumeo_ipb_id' => 'nullable|integer',
-
             'notify_on_lesson_comment_reply' => 'nullable|boolean',
             'notify_weekly_update' => 'nullable|boolean',
             'notify_on_forum_post_like' => 'nullable|boolean',
@@ -93,8 +90,6 @@ class UserCreateRequest extends FormRequest
                 'profile_picture_url',
                 'timezone',
                 'permission_level',
-                'legacy_drumeo_wordpress_id',
-                'legacy_drumeo_ipb_id',
                 'notify_on_lesson_comment_reply',
                 'notify_weekly_update',
                 'notify_on_forum_post_like',

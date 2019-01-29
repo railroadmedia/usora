@@ -4,16 +4,21 @@ namespace Railroad\Usora\Entities\Traits;
 
 trait DrumsUserProperties
 {
+    /**
+     * @ORM\Column(type="integer")
+     * @var integer
+     */
+    protected $legacyDrumeoId;
 
     /**
      * @ORM\Column(type="integer")
-     * @var string
+     * @var integer
      */
     protected $legacyDrumeoWordpressId;
 
     /**
      * @ORM\Column(type="integer")
-     * @var string
+     * @var integer
      */
     protected $legacyDrumeoIpbId;
 
@@ -54,7 +59,23 @@ trait DrumsUserProperties
     protected $drumsGearStickBrands;
 
     /**
-     * @return string
+     * @return integer
+     */
+    public function getLegacyDrumeoId()
+    {
+        return $this->legacyDrumeoId;
+    }
+
+    /**
+     * @param integer $legacyDrumeoId
+     */
+    public function setLegacyDrumeoId($legacyDrumeoId)
+    {
+        $this->legacyDrumeoId = $legacyDrumeoId;
+    }
+
+    /**
+     * @return integer
      */
     public function getLegacyDrumeoWordpressId()
     {
@@ -62,7 +83,7 @@ trait DrumsUserProperties
     }
 
     /**
-     * @param string $legacyDrumeoWordpressId
+     * @param integer $legacyDrumeoWordpressId
      */
     public function setLegacyDrumeoWordpressId($legacyDrumeoWordpressId)
     {
@@ -70,7 +91,7 @@ trait DrumsUserProperties
     }
 
     /**
-     * @return string
+     * @return integer
      */
     public function getLegacyDrumeoIpbId()
     {
@@ -78,7 +99,7 @@ trait DrumsUserProperties
     }
 
     /**
-     * @param string $legacyDrumeoIpbId
+     * @param integer $legacyDrumeoIpbId
      */
     public function setLegacyDrumeoIpbId($legacyDrumeoIpbId)
     {
