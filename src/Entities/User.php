@@ -109,10 +109,11 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
 
     /**
      * @param string $password
+     * @param bool $hash
      */
-    public function setPassword($password)
+    public function setPassword($password, $hash = true)
     {
-        $this->password = Hash::make($password);
+        $this->password = $hash ? Hash::make($password) : $password;
     }
 
     /**
