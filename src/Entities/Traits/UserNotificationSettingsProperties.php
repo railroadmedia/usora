@@ -32,6 +32,12 @@ trait UserNotificationSettingsProperties
      * @ORM\Column(type="boolean")
      * @var boolean
      */
+    protected $notifyOnForumPostReply = true;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @var boolean
+     */
     protected $notifyOnLessonCommentLike = true;
 
     /**
@@ -96,6 +102,22 @@ trait UserNotificationSettingsProperties
     public function setNotifyOnForumFollowedThreadReply($notifyOnForumFollowedThreadReply)
     {
         $this->notifyOnForumFollowedThreadReply = $notifyOnForumFollowedThreadReply;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNotifyOnForumPostReply()
+    {
+        return $this->notifyOnForumPostReply;
+    }
+
+    /**
+     * @param bool $notifyOnForumPostReply
+     */
+    public function setNotifyOnForumPostReply($notifyOnForumPostReply)
+    {
+        $this->notifyOnForumPostReply = $notifyOnForumPostReply;
     }
 
     /**

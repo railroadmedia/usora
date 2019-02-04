@@ -63,6 +63,11 @@ class AddCoreBrandColumnsToUsersTable extends Migration
                         ->after('legacy_drumeo_ipb_id')
                         ->default(true);
 
+                    $table->boolean('notify_on_forum_post_reply')
+                        ->index()
+                        ->after('legacy_drumeo_ipb_id')
+                        ->default(true);
+
                     $table->boolean('notify_on_lesson_comment_like')
                         ->index()
                         ->after('legacy_drumeo_ipb_id')
@@ -172,6 +177,7 @@ class AddCoreBrandColumnsToUsersTable extends Migration
                     $table->dropColumn('notify_weekly_update');
                     $table->dropColumn('notify_on_forum_post_like');
                     $table->dropColumn('notify_on_forum_followed_thread_reply');
+                    $table->dropColumn('notify_on_forum_post_reply');
                     $table->dropColumn('notify_on_lesson_comment_like');
                     $table->dropColumn('drums_playing_since_year');
                     $table->dropColumn('drums_gear_photo');

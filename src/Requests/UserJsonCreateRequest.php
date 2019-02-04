@@ -38,6 +38,7 @@ class UserJsonCreateRequest extends FormRequest
             'data.attributes.notify_weekly_update' => 'nullable|boolean',
             'data.attributes.notify_on_forum_post_like' => 'nullable|boolean',
             'data.attributes.notify_on_forum_followed_thread_reply' => 'nullable|boolean',
+            'data.attributes.notify_on_forum_post_reply' => 'nullable|boolean',
             'data.attributes.notify_on_lesson_comment_like' => 'nullable|boolean',
 
             'data.attributes.drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
@@ -87,6 +88,7 @@ class UserJsonCreateRequest extends FormRequest
                 'data.attributes.notify_weekly_update',
                 'data.attributes.notify_on_forum_post_like',
                 'data.attributes.notify_on_forum_followed_thread_reply',
+                'data.attributes.notify_on_forum_post_reply',
                 'data.attributes.notify_on_lesson_comment_like',
                 'data.attributes.drums_playing_since_year',
                 'data.attributes.drums_gear_photo',

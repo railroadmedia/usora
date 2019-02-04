@@ -45,6 +45,7 @@ class UserCreateRequest extends FormRequest
             'notify_weekly_update' => 'nullable|boolean',
             'notify_on_forum_post_like' => 'nullable|boolean',
             'notify_on_forum_followed_thread_reply' => 'nullable|boolean',
+            'notify_on_forum_post_reply' => 'nullable|boolean',
             'notify_on_lesson_comment_like' => 'nullable|boolean',
 
             'drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
@@ -94,6 +95,7 @@ class UserCreateRequest extends FormRequest
                 'notify_weekly_update',
                 'notify_on_forum_post_like',
                 'notify_on_forum_followed_thread_reply',
+                'notify_on_forum_post_reply',
                 'notify_on_lesson_comment_like',
                 'drums_playing_since_year',
                 'drums_gear_photo',

@@ -10,7 +10,6 @@ use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Gedmo\DoctrineExtensions;
@@ -26,6 +25,7 @@ use Railroad\Doctrine\Types\Domain\GenderType;
 use Railroad\Doctrine\Types\Domain\PhoneNumberType;
 use Railroad\Doctrine\Types\Domain\TimezoneType;
 use Railroad\Doctrine\Types\Domain\UrlType;
+use Railroad\Usora\Commands\MigrateUserFieldsToColumns;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Routes\RouteRegistrar;
 use Redis;
@@ -65,15 +65,26 @@ class UsoraServiceProvider extends ServiceProvider
             ]
         );
 
-        // only run migrations if this is the master 'host' implementation
+        // migrations: only run migrations if this is the master 'host' implementation
         if (config('usora.data_mode') == 'host') {
             $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         }
 
+        // routes
         if (config('usora.autoload_all_routes') == true) {
             $this->routeRegistrar->registerAll();
         }
 
+        // commands
+        if ($this->app->runningInConsole()) {
+            $this->commands(
+                [
+                    MigrateUserFieldsToColumns::class,
+                ]
+            );
+        }
+
+        // views
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
     }
 

@@ -33,6 +33,7 @@ return [
     // tables
     'tables' => [
         'users' => 'usora_users',
+        'user_fields' => 'usora_user_fields',
         'email_changes' => 'usora_email_changes',
         'password_resets' => 'usora_password_resets',
     ],
