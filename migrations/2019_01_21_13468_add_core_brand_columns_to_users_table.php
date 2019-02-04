@@ -35,7 +35,7 @@ class AddCoreBrandColumnsToUsersTable extends Migration
 
                     $table->integer('legacy_drumeo_wordpress_id')
                         ->index()
-                        ->after('legacy_drumeo_id')
+                        ->after('legacy_guitareo_id')
                         ->nullable();
 
                     $table->integer('legacy_drumeo_ipb_id')
