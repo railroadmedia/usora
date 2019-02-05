@@ -203,7 +203,7 @@ trait BasicUserInformationProperties
      */
     public function setPhoneNumber($phoneNumber)
     {
-        $this->phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
+        $this->phoneNumber = !empty($phoneNumber) ? preg_replace('/[^0-9]/', '', $phoneNumber) : $phoneNumber;
     }
 
     /**
