@@ -71,6 +71,8 @@ class AuthenticationController extends Controller
             ]
         );
 
+        $request->attributes->set('remember', (boolean) $request->get('remember', false));
+
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
@@ -85,7 +87,7 @@ class AuthenticationController extends Controller
                     ->withErrors($errors);
         }
 
-        if (auth()->attempt($request->only('email', 'password'), config('usora.remember_me'))) {
+        if (auth()->attempt($request->only('email', 'password'), $request->get('remember', false))) {
             $user = $this->userRepository->find(auth()->id());
 
             foreach (config('usora.domains_to_authenticate_on') as $domain) {
@@ -109,7 +111,7 @@ class AuthenticationController extends Controller
                 if (WpPassword::check(trim($request->get('password')), $userByEmail->getPassword())) {
 
                     SaltedSessionGuard::$updateSalt = false;
-                    auth()->loginUsingId($userByEmail->getId(), config('usora.remember_me'));
+                    auth()->loginUsingId($userByEmail->getId(), $request->get('remember', false));
 
                     foreach (config('usora.domains_to_authenticate_on') as $domain) {
                         ClientRelayService::authorizeUserOnDomain(
@@ -174,7 +176,7 @@ class AuthenticationController extends Controller
 
             SaltedSessionGuard::$updateSalt = false;
 
-            auth()->loginUsingId($user->getId(), config('usora.remember_me'));
+            auth()->loginUsingId($user->getId(), $request->get('remember', false));
         }
 
         return response('');
@@ -264,7 +266,7 @@ class AuthenticationController extends Controller
         if ($this->hasher->check($user->getId() . $user->getPassword() . $user->getSessionSalt(), $verificationToken)) {
             SaltedSessionGuard::$updateSalt = false;
 
-            auth()->loginUsingId($userId, config('usora.remember_me'));
+            auth()->loginUsingId($userId, $request->get('remember', false));
 
             return response()->json(['success' => 'true']);
         }

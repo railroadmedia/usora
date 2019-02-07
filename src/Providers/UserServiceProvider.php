@@ -2,11 +2,13 @@
 
 namespace Railroad\Usora\Providers;
 
+use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
+use Railroad\Usora\Entities\RememberToken;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Managers\UsoraEntityManager;
 
@@ -57,33 +59,56 @@ class UserServiceProvider implements UserProvider
             return null;
         }
 
-        $rememberToken = $user->getRememberToken();
+        $rememberTokens = $user->getRememberTokens();
 
-        return $rememberToken && hash_equals($rememberToken, $token) ? $user : null;
+        foreach ($rememberTokens as $rememberToken) {
+            if (!empty($rememberToken->getToken()) == hash_equals($rememberToken->getToken(), $token)) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * @param Authenticatable $user
+     * @param Authenticatable|User $user
      * @param string $token
      * @return bool
      * @throws \Doctrine\ORM\ORMException
      */
     public function updateRememberToken(Authenticatable $user, $token)
     {
-        $user =
-            $this->entityManager->getRepository(User::class)
-                ->find($user->getAuthIdentifier());
+        // todo: clear expired remember tokens
+        $rememberToken = new RememberToken();
 
-        if (!is_null($user)) {
-            $user->setRememberToken($token);
+        $rememberToken->setToken(Str::random(60));
+        $rememberToken->setDeviceInformation(request()->userAgent() . '|' . request()->ip());
+        $rememberToken->setExpiresAt(Carbon::now()->addSeconds(config('usora.remember_me_token_expiration_time')));
+        $rememberToken->setUser($user);
 
-            $this->entityManager->persist($user);
+        $this->entityManager->persist($rememberToken);
+        $this->entityManager->flush();
+
+        $user->addRememberToken($rememberToken);
+        $user->setRememberToken($rememberToken->getToken());
+
+        return true;
+    }
+
+    /**
+     * @param $token
+     * @param $userId
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function deleteRememberToken($token, $userId)
+    {
+        $rememberToken = $this->entityManager->getRepository(RememberToken::class)
+            ->findOneBy(['token' => $token, 'user' => $userId]);
+
+        if (!empty($rememberToken)) {
+            $this->entityManager->remove($rememberToken);
             $this->entityManager->flush();
-
-            return true;
         }
-
-        return false;
     }
 
     /**

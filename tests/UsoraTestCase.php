@@ -126,6 +126,9 @@ class UsoraTestCase extends TestCase
                 ->getMock();
 
         $this->app->instance(PermissionService::class, $this->permissionServiceMock);
+
+        $this->app['router']->middlewareGroup('test_public_route_group', []);
+        $this->app['router']->middlewareGroup('test_logged_in_route_group', []);
     }
 
     /**
@@ -183,12 +186,13 @@ class UsoraTestCase extends TestCase
         config()->set('usora.entities', $defaultConfig['entities']);
 
         config()->set('usora.autoload_all_routes', true);
-        config()->set('usora.route_middleware_public_groups', []);
-        config()->set('usora.route_middleware_logged_in_groups', []);
+        config()->set('usora.route_middleware_public_groups', ['test_public_route_group']);
+        config()->set('usora.route_middleware_logged_in_groups', ['test_logged_in_route_group']);
 
         // set auth to our custom provider
         config()->set('auth.providers.usora.driver', 'usora');
         config()->set('auth.guards.web.provider', 'usora');
+        config()->set('auth.guards.web.driver', 'usora');
 
         // set password configuration
         config()->set('auth.passwords.users.provider', 'usora');

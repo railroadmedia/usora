@@ -36,6 +36,7 @@ return [
         'user_fields' => 'usora_user_fields',
         'email_changes' => 'usora_email_changes',
         'password_resets' => 'usora_password_resets',
+        'remember_tokens' => 'usora_remember_tokens',
     ],
 
     // routes
@@ -57,8 +58,8 @@ return [
     'login_page_path' => 'login',
     'login_success_redirect_path' => 'my-restricted-area',
 
-    // use remember me by default?
-    'remember_me' => true,
+    // how long until the remember tokens expire in seconds
+    'remember_me_token_expiration_time' => 31536000, // 1 year
 
     // password reset
     'password_reset_notification_class' => \Railroad\Usora\Notifications\ResetPassword::class,

@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Entities;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -50,10 +51,16 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     protected $password;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\OneToMany(targetEntity="RememberToken", mappedBy="user", orphanRemoval=true)
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @var ArrayCollection
+     */
+    protected $rememberTokens;
+
+    /**
      * @var string
      */
-    protected $rememberToken;
+    protected $currentRememberToken;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -72,7 +79,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
      */
     public function __construct()
     {
-
+        $this->rememberTokens = new ArrayCollection();
     }
 
     /**
@@ -117,19 +124,44 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     }
 
     /**
+     * @return ArrayCollection|RememberToken[]
+     */
+    public function getRememberTokens()
+    {
+        return $this->rememberTokens;
+    }
+
+    /**
+     * @param RememberToken $rememberToken
+     */
+    public function addRememberToken($rememberToken)
+    {
+        $this->rememberTokens->add($rememberToken);
+        $rememberToken->setUser($this);
+    }
+
+    /**
+     * @param RememberToken $rememberToken
+     */
+    public function deleteRememberToken($rememberToken)
+    {
+        $this->rememberTokens->removeElement($rememberToken);
+    }
+
+    /**
      * @return string
      */
     public function getRememberToken()
     {
-        return $this->rememberToken;
+        return $this->currentRememberToken;
     }
 
     /**
-     * @param string $rememberToken
+     * @param string $value
      */
-    public function setRememberToken($rememberToken)
+    public function setRememberToken($value)
     {
-        $this->rememberToken = $rememberToken;
+        $this->currentRememberToken = $value;
     }
 
     /**

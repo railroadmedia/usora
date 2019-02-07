@@ -5,9 +5,11 @@ namespace Railroad\Usora\Tests\Functional;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Faker\ORM\Doctrine\Populator;
+use Illuminate\Routing\Router;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Middleware\AuthenticatedOnly;
 use Railroad\Usora\Tests\UsoraTestCase;
 use ReflectionClass;
 
@@ -88,6 +90,56 @@ class AuthenticationControllerTest extends UsoraTestCase
         );
 
         $response->assertRedirect(config('usora.login_success_redirect_path'));
+    }
+
+    public function test_authenticate_via_remember_token()
+    {
+        $userId = 1;
+
+        $response = $this->call(
+            'POST',
+            'usora/authenticate/with-credentials',
+            ['email' => 'login_user_test@email.com', 'password' => 'Password12345!@', 'remember' => true]
+        );
+
+        $this->assertEquals(
+            $userId,
+            $this->app->make('auth')
+                ->guard()
+                ->id()
+        );
+
+        session()->flush();
+        auth()
+            ->guard()
+            ->nullCurrentUser();
+
+        $cookies = [];
+
+        foreach (cookie()->getQueuedCookies() as $cookie) {
+            $cookies[$cookie->getName()] = $cookie->getValue();
+        }
+
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
+
+        /**
+         * @var $router Router
+         */
+        $router = $this->app['router'];
+
+        $router->pushMiddlewareToGroup('test_logged_in_route_group', AuthenticatedOnly::class);
+
+        $response = $this->call(
+            'GET',
+            'usora/json-api/user/index',
+            [],
+            $cookies
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $router->middlewareGroup('test_logged_in_route_group', []);
     }
 
     public function test_authenticate_via_verification_token_validation_failed()
@@ -274,6 +326,39 @@ class AuthenticationControllerTest extends UsoraTestCase
         $response = $this->call(
             'GET',
             'usora/deauthenticate'
+        );
+
+        $this->assertEmpty(
+            $this->app->make('auth')
+                ->guard()
+                ->id()
+        );
+    }
+
+    public function test_deauthenticate_with_remember()
+    {
+        $userId = 1;
+
+        $user = auth()->loginUsingId($userId, true);
+
+        $this->assertEquals(
+            $userId,
+            $this->app->make('auth')
+                ->guard()
+                ->id()
+        );
+
+        $cookies = [];
+
+        foreach (cookie()->getQueuedCookies() as $cookie) {
+            $cookies[$cookie->getName()] = $cookie->getValue();
+        }
+
+        $response = $this->call(
+            'GET',
+            'usora/deauthenticate',
+            [],
+            $cookies
         );
 
         $this->assertEmpty(
