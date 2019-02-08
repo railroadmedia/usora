@@ -13,6 +13,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 class EmailChange
 {
     use TimestampableEntity;
+
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
      * @var int
@@ -46,7 +47,7 @@ class EmailChange
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
@@ -62,7 +63,7 @@ class EmailChange
     /**
      * @param mixed $user
      */
-    public function setUser($user): void
+    public function setUser($user)
     {
         $this->user = $user;
     }
@@ -70,7 +71,7 @@ class EmailChange
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail()
     {
         return $this->email;
     }
@@ -78,7 +79,7 @@ class EmailChange
     /**
      * @param string $email
      */
-    public function setEmail(string $email): void
+    public function setEmail($email)
     {
         $this->email = $email;
     }
@@ -86,7 +87,7 @@ class EmailChange
     /**
      * @return string
      */
-    public function getToken(): string
+    public function getToken()
     {
         return $this->token;
     }
@@ -94,7 +95,7 @@ class EmailChange
     /**
      * @param string $token
      */
-    public function setToken(string $token): void
+    public function setToken($token)
     {
         $this->token = $token;
     }

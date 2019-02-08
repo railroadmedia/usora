@@ -39,8 +39,8 @@ class ForgotPasswordController extends Controller
             return redirect()
                 ->to(config('usora.login_page_path'))
                 ->with(
-                    'successes',
-                    new MessageBag(['password' => 'Password reset link has been sent to your email.'])
+                    'status',
+                    'Password reset link has been sent to your email.'
                 );
         }
 

@@ -62,6 +62,7 @@ return [
     'remember_me_token_expiration_time' => 31536000, // 1 year
 
     // password reset
+    'password_reset_form_route_name' => 'reset-password',
     'password_reset_notification_class' => \Railroad\Usora\Notifications\ResetPassword::class,
     'password_reset_notification_channel' => 'mail',
 

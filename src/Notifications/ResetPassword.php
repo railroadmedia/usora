@@ -22,7 +22,13 @@ class ResetPassword extends ResetPasswordBase
         return (new MailMessage)->line(
             'You are receiving this email because we received a password reset request for your account.'
         )
-            ->action('Reset Password', url()->route('usora.password.reset') . '?token=' . $this->token)
+            ->action(
+                'Reset Password',
+                url()->route(
+                    config('usora.password_reset_form_route_name'),
+                    ['token' => $this->token, 'email' => request('email')]
+                )
+            )
             ->line('If you did not request a password reset, no further action is required.');
     }
 }
