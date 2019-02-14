@@ -29,6 +29,7 @@ return [
 
     // users
     'default_profile_picture_url' => 'https://picsum.photos/250/250',
+    'default_timezone' => 'America/Los_Angeles',
 
     // tables
     'tables' => [

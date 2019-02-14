@@ -243,7 +243,7 @@ trait BasicUserInformationProperties
      */
     public function getTimezone()
     {
-        return $this->timezone;
+        return $this->timezone ?? config('usora.default_timezone');
     }
 
     /**
