@@ -47,6 +47,7 @@ class UserCreateRequest extends FormRequest
             'notify_on_forum_followed_thread_reply' => 'nullable|boolean',
             'notify_on_forum_post_reply' => 'nullable|boolean',
             'notify_on_lesson_comment_like' => 'nullable|boolean',
+            'notifications_summary_frequency_minutes' => 'nullable|integer',
 
             'drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
             'drums_gear_photo' => 'nullable|url',
@@ -97,6 +98,7 @@ class UserCreateRequest extends FormRequest
                 'notify_on_forum_followed_thread_reply',
                 'notify_on_forum_post_reply',
                 'notify_on_lesson_comment_like',
+                'notifications_summary_frequency_minutes',
                 'drums_playing_since_year',
                 'drums_gear_photo',
                 'drums_gear_cymbal_brands',

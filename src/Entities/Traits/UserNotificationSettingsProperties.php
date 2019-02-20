@@ -41,6 +41,14 @@ trait UserNotificationSettingsProperties
     protected $notifyOnLessonCommentLike = true;
 
     /**
+     * If this is null notifications should be sent instantly.
+     *
+     * @ORM\Column(type="integer")
+     * @var integer|null
+     */
+    protected $notificationsSummaryFrequencyMinutes = null;
+
+    /**
      * @return bool
      */
     public function getNotifyOnLessonCommentReply()
@@ -135,4 +143,22 @@ trait UserNotificationSettingsProperties
     {
         $this->notifyOnLessonCommentLike = $notifyOnLessonCommentLike;
     }
+
+    /**
+     * @return int|null
+     */
+    public function getNotificationsSummaryFrequencyMinutes()
+    {
+        return $this->notificationsSummaryFrequencyMinutes;
+    }
+
+    /**
+     * @param int|null $notificationsSummaryFrequencyMinutes
+     */
+    public function setNotificationsSummaryFrequencyMinutes($notificationsSummaryFrequencyMinutes)
+    {
+        $this->notificationsSummaryFrequencyMinutes = $notificationsSummaryFrequencyMinutes;
+    }
+
+
 }

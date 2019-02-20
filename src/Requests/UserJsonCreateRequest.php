@@ -40,6 +40,7 @@ class UserJsonCreateRequest extends FormRequest
             'data.attributes.notify_on_forum_followed_thread_reply' => 'nullable|boolean',
             'data.attributes.notify_on_forum_post_reply' => 'nullable|boolean',
             'data.attributes.notify_on_lesson_comment_like' => 'nullable|boolean',
+            'data.attributes.notifications_summary_frequency_minutes' => 'nullable|integer',
 
             'data.attributes.drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
             'data.attributes.drums_gear_photo' => 'nullable|url',
@@ -90,6 +91,7 @@ class UserJsonCreateRequest extends FormRequest
                 'data.attributes.notify_on_forum_followed_thread_reply',
                 'data.attributes.notify_on_forum_post_reply',
                 'data.attributes.notify_on_lesson_comment_like',
+                'data.attributes.notifications_summary_frequency_minutes',
                 'data.attributes.drums_playing_since_year',
                 'data.attributes.drums_gear_photo',
                 'data.attributes.drums_gear_cymbal_brands',
