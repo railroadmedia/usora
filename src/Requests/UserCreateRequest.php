@@ -26,10 +26,12 @@ class UserCreateRequest extends FormRequest
         return [
             'email' => 'required|email|unique:' .
                 config('usora.database_connection_name') .
+                '.' .
                 config('usora.tables.users') .
                 ',email',
             'display_name' => 'required|string|max:255|min:2|unique:' .
                 config('usora.database_connection_name') .
+                '.' .
                 config('usora.tables.users') .
                 ',display_name',
             'password' => 'required|string|min:8|max:128',

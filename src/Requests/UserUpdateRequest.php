@@ -26,10 +26,12 @@ class UserUpdateRequest extends FormRequest
         return [
             'email' => 'email|unique:' .
                 config('usora.database_connection_name') .
+                '.' .
                 config('usora.tables.users') .
                 ',email',
             'display_name' => 'string|max:255|min:2|unique:' .
                 config('usora.database_connection_name') .
+                '.' .
                 config('usora.tables.users') .
                 ',display_name',
             'password' => 'string|min:8|max:128|confirmed',

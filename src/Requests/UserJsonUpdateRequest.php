@@ -14,10 +14,12 @@ class UserJsonUpdateRequest extends FormRequest
         return [
             'data.attributes.email' => 'email|unique:' .
                 config('usora.database_connection_name') .
+                '.' .
                 config('usora.tables.users') .
                 ',email',
             'data.attributes.display_name' => 'string|max:255|min:2|unique:' .
                 config('usora.database_connection_name') .
+                '.' .
                 config('usora.tables.users') .
                 ',display_name',
             'data.attributes.password' => 'string|min:8|max:128|confirmed',
