@@ -60,15 +60,17 @@ Users can be signed in on any domain running this package with a single login at
 API Reference
 -----------------------------------------
 
-### Form API
+### User Form API
 
 `PUT /usora/user/store`
 `PATCH /usora/user/update/{user_id}`
 `DETLETE /usora/user/delete/{user_id}`
 
-Available attributes to put/patch with validation rules:
+Parameters and validation for PUT/PATCH:
 
 **\* NOTE: Email can only be updated by admins with special privileges. Normal users must use the email change endpoint.**
+
+*NOTE: Required parameters are only required for PUT/create requests.
 
 ```php
 [
@@ -121,5 +123,47 @@ Available attributes to put/patch with validation rules:
 Will return a redirect to URL passed in with 'redirect' parameter, or will return to previous URL. Always redirects with
 ```php
 ['success' => true]
+```
+flashed to the session.
+
+
+### Email Change Form API
+
+`POST /usora/email-change/request`
+
+Parameters and validation for POST:
+
+```php
+[
+    'email' => 'required|email|unique:usora_users,email',
+];
+```
+
+Will return a redirect to URL passed in with 'redirect' parameter, or will return to previous URL. Always redirects with
+```php
+[
+    'successes' => new MessageBag(
+        ['password' => 'An email confirmation link has been sent to your new email address.']
+    ),
+]
+```
+flashed to the session.
+
+
+`GET /usora/email-change/confirm`
+
+```php
+[
+    'token' => 'bail|required|string|exists:usora_email_changes,token',
+]
+```
+
+Will return a redirect to URL passed in with 'redirect' parameter, or will return to previous URL. Always redirects with
+```php
+[
+    'successes' => new MessageBag(
+        ['password' => 'Your email has been updated successfully.']
+    ),
+];
 ```
 flashed to the session.

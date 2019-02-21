@@ -115,9 +115,10 @@ class EmailChangeController extends Controller
             $request->all(),
             [
                 'token' => 'bail|required|string|exists:' .
-
-                    config('usora.database_connection_name') . '.' . config('usora.tables.email_changes'),
-                'token',
+                    config('usora.database_connection_name') .
+                    '.' .
+                    config('usora.tables.email_changes') .
+                    ',token',
             ]
         );
 
