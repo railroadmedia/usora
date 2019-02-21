@@ -62,9 +62,9 @@ API Reference
 
 ### User Form API
 
-`PUT /usora/user/store`
-`PATCH /usora/user/update/{user_id}`
-`DETLETE /usora/user/delete/{user_id}`
+**`PUT /usora/user/store`**  
+**`PATCH /usora/user/update/{user_id}`**    
+**`DELETE /usora/user/delete/{user_id}`**  
 
 Parameters and validation for PUT/PATCH:
 
@@ -129,7 +129,7 @@ flashed to the session.
 
 ### Email Change Form API
 
-`POST /usora/email-change/request`
+**`POST /usora/email-change/request`**
 
 Parameters and validation for POST:
 
@@ -150,7 +150,7 @@ Will return a redirect to URL passed in with 'redirect' parameter, or will retur
 flashed to the session.
 
 
-`GET /usora/email-change/confirm`
+**`GET /usora/email-change/confirm`**
 
 ```php
 [
