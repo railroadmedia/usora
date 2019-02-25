@@ -70,4 +70,22 @@ return [
     'email_change_notification_class' => \Railroad\Usora\Notifications\EmailChange::class,
     'email_change_notification_channel' => 'mail',
     'email_change_token_ttl' => 24, // hours unit
+
+    // file uploading
+    'file_upload_aws_s3_access_key' => '',
+    'file_upload_aws_s3_access_secret' => '',
+    'file_upload_aws_s3_region' => '',
+    'file_upload_aws_s3_bucket' => '',
+    'file_upload_aws_s3_bucket_cloud_front_url' => '',
+
+    // the uploaded file URL will be injected in to the request with the 'file_' removed from the key
+    // keys MUST start with 'file_', ex: 'file_my_profile_picture'
+    'allowed_file_upload_request_keys' => [
+        'file_profile_picture_url' => [
+            'path' => '/path/inside/bucket/',
+        ],
+        'file_other_image_key' => [
+            'path' => '/path/inside/bucket/',
+        ],
+    ],
 ];
