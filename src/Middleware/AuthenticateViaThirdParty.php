@@ -22,7 +22,7 @@ class AuthenticateViaThirdParty
 
             session()->put('failure-redirect-url', $request->getUri());
 
-            return redirect()->route('usora.authenticate.third-party');
+            return redirect()->route('usora.authenticate.with-third-party');
         }
 
         if (session()->get('skip-third-party-auth-check') == true) {
