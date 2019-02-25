@@ -88,7 +88,6 @@ class UploadFilesToRemote
                 if ($uploadedSuccessfully) {
 
                     $request->files->remove($key);
-                    $request->request->add(['test' => 'test123']);
 
                     $requestWithFileUrls = Request::createFrom($request);
 
