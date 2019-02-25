@@ -7,14 +7,13 @@ use Closure;
 use Illuminate\Http\Request;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
-use Symfony\Component\VarDumper\VarDumper;
 
 class UploadFilesToRemote
 {
     /**
      * @var Filesystem
      */
-    private $filesystem;
+    protected $filesystem;
 
     /**
      * Create a new error binder instance.
@@ -57,24 +56,9 @@ class UploadFilesToRemote
         foreach (config('usora.allowed_file_upload_request_keys') as $key => $options) {
             if (!empty($request->file($key))) {
                 $path = '/' . trim($options['path'], '/') . '/';
+                $fileName = $this->getFileName($request, $key);
 
-                if (auth()->check()) {
-                    $fileName = time() .
-                        '_' .
-                        auth()->id() .
-                        '_' .
-                        $key .
-                        '.' .
-                        $request->file($key)
-                            ->extension();
-                } else {
-                    $fileName = time() .
-                        '_' .
-                        $key .
-                        '.' .
-                        $request->file($key)
-                            ->extension();
-                }
+                $this->processFile($request, $key);
 
                 $uploadedSuccessfully = $this->filesystem->put(
                     $path . $fileName,
@@ -103,5 +87,35 @@ class UploadFilesToRemote
         }
 
         return $next($requestWithFileUrls ?? $request);
+    }
+
+    /**
+     * @param $request
+     * @param $key
+     */
+    protected function processFile($request, $key)
+    {
+
+    }
+
+    protected function getFileName($request, $key)
+    {
+        if (auth()->check()) {
+            return time() .
+                '_' .
+                auth()->id() .
+                '_' .
+                $key .
+                '.' .
+                $request->file($key)
+                    ->extension();
+        }
+
+        return time() .
+            '_' .
+            $key .
+            '.' .
+            $request->file($key)
+                ->extension();
     }
 }
