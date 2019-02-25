@@ -54,9 +54,10 @@ class SaltedSessionGuard extends SessionGuard
 
         if (!is_null($id)) {
             $user = $this->provider->retrieveById($id);
-            $this->user = $user;
 
             if ($user->getSessionSalt() === $salt) {
+                $this->user = $user;
+
                 return $this->user;
             }
         }
@@ -142,7 +143,6 @@ class SaltedSessionGuard extends SessionGuard
             return;
         }
 
-        $this->provider->updateSessionSalt($user, '');
 
         $this->clearUserDataFromStorage();
 
@@ -150,6 +150,8 @@ class SaltedSessionGuard extends SessionGuard
             $recaller = $this->recaller();
 
             $this->provider->deleteRememberToken($recaller->token(), $user->getAuthIdentifier());
+        } else {
+            $this->provider->updateSessionSalt($user, '');
         }
 
         if (isset($this->events)) {

@@ -215,7 +215,7 @@ class AuthenticationController extends Controller
     {
         $user = auth()->user();
 
-        if (empty($user)) {
+        if (empty($user) || empty($user->getSessionSalt())) {
             return view(
                 'usora::post-message-verification-token',
                 [
