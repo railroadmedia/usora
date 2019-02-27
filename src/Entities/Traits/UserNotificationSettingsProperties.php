@@ -43,7 +43,7 @@ trait UserNotificationSettingsProperties
     /**
      * If this is null notifications should be sent instantly.
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @var integer|null
      */
     protected $notificationsSummaryFrequencyMinutes = null;

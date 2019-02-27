@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -67,6 +68,8 @@ class UserJsonController extends Controller
         $this->jsonApiHydrator = new JsonApiHydrator($this->entityManager);
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
+
+        $this->middleware([ConvertEmptyStringsToNull::class]);
     }
 
     /**

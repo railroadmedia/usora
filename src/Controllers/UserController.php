@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -58,6 +59,8 @@ class UserController extends Controller
         $this->arrayHydrator = new ArrayHydrator($this->entityManager);
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
+
+        $this->middleware([ConvertEmptyStringsToNull::class]);
     }
 
     /**
