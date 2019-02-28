@@ -71,7 +71,7 @@ class AuthenticationController extends Controller
             ]
         );
 
-        $request->attributes->set('remember', (boolean) $request->get('remember', false));
+        $request->attributes->set('remember', (boolean)$request->get('remember', false));
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
@@ -198,11 +198,23 @@ class AuthenticationController extends Controller
             return redirect()->to(config('usora.login_success_redirect_path'));
         }
 
+        $domains = config('usora.domains_to_check_for_authentication');
+        $currentSubdomain = array_reverse(explode('.', $request->getHttpHost()))[2] ?? '';
+
+        foreach ($domains as $domainIndex => $domain) {
+            $explodedDomain = explode('.', $domain);
+
+            if (count($explodedDomain) == 2 && !empty($currentSubdomain)) {
+                $domains[$domainIndex] = $currentSubdomain . '.' . $domain;
+            }
+        }
+
         return view(
             'usora::authentication-check',
             [
                 'loginSuccessRedirectUrl' => url()->to(config('usora.login_success_redirect_path')),
                 'loginPageUrl' => session()->get('failure-redirect-url', url()->to(config('usora.login_page_path'))),
+                'domains' => $domains,
             ]
         );
     }

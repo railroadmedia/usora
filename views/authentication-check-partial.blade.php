@@ -5,6 +5,7 @@
     var domainsToAuthenticateFromCount =
             {{ count(config('usora.domains_to_check_for_authentication')) }};
     var failedDomains = 0;
+    var attemptedDomains = 0;
 
     @foreach(config('usora.domains_to_check_for_authentication') as $domain)
         domainsToAuthenticateFromChecked['{{ $domain }}'] = true;
@@ -73,11 +74,20 @@
 
         return hostname;
     }
+
+    function iframeLoaded(e) {
+        attemptedDomains++;
+
+        if (attemptedDomains => domainsToAuthenticateFromCount) {
+            window.location.replace(loginPageUrl);
+        }
+    }
 </script>
 
-@foreach(config('usora.domains_to_check_for_authentication') as $domain)
+@foreach($domains as $domain)
     <iframe id="receiver"
-            src="https://{{ (array_reverse(explode('.', request()->getHost()))[2] . '.') ?? '' }}{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
+            onload="iframeLoaded()"
+            src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">
     </iframe>
 @endforeach
