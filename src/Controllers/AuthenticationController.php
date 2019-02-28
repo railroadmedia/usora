@@ -234,6 +234,7 @@ class AuthenticationController extends Controller
                     'failed' => true,
                     'token' => null,
                     'userId' => null,
+                    'domains' => [],
                 ]
             );
         }
