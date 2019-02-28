@@ -47,12 +47,15 @@ return [
     'route_prefix' => 'usora',
 
     // authentication domains
+    // if you dont set a subdomain, the current request subdomain will be used
     'domains_to_authenticate_on' => [
-        'dev.domain1.com',
+        'domain1.com',
+        'sub.domain2.com',
     ],
 
     'domains_to_check_for_authentication' => [
-        'dev.domain2.com',
+        'domain2.com',
+        'sub.domain2.com',
     ],
 
     // authentication
