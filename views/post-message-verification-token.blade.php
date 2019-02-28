@@ -11,17 +11,23 @@
     var failed = '{{ $failed }}';
 
     window.onload = function () {
-        if (failed) {
-            window.parent.postMessage({failed: true}, '*');
-            return;
-        }
+        try {
 
-        @foreach(config('usora.domains_to_authenticate_on') as $domain)
+            if (failed) {
+                window.parent.postMessage({failed: true}, '*');
+                return;
+            }
+
+            @foreach($domains as $domain)
             window.parent.postMessage(
                 {token: token, user_id: userId, failed: false},
                 'https://' + '{{ $domain }}'
             );
-        @endforeach
+
+            @endforeach
+        } catch(error) {
+
+        }
     }
 </script>
 </body>

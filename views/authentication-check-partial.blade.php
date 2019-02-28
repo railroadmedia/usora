@@ -6,13 +6,16 @@
             {{ count(config('usora.domains_to_check_for_authentication')) }};
     var failedDomains = 0;
     var attemptedDomains = 0;
+    var messageReceived = false;
 
-    @foreach(config('usora.domains_to_check_for_authentication') as $domain)
+    @foreach($domains as $domain)
         domainsToAuthenticateFromChecked['{{ $domain }}'] = true;
 
     @endforeach
 
     function receiveMessage(e) {
+        messageReceived = true;
+
         var failed = e.data['failed'];
         var token = e.data['token'];
         var userId = e.data['user_id'];
@@ -57,8 +60,8 @@
     window.addEventListener('message', receiveMessage);
 
     setTimeout(function () {
-        // window.location.replace(loginPageUrl);
-    }, 8000);
+        window.location.replace(loginPageUrl);
+    }, 7000);
 
     function extractHostname(url) {
         var hostname;
@@ -79,13 +82,22 @@
         attemptedDomains++;
 
         if (attemptedDomains => domainsToAuthenticateFromCount) {
-            window.location.replace(loginPageUrl);
+            setTimeout(function () {
+                if (!messageReceived) {
+                    messageReceived = true;
+
+                    console.log('SSO failed, could not contact other domains.');
+
+                    window.location.replace(loginPageUrl);
+                }
+            }, 500);
         }
     }
 </script>
 
 @foreach($domains as $domain)
     <iframe id="receiver"
+            class="cookie-iframe"
             onload="iframeLoaded()"
             src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">

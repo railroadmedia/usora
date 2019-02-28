@@ -238,12 +238,24 @@ class AuthenticationController extends Controller
             );
         }
 
+        $domains = config('usora.domains_to_check_for_authentication');
+        $currentSubdomain = array_reverse(explode('.', $request->getHttpHost()))[2] ?? '';
+
+        foreach ($domains as $domainIndex => $domain) {
+            $explodedDomain = explode('.', $domain);
+
+            if (count($explodedDomain) == 2 && !empty($currentSubdomain)) {
+                $domains[$domainIndex] = $currentSubdomain . '.' . $domain;
+            }
+        }
+
         return view(
             'usora::post-message-verification-token',
             [
                 'failed' => false,
                 'token' => $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
                 'userId' => $user->getId(),
+                'domains' => $domains,
             ]
         );
     }
