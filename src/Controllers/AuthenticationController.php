@@ -2,7 +2,9 @@
 
 namespace Railroad\Usora\Controllers;
 
+use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
+use Illuminate\Auth\Recaller;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -227,7 +229,7 @@ class AuthenticationController extends Controller
     {
         $user = auth()->user();
 
-        if (empty($user) || empty($user->getSessionSalt())) {
+        if (empty($user)) {
             return view(
                 'usora::post-message-verification-token',
                 [
@@ -250,11 +252,26 @@ class AuthenticationController extends Controller
             }
         }
 
+        // if we are authed via a remember token
+        $rememberTokenCookieValue = $request->cookies->get(
+            auth()
+                ->guard()
+                ->getRecallerName()
+        );
+
+        if (!empty($rememberTokenCookieValue) && auth()->viaRemember()) {
+            $recaller = new Recaller($rememberTokenCookieValue);
+
+            $hash = 'remember_token|' . $this->hasher->make($user->getId() . $user->getPassword() . $recaller->token());
+        } else {
+            $hash = 'salt|' . $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt());
+        }
+
         return view(
             'usora::post-message-verification-token',
             [
                 'failed' => false,
-                'token' => $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
+                'token' => $hash,
                 'userId' => $user->getId(),
                 'domains' => $domains,
             ]
@@ -288,12 +305,48 @@ class AuthenticationController extends Controller
 
         $user = $this->userRepository->find($userId);
 
-        if ($this->hasher->check($user->getId() . $user->getPassword() . $user->getSessionSalt(), $verificationToken)) {
-            SaltedSessionGuard::$updateSalt = false;
+        if (strpos($verificationToken, 'remember_token|') === 0) {
+            $verificationToken = substr($verificationToken, 15);
 
-            auth()->loginUsingId($userId, $request->get('remember', false));
+            $rememberTokens = $user->getRememberTokens();
 
-            return response()->json(['success' => 'true']);
+            foreach ($rememberTokens as $rememberToken) {
+
+                if ($this->hasher->check(
+                        $user->getId() . $user->getPassword() . $rememberToken->getToken(),
+                        $verificationToken
+                    ) && $rememberToken->getExpiresAt() > Carbon::now()) {
+
+                    cookie()->queue(
+                        cookie()->make(
+                            auth()
+                                ->guard()
+                                ->getRecallerName(),
+                            $user->getAuthIdentifier() .
+                            '|' .
+                            $rememberToken->getToken() .
+                            '|' .
+                            $user->getAuthPassword()
+                        )
+                    );
+                }
+            }
+
+        } elseif (strpos($verificationToken, 'salt|') === 0) {
+
+            $verificationToken = substr($verificationToken, 5);
+
+            if ($this->hasher->check(
+                $user->getId() . $user->getPassword() . $user->getSessionSalt(),
+                $verificationToken
+            )) {
+
+                SaltedSessionGuard::$updateSalt = false;
+
+                auth()->loginUsingId($userId, false);
+
+                return response()->json(['success' => 'true']);
+            }
         }
 
         return response()->json(['success' => 'false']);

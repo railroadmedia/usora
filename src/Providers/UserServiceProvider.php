@@ -62,7 +62,9 @@ class UserServiceProvider implements UserProvider
         $rememberTokens = $user->getRememberTokens();
 
         foreach ($rememberTokens as $rememberToken) {
-            if (!empty($rememberToken->getToken()) == hash_equals($rememberToken->getToken(), $token)) {
+            if (!empty($rememberToken->getToken()) == hash_equals($rememberToken->getToken(), $token) &&
+                $rememberToken->getExpiresAt() > Carbon::now()) {
+
                 return $user;
             }
         }

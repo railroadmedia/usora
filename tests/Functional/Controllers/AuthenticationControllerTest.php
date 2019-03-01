@@ -297,7 +297,7 @@ class AuthenticationControllerTest extends UsoraTestCase
             'usora/authenticate/set-authentication-cookie',
             [
                 'uid' => $user->getId(),
-                'vt' => $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
+                'vt' => 'salt|' . $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
             ]
         );
 

@@ -52,7 +52,7 @@ class SaltedSessionGuard extends SessionGuard
         $id = $this->session->get($this->getName());
         $salt = $this->session->get($this->getSaltName());
 
-        if (!is_null($id)) {
+        if (!is_null($id) && !empty($salt)) {
             $user = $this->provider->retrieveById($id);
 
             if ($user->getSessionSalt() === $salt) {
@@ -97,15 +97,17 @@ class SaltedSessionGuard extends SessionGuard
                         $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword()
                     )
                 );
-        }
-
-        if (self::$updateSalt && empty($user->getSessionSalt())) {
-            $salt = Str::random(60);
-
-            $this->session->put($this->getSaltName(), $salt);
-            $this->provider->updateSessionSalt($user, $salt);
         } else {
-            $this->session->put($this->getSaltName(), $user->getSessionSalt());
+
+            if (self::$updateSalt && empty($user->getSessionSalt())) {
+                $salt = Str::random(60);
+
+                $this->session->put($this->getSaltName(), $salt);
+                $this->provider->updateSessionSalt($user, $salt);
+            } else {
+                $this->session->put($this->getSaltName(), $user->getSessionSalt());
+            }
+
         }
 
         $this->fireLoginEvent($user, $remember);
@@ -143,15 +145,14 @@ class SaltedSessionGuard extends SessionGuard
             return;
         }
 
-
         $this->clearUserDataFromStorage();
+
+        $this->provider->updateSessionSalt($user, '');
 
         if (!is_null($this->user) && !empty($this->recaller())) {
             $recaller = $this->recaller();
 
             $this->provider->deleteRememberToken($recaller->token(), $user->getAuthIdentifier());
-        } else {
-            $this->provider->updateSessionSalt($user, '');
         }
 
         if (isset($this->events)) {
