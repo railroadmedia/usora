@@ -16,12 +16,14 @@ class UserJsonUpdateRequest extends FormRequest
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .
-                ',email',
+                ',email,' .
+                $this->route('id'),
             'data.attributes.display_name' => 'string|max:255|min:2|unique:' .
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .
-                ',display_name',
+                ',display_name,' .
+                $this->route('id'),
             'data.attributes.password' => 'string|min:8|max:128|confirmed',
 
             'data.attributes.first_name' => 'nullable|string|max:255',

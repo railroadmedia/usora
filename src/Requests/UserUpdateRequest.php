@@ -28,12 +28,14 @@ class UserUpdateRequest extends FormRequest
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .
-                ',email',
+                ',email,' .
+                $this->route('id'),
             'display_name' => 'string|max:255|min:2|unique:' .
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .
-                ',display_name',
+                ',display_name,' .
+                $this->route('id'),
             'password' => 'string|min:8|max:128|confirmed',
 
             'first_name' => 'nullable|string|max:255',
