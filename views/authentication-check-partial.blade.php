@@ -1,5 +1,5 @@
 <script type="application/javascript">
-    document.addEventListener('DOMContentLoaded', function(){
+    document.addEventListener('DOMContentLoaded', function () {
         var loginSuccessRedirectUrl = '{{ $loginSuccessRedirectUrl }}';
         var loginPageUrl = '{{ $loginPageUrl }}';
         var domainsToAuthenticateFromChecked = [];
@@ -15,8 +15,6 @@
         @endforeach
 
         function receiveMessage(e) {
-            messageReceived = true;
-
             var failed = e.data['failed'];
             var token = e.data['token'];
             var userId = e.data['user_id'];
@@ -32,6 +30,8 @@
 
                 return;
             }
+
+            messageReceived = true;
 
             console.log('Success: ' + domain);
 
@@ -83,7 +83,11 @@
             attemptedDomains++;
 
             if (attemptedDomains >= domainsToAuthenticateFromCount) {
+                console.log('NOW!');
+
                 setTimeout(function () {
+                    console.log(messageReceived);
+
                     if (!messageReceived) {
                         messageReceived = true;
 
@@ -95,9 +99,13 @@
             }
         }
 
-        document.getElementById('receiver').onload = function(e){
-            iframeLoaded(e);
-        };
+        var iframes = document.querySelectorAll('.cookie-iframe');
+
+        for (var i = 0; i < iframes.length; i++) {
+            iframes[i].onload = function (e) {
+                iframeLoaded(e);
+            }
+        }
     });
 </script>
 
