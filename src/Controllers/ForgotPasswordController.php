@@ -36,6 +36,8 @@ class ForgotPasswordController extends Controller
                 );
 
         if ($response === Password::RESET_LINK_SENT) {
+            session()->put('skip-third-party-auth-check', true);
+
             return redirect()
                 ->to(config('usora.login_page_path'))
                 ->with(
