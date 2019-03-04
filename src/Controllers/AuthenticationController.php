@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Validation\ValidationException;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\UserEvent;
@@ -65,13 +66,25 @@ class AuthenticationController extends Controller
      */
     public function authenticateViaCredentials(Request $request)
     {
-        $this->validate(
-            $request,
-            [
-                'email' => 'required|string',
-                'password' => 'required|string',
-            ]
-        );
+         try {
+             $this->validate(
+                 $request,
+                 [
+                     'email' => 'required|string',
+                     'password' => 'required|string',
+                 ]
+             );
+         } catch (ValidationException $exception) {
+             session()->put('skip-third-party-auth-check', true);
+
+             return $request->has('redirect') ?
+                 redirect()
+                     ->away($request->get('redirect'))
+                     ->withErrors($exception->errors()) :
+                 redirect()
+                     ->to(config('usora.login_page_path'))
+                     ->withErrors($exception->errors());
+         }
 
         $request->attributes->set('remember', (boolean)$request->get('remember', false));
 
@@ -79,6 +92,8 @@ class AuthenticationController extends Controller
             $this->fireLockoutEvent($request);
 
             $errors = ['throttle' => 'Too many login attempts. Try again later.'];
+
+            session()->put('skip-third-party-auth-check', true);
 
             return $request->has('redirect') ?
                 redirect()
@@ -139,6 +154,8 @@ class AuthenticationController extends Controller
         $this->incrementLoginAttempts($request);
 
         $errors = ['invalid-credentials' => 'Invalid authentication credentials, please try again.'];
+
+        session()->put('skip-third-party-auth-check', true);
 
         return $request->has('redirect') ?
             redirect()
