@@ -166,7 +166,7 @@ class EmailChangeController extends Controller
                 ->away($request->get('redirect'))
                 ->with($message) :
             redirect()
-                ->back()
+                ->to(config('usora.email_change_confirmation_success_redirect_path'))
                 ->with($message);
     }
 

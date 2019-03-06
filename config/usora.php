@@ -73,6 +73,7 @@ return [
     'email_change_notification_class' => \Railroad\Usora\Notifications\EmailChange::class,
     'email_change_notification_channel' => 'mail',
     'email_change_token_ttl' => 24, // hours unit
+    'email_change_confirmation_success_redirect_path' => 'members',
 
     // file uploading
     'file_upload_aws_s3_access_key' => '',
