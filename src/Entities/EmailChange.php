@@ -39,12 +39,6 @@ class EmailChange
     protected $token;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @var \DateTime
-     */
-    protected $createdAt;
-
-    /**
      * @return int
      */
     public function getId()
