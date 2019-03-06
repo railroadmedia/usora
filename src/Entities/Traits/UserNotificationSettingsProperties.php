@@ -115,7 +115,7 @@ trait UserNotificationSettingsProperties
     /**
      * @return bool
      */
-    public function isNotifyOnForumPostReply()
+    public function getNotifyOnForumPostReply()
     {
         return $this->notifyOnForumPostReply;
     }
