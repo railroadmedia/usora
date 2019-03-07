@@ -24,7 +24,7 @@ class EmailChangeRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|unique:' .
+            'email' => 'required|email|max:255|unique:' .
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .

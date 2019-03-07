@@ -12,13 +12,13 @@ class UserJsonUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'data.attributes.email' => 'email|unique:' .
+            'data.attributes.email' => 'email|max:255|unique:' .
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .
                 ',email,' .
                 $this->route('id'),
-            'data.attributes.display_name' => 'string|max:255|min:2|unique:' .
+            'data.attributes.display_name' => 'string|max:64|min:2|unique:' .
                 config('usora.database_connection_name') .
                 '.' .
                 config('usora.tables.users') .
@@ -26,18 +26,18 @@ class UserJsonUpdateRequest extends FormRequest
                 $this->route('id'),
             'data.attributes.password' => 'string|min:8|max:128|confirmed',
 
-            'data.attributes.first_name' => 'nullable|string|max:255',
-            'data.attributes.last_name' => 'nullable|string|max:255',
+            'data.attributes.first_name' => 'nullable|string|max:64',
+            'data.attributes.last_name' => 'nullable|string|max:64',
             'data.attributes.gender' => 'nullable|string|in:male,female,other',
-            'data.attributes.country' => 'nullable|string',
-            'data.attributes.region' => 'nullable|string',
-            'data.attributes.city' => 'nullable|string',
+            'data.attributes.country' => 'nullable|string|max:84',
+            'data.attributes.region' => 'nullable|string|max:84',
+            'data.attributes.city' => 'nullable|string|max:84',
             'data.attributes.birthday' => 'nullable|string|date',
-            'data.attributes.phone_number' => 'nullable|string|integer',
-            'data.attributes.biography' => 'nullable|string',
-            'data.attributes.profile_picture_url' => 'nullable|string|url',
+            'data.attributes.phone_number' => 'nullable|string|max:15',
+            'data.attributes.biography' => 'nullable|string|max:15000',
+            'data.attributes.profile_picture_url' => 'nullable|string|url|max:1000',
             'data.attributes.timezone' => 'nullable|string|in:' . implode(',', timezone_identifiers_list()),
-            'data.attributes.permission_level' => 'nullable|string',
+            'data.attributes.permission_level' => 'nullable|string|max:255',
 
             'data.attributes.notify_on_lesson_comment_reply' => 'nullable|boolean',
             'data.attributes.notify_weekly_update' => 'nullable|boolean',
@@ -45,26 +45,26 @@ class UserJsonUpdateRequest extends FormRequest
             'data.attributes.notify_on_forum_followed_thread_reply' => 'nullable|boolean',
             'data.attributes.notify_on_forum_post_reply' => 'nullable|boolean',
             'data.attributes.notify_on_lesson_comment_like' => 'nullable|boolean',
-            'data.attributes.notifications_summary_frequency_minutes' => 'nullable|integer',
+            'data.attributes.notifications_summary_frequency_minutes' => 'nullable|integer|max:43200',
 
             'data.attributes.drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
-            'data.attributes.drums_gear_photo' => 'nullable|url',
-            'data.attributes.drums_gear_cymbal_brands' => 'nullable|string',
-            'data.attributes.drums_gear_set_brands' => 'nullable|string',
-            'data.attributes.drums_gear_hardware_brands' => 'nullable|string',
-            'data.attributes.drums_gear_stick_brands' => 'nullable|string',
+            'data.attributes.drums_gear_photo' => 'nullable|url|max:1000',
+            'data.attributes.drums_gear_cymbal_brands' => 'nullable|string|max:255',
+            'data.attributes.drums_gear_set_brands' => 'nullable|string|max:255',
+            'data.attributes.drums_gear_hardware_brands' => 'nullable|string|max:255',
+            'data.attributes.drums_gear_stick_brands' => 'nullable|string|max:255',
 
             'data.attributes.guitar_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
-            'data.attributes.guitar_gear_photo' => 'nullable|url',
-            'data.attributes.guitar_gear_guitar_brands' => 'nullable|string',
-            'data.attributes.guitar_gear_amp_brands' => 'nullable|string',
-            'data.attributes.guitar_gear_pedal_brands' => 'nullable|string',
-            'data.attributes.guitar_gear_string_brands' => 'nullable|string',
+            'data.attributes.guitar_gear_photo' => 'nullable|url|max:1000',
+            'data.attributes.guitar_gear_guitar_brands' => 'nullable|string|max:255',
+            'data.attributes.guitar_gear_amp_brands' => 'nullable|string|max:255',
+            'data.attributes.guitar_gear_pedal_brands' => 'nullable|string|max:255',
+            'data.attributes.guitar_gear_string_brands' => 'nullable|string|max:255',
 
             'data.attributes.piano_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
-            'data.attributes.piano_gear_photo' => 'nullable|url',
-            'data.attributes.piano_gear_piano_brands' => 'nullable|string',
-            'data.attributes.piano_gear_keyboard_brands' => 'nullable|string',
+            'data.attributes.piano_gear_photo' => 'nullable|url|max:1000',
+            'data.attributes.piano_gear_piano_brands' => 'nullable|string|max:255',
+            'data.attributes.piano_gear_keyboard_brands' => 'nullable|string|max:255',
         ];
     }
 

@@ -19,6 +19,8 @@ class UserFakeDataHydrator extends FakeDataHydrator
         $defaultEntity->setDrumsPlayingSinceYear(rand(1900, 2019));
         $defaultEntity->setPianoPlayingSinceYear(rand(1900, 2019));
         $defaultEntity->setGuitarPlayingSinceYear(rand(1900, 2019));
+        $defaultEntity->setNotificationsSummaryFrequencyMinutes(rand(0, 5000));
+        $defaultEntity->setPhoneNumber(rand(10000000000, 99999999999));
 
         return $defaultEntity;
     }

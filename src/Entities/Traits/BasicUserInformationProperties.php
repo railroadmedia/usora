@@ -25,19 +25,19 @@ trait BasicUserInformationProperties
     protected $gender;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=84)
      * @var string
      */
     protected $country;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=84)
      * @var string
      */
     protected $region;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", length=84)
      * @var string
      */
     protected $city;

@@ -238,6 +238,7 @@ class UserJsonControllerTest extends UsoraTestCase
                 ],
             ]
         );
+
         // assert response status code
         $this->assertEquals(201, $response->getStatusCode());
 
