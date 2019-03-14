@@ -66,25 +66,25 @@ class AuthenticationController extends Controller
      */
     public function authenticateViaCredentials(Request $request)
     {
-         try {
-             $this->validate(
-                 $request,
-                 [
-                     'email' => 'required|string',
-                     'password' => 'required|string',
-                 ]
-             );
-         } catch (ValidationException $exception) {
-             session()->put('skip-third-party-auth-check', true);
+        try {
+            $this->validate(
+                $request,
+                [
+                    'email' => 'required|string',
+                    'password' => 'required|string',
+                ]
+            );
+        } catch (ValidationException $exception) {
+            session()->put('skip-third-party-auth-check', true);
 
-             return $request->has('redirect') ?
-                 redirect()
-                     ->away($request->get('redirect'))
-                     ->withErrors($exception->errors()) :
-                 redirect()
-                     ->to(config('usora.login_page_path'))
-                     ->withErrors($exception->errors());
-         }
+            return $request->has('redirect') ?
+                redirect()
+                    ->to(config('usora.login_page_path') . '?' . $request->has('redirect'))
+                    ->withErrors($exception->errors()) :
+                redirect()
+                    ->to(config('usora.login_page_path'))
+                    ->withErrors($exception->errors());
+        }
 
         $request->attributes->set('remember', (boolean)$request->get('remember', false));
 
@@ -97,7 +97,7 @@ class AuthenticationController extends Controller
 
             return $request->has('redirect') ?
                 redirect()
-                    ->away($request->get('redirect'))
+                    ->to(config('usora.login_page_path') . '?' . $request->has('redirect'))
                     ->withErrors($errors) :
                 redirect()
                     ->to(config('usora.login_page_path'))
@@ -142,9 +142,8 @@ class AuthenticationController extends Controller
 
                     event(new UserEvent($userByEmail->getId(), 'authenticated'));
 
-                    $redirect =
-                        $request->has('redirect') ? $request->get('redirect') :
-                            config('usora.login_success_redirect_path');
+                    $redirect = $request->has('redirect') ? $request->get('redirect') :
+                        config('usora.login_success_redirect_path');
 
                     return redirect()->away($redirect);
                 }
@@ -159,7 +158,7 @@ class AuthenticationController extends Controller
 
         return $request->has('redirect') ?
             redirect()
-                ->away($request->get('redirect'))
+                ->to(config('usora.login_page_path') . '?' . $request->has('redirect'))
                 ->withErrors($errors) :
             redirect()
                 ->to(config('usora.login_page_path'))
