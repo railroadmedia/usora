@@ -79,7 +79,7 @@ class AuthenticationController extends Controller
 
             return $request->has('redirect') ?
                 redirect()
-                    ->to(config('usora.login_page_path') . '?' . $request->has('redirect'))
+                    ->to(config('usora.login_page_path') . '?redirect_to=' . $request->get('redirect'))
                     ->withErrors($exception->errors()) :
                 redirect()
                     ->to(config('usora.login_page_path'))
@@ -97,7 +97,7 @@ class AuthenticationController extends Controller
 
             return $request->has('redirect') ?
                 redirect()
-                    ->to(config('usora.login_page_path') . '?' . $request->has('redirect'))
+                    ->to(config('usora.login_page_path') . '?redirect_to=' . $request->get('redirect'))
                     ->withErrors($errors) :
                 redirect()
                     ->to(config('usora.login_page_path'))
@@ -158,7 +158,7 @@ class AuthenticationController extends Controller
 
         return $request->has('redirect') ?
             redirect()
-                ->to(config('usora.login_page_path') . '?' . $request->has('redirect'))
+                ->to(config('usora.login_page_path') . '?redirect_to=' . $request->get('redirect'))
                 ->withErrors($errors) :
             redirect()
                 ->to(config('usora.login_page_path'))
