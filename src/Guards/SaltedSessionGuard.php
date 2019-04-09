@@ -68,9 +68,7 @@ class SaltedSessionGuard extends SessionGuard
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
-                $this->updateSession($this->user->getAuthIdentifier());
-
-                $this->fireLoginEvent($this->user, true);
+                $this->login($this->user, true);
 
                 return $this->user;
             }
@@ -97,17 +95,16 @@ class SaltedSessionGuard extends SessionGuard
                         $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword()
                     )
                 );
-        } else {
+        }
 
-            if (self::$updateSalt && empty($user->getSessionSalt())) {
-                $salt = Str::random(60);
+        if (self::$updateSalt && empty($user->getSessionSalt())) {
+            $salt = Str::random(60);
 
-                $this->session->put($this->getSaltName(), $salt);
-                $this->provider->updateSessionSalt($user, $salt);
-            } else {
-                $this->session->put($this->getSaltName(), $user->getSessionSalt());
-            }
-
+            $this->session->put($this->getSaltName(), $salt);
+            $this->provider->updateSessionSalt($user, $salt);
+        }
+        else {
+            $this->session->put($this->getSaltName(), $user->getSessionSalt());
         }
 
         $this->fireLoginEvent($user, $remember);
