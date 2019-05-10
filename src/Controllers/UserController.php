@@ -14,6 +14,9 @@ use Illuminate\Routing\Controller;
 use Railroad\DoctrineArrayHydrator\ArrayHydrator;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Events\UserCreated;
+use Railroad\Usora\Events\UserDeleted;
+use Railroad\Usora\Events\UserUpdated;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Requests\UserCreateRequest;
@@ -84,6 +87,8 @@ class UserController extends Controller
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
+        event(new UserCreated($user));
+
         $message = ['success' => true];
 
         return $request->has('redirect') ?
@@ -111,6 +116,7 @@ class UserController extends Controller
         }
 
         $user = $this->userRepository->find($id);
+        $oldUser = clone($user);
 
         if (empty($user)) {
             throw new NotFoundHttpException();
@@ -127,6 +133,8 @@ class UserController extends Controller
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        event(new UserUpdated($user, $oldUser));
 
         $message = ['success' => true];
 
@@ -156,6 +164,8 @@ class UserController extends Controller
         if (!is_null($user)) {
             $this->entityManager->remove($user);
             $this->entityManager->flush();
+
+            event(new UserDeleted($user));
         }
 
         $message = ['success' => true];
