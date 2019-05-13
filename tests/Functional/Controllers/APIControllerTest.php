@@ -49,6 +49,8 @@ class APIControllerTest extends UsoraTestCase
 
         $this->assertArrayHasKey('token', $response->decodeResponseJson());
         $this->assertArrayHasKey('userId', $response->decodeResponseJson());
+        $this->assertEquals('bearer', $response->decodeResponseJson()['tokenType']);
+        $this->assertEquals(3600, $response->decodeResponseJson()['expiresIn']);
     }
 
     public function test_invalid_credentials_auth()

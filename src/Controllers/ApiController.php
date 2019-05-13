@@ -55,6 +55,8 @@ class ApiController extends Controller
                 'success' => true,
                 'token' => $jwt_token,
                 'userId' => auth()->id(),
+                'tokenType' => 'bearer',
+                'expiresIn' => $this->jwtAuth->factory()->getTTL() * 60,
             ]
         );
     }
