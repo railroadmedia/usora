@@ -1,6 +1,6 @@
 <?php
 
-namespace Railroad\Usora\Events;
+namespace Railroad\Usora\Events\User;
 
 use Railroad\Usora\Entities\User;
 
