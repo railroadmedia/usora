@@ -8,6 +8,7 @@ use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
+use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -175,7 +176,8 @@ class UsoraServiceProvider extends ServiceProvider
         $ormConfiguration->setProxyDir($proxyDir);
         $ormConfiguration->setProxyNamespace('DoctrineProxies');
         $ormConfiguration->setAutoGenerateProxyClasses(
-            config('usora.development_mode')
+            config('usora.development_mode') ? AbstractProxyFactory::AUTOGENERATE_ALWAYS :
+                AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS
         );
         $ormConfiguration->setMetadataDriverImpl($driverChain);
         $ormConfiguration->setNamingStrategy(
@@ -193,7 +195,8 @@ class UsoraServiceProvider extends ServiceProvider
                 'password' => config('usora.database_password'),
                 'host' => config('usora.database_host'),
             ];
-        } else {
+        }
+        else {
             $databaseOptions = [
                 'driver' => config('usora.database_driver'),
                 'user' => config('usora.database_user'),
