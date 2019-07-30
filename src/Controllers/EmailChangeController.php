@@ -131,7 +131,7 @@ class EmailChangeController extends Controller
         $emailChangeData = $this->emailChangeRepository->findOneBy(['token' => $request->get('token')]);
 
         if (Carbon::parse(
-                $emailChangeData->getCreatedAt()
+                $emailChangeData->getUpdatedAt()
                     ->format('Y-m-d H:i:s')
             ) <
             Carbon::now()
