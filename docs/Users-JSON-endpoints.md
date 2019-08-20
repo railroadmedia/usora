@@ -1,5 +1,40 @@
 # Users-JSON-endpoints
 
+- [JSON Endpoints](#json-endpoints)
+  * [Pull users](#pull-users)
+    + [HTTP Request](#http-request)
+    + [Permissions](#permissions)
+    + [Request Parameters](#request-parameters)
+    + [Request Example:](#request-example-)
+    + [Response Example (200):](#response-example--200--)
+  * [Pull user](#pull-user)
+    + [HTTP Request](#http-request-1)
+    + [Permissions](#permissions-1)
+    + [Request Parameters](#request-parameters-1)
+    + [Request Example:](#request-example--1)
+    + [Response Example (200):](#response-example--200---1)
+  * [Create new user](#create-new-user)
+    + [HTTP Request](#http-request-2)
+    + [Permissions](#permissions-2)
+    + [Request Parameters](#request-parameters-2)
+    + [Validation Rules](#validation-rules)
+    + [Request Example:](#request-example--2)
+    + [Response Example (200):](#response-example--200---2)
+  * [Update an existing user.](#update-an-existing-user)
+    + [HTTP Request](#http-request-3)
+    + [Permissions](#permissions-3)
+    + [Request Parameters](#request-parameters-3)
+    + [Validation Rules](#validation-rules-1)
+    + [Request Example:](#request-example--3)
+    + [Response Example (200):](#response-example--200---3)
+  * [Delete an user](#delete-an-user)
+    + [HTTP Request](#http-request-4)
+    + [Permissions](#permissions-4)
+    + [Request Parameters](#request-parameters-4)
+    + [Request Example:](#request-example--4)
+    + [Response Example (404)](#response-example--404-)
+
+
 # JSON Endpoints
 
 
@@ -33,7 +68,7 @@ $.ajax({
     url: 'https://www.domain.com' +
              '/usora/json-api/user/index',
 {
-    "search_term": "iusto",
+    "search_term": "nisi",
     "per_page": 2,
     "page": 1,
     "sort": "createdAt"
@@ -274,7 +309,7 @@ $.ajax({
 |body|data.attributes.password|    |string |
 |body|data.attributes.first_name|    ||
 |body|data.attributes.last_name|    ||
-|body|data.attributes.data.attributes.gender|    ||
+|body|data.attributes.gender|    ||
 |body|data.attributes.country|    ||
 |body|data.attributes.region|    ||
 |body|data.attributes.city|    ||
@@ -364,20 +399,16 @@ $.ajax({
             "password": "John",
             "first_name": "John",
             "last_name": "Snow",
-            "data": {
-                "attributes": {
-                    "gender": "female"
-                }
-            },
-            "country": "rerum",
-            "region": "corrupti",
-            "city": "magnam",
+            "gender": "female",
+            "country": "nemo",
+            "region": "deleniti",
+            "city": "ut",
             "birthday": "2019-05-21 21:20:10",
             "phone_number": "0045124512",
-            "biography": "ut",
+            "biography": "debitis",
             "profile_picture_url": "''",
-            "timezone": "totam",
-            "permission_level": 6,
+            "timezone": "eveniet",
+            "permission_level": 12,
             "notify_on_lesson_comment_reply": [],
             "notify_weekly_update": [],
             "notify_on_forum_post_like": [],
@@ -474,7 +505,7 @@ $.ajax({
 |body|data.attributes.display_name|    ||
 |body|data.attributes.first_name|    ||
 |body|data.attributes.last_name|    ||
-|body|data.attributes.data.attributes.gender|    ||
+|body|data.attributes.gender|    ||
 |body|data.attributes.country|    ||
 |body|data.attributes.region|    ||
 |body|data.attributes.city|    ||
@@ -565,20 +596,16 @@ $.ajax({
             "display_name": "John Snow",
             "first_name": "John",
             "last_name": "Snow",
-            "data": {
-                "attributes": {
-                    "gender": "female"
-                }
-            },
-            "country": "incidunt",
-            "region": "molestias",
-            "city": "velit",
+            "gender": "female",
+            "country": "doloribus",
+            "region": "libero",
+            "city": "ut",
             "birthday": "2019-05-21 21:20:10",
             "phone_number": "0045124512",
-            "biography": "aut",
+            "biography": "eius",
             "profile_picture_url": "''",
-            "timezone": "voluptatem",
-            "permission_level": 7,
+            "timezone": "assumenda",
+            "permission_level": 3,
             "notify_on_lesson_comment_reply": [],
             "notify_weekly_update": [],
             "notify_on_forum_post_like": [],
@@ -683,12 +710,9 @@ $.ajax({
 });
 ```
 
-### Response Example (404):
+### Response Example (404)
 
 ```json
-{
-    "message": ""
-}
 ```
 
 
