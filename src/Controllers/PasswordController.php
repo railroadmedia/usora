@@ -58,6 +58,12 @@ class PasswordController extends Controller
     /**
      * Reset the given user's password.
      *
+     * @permission Must be logged in
+     * @permission Only users with edit-users ability
+     *
+     * @bodyParam current_password required
+     * @bodyParam new_password required
+     *
      * @param  Request $request
      * @return RedirectResponse
      * @throws NotAllowedException

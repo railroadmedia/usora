@@ -26,6 +26,12 @@ use ReflectionException;
 use Spatie\Fractal\Fractal;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Class UserJsonController
+ *
+ * @package Railroad\Usora\Controllers
+ * @group Users-JSON-endpoints
+ */
 class UserJsonController extends Controller
 {
     /**
@@ -76,8 +82,125 @@ class UserJsonController extends Controller
     }
 
     /**
+     * Pull users
+     *
+     * @permission Must be logged in
+     * @permission Only users with index-users ability
+     * @bodyParam search_term string
+     * @bodyParam per_page integer Default:25 Example:2
+     * @bodyParam page integer Default:1 Example:1
+     * @bodyParam sort string Default:createdAt Example:createdAt
      * @param Request $request
      * @return Fractal
+     * @response {
+     * "data": [
+     * {
+     * "type": "user",
+     * "id": "154105",
+     * "attributes": {
+     * "email": "03elijah.brown@gmail.com",
+     * "display_name": "03elijah.brown8837",
+     * "created_at": "2019-04-30 18:41:13",
+     * "updated_at": "2019-05-23 15:56:21",
+     * "first_name": null,
+     * "last_name": null,
+     * "gender": "",
+     * "country": null,
+     * "region": null,
+     * "city": null,
+     * "birthday": null,
+     * "phone_number": "",
+     * "biography": null,
+     * "profile_picture_url": "",
+     * "timezone": "",
+     * "permission_level": null,
+     * "drums_playing_since_year": null,
+     * "drums_gear_photo": "",
+     * "drums_gear_cymbal_brands": null,
+     * "drums_gear_set_brands": null,
+     * "drums_gear_hardware_brands": null,
+     * "drums_gear_stick_brands": null,
+     * "guitar_playing_since_year": null,
+     * "guitar_gear_photo": "",
+     * "guitar_gear_guitar_brands": null,
+     * "guitar_gear_amp_brands": null,
+     * "guitar_gear_pedal_brands": null,
+     * "guitar_gear_string_brands": null,
+     * "piano_playing_since_year": null,
+     * "piano_gear_photo": "",
+     * "piano_gear_piano_brands": null,
+     * "piano_gear_keyboard_brands": null,
+     * "notify_on_lesson_comment_reply": true,
+     * "notify_weekly_update": true,
+     * "notify_on_forum_post_like": true,
+     * "notify_on_forum_followed_thread_reply": true,
+     * "notify_on_forum_post_reply": true,
+     * "notify_on_lesson_comment_like": true,
+     * "notifications_summary_frequency_minutes": null
+     * }
+     * },
+     * {
+     * "type": "user",
+     * "id": "151248",
+     * "attributes": {
+     * "email": "08borda25@gmail.com",
+     * "display_name": "borda91",
+     * "created_at": "2017-05-27 23:46:12",
+     * "updated_at": "2019-04-01 00:41:14",
+     * "first_name": null,
+     * "last_name": null,
+     * "gender": "",
+     * "country": null,
+     * "region": null,
+     * "city": null,
+     * "birthday": null,
+     * "phone_number": "",
+     * "biography": null,
+     * "profile_picture_url": "",
+     * "timezone": "",
+     * "permission_level": null,
+     * "drums_playing_since_year": null,
+     * "drums_gear_photo": "",
+     * "drums_gear_cymbal_brands": null,
+     * "drums_gear_set_brands": null,
+     * "drums_gear_hardware_brands": null,
+     * "drums_gear_stick_brands": null,
+     * "guitar_playing_since_year": null,
+     * "guitar_gear_photo": "",
+     * "guitar_gear_guitar_brands": null,
+     * "guitar_gear_amp_brands": null,
+     * "guitar_gear_pedal_brands": null,
+     * "guitar_gear_string_brands": null,
+     * "piano_playing_since_year": null,
+     * "piano_gear_photo": "",
+     * "piano_gear_piano_brands": null,
+     * "piano_gear_keyboard_brands": null,
+     * "notify_on_lesson_comment_reply": true,
+     * "notify_weekly_update": true,
+     * "notify_on_forum_post_like": true,
+     * "notify_on_forum_followed_thread_reply": true,
+     * "notify_on_forum_post_reply": true,
+     * "notify_on_lesson_comment_like": true,
+     * "notifications_summary_frequency_minutes": null
+     * }
+     * }
+     * ],
+     * "meta": {
+     * "pagination": {
+     * "total": 5825,
+     * "count": 2,
+     * "per_page": 2,
+     * "current_page": 1,
+     * "total_pages": 2913
+     * }
+     * },
+     * "links": {
+     * "self": "https:\/\/dev.musora.com\/usora\/json-api\/user\/index?limit=2&page=1&sort=email&per_page=2",
+     * "first": "https:\/\/dev.musora.com\/usora\/json-api\/user\/index?limit=2&page=1&sort=email&per_page=2",
+     * "next": "https:\/\/dev.musora.com\/usora\/json-api\/user\/index?limit=2&page=2&sort=email&per_page=2",
+     * "last": "https:\/\/dev.musora.com\/usora\/json-api\/user\/index?limit=2&page=2913&sort=email&per_page=2"
+     * }
+     * }
      */
     public function index(Request $request)
     {
@@ -121,6 +244,59 @@ class UserJsonController extends Controller
     }
 
     /**
+     * Pull user
+     *
+     * @queryParam id required Example:151248
+     *
+     * @permission Must be logged in
+     * @permission Only user with show-users ability
+     * @response {
+     * "data": {
+     * "type": "user",
+     * "id": "151248",
+     * "attributes": {
+     * "email": "08borda25@gmail.com",
+     * "display_name": "borda91",
+     * "created_at": "2017-05-27 23:46:12",
+     * "updated_at": "2019-04-01 00:41:14",
+     * "first_name": null,
+     * "last_name": null,
+     * "gender": "",
+     * "country": null,
+     * "region": null,
+     * "city": null,
+     * "birthday": null,
+     * "phone_number": "",
+     * "biography": null,
+     * "profile_picture_url": "",
+     * "timezone": "",
+     * "permission_level": null,
+     * "drums_playing_since_year": null,
+     * "drums_gear_photo": "",
+     * "drums_gear_cymbal_brands": null,
+     * "drums_gear_set_brands": null,
+     * "drums_gear_hardware_brands": null,
+     * "drums_gear_stick_brands": null,
+     * "guitar_playing_since_year": null,
+     * "guitar_gear_photo": "",
+     * "guitar_gear_guitar_brands": null,
+     * "guitar_gear_amp_brands": null,
+     * "guitar_gear_pedal_brands": null,
+     * "guitar_gear_string_brands": null,
+     * "piano_playing_since_year": null,
+     * "piano_gear_photo": "",
+     * "piano_gear_piano_brands": null,
+     * "piano_gear_keyboard_brands": null,
+     * "notify_on_lesson_comment_reply": true,
+     * "notify_weekly_update": true,
+     * "notify_on_forum_post_like": true,
+     * "notify_on_forum_followed_thread_reply": true,
+     * "notify_on_forum_post_reply": true,
+     * "notify_on_lesson_comment_like": true,
+     * "notifications_summary_frequency_minutes": null
+     * }
+     * }
+     * }
      * @param integer $id
      * @return Fractal
      */
@@ -135,13 +311,64 @@ class UserJsonController extends Controller
         return ResponseService::userJson($user);
     }
 
-    /**
+    /** Create new user
+     *
      * @param UserJsonCreateRequest $request
      * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
      * @throws DBALException
      * @throws ReflectionException
+     *
+     * @permission Must be logged in
+     * @permission Only user with create-users ability
+     * @response {
+     * "data": {
+     * "type": "user",
+     * "id": "151248",
+     * "attributes": {
+     * "email": "08borda25@gmail.com",
+     * "display_name": "borda91",
+     * "created_at": "2017-05-27 23:46:12",
+     * "updated_at": "2019-04-01 00:41:14",
+     * "first_name": null,
+     * "last_name": null,
+     * "gender": "",
+     * "country": null,
+     * "region": null,
+     * "city": null,
+     * "birthday": null,
+     * "phone_number": "",
+     * "biography": null,
+     * "profile_picture_url": "",
+     * "timezone": "",
+     * "permission_level": null,
+     * "drums_playing_since_year": null,
+     * "drums_gear_photo": "",
+     * "drums_gear_cymbal_brands": null,
+     * "drums_gear_set_brands": null,
+     * "drums_gear_hardware_brands": null,
+     * "drums_gear_stick_brands": null,
+     * "guitar_playing_since_year": null,
+     * "guitar_gear_photo": "",
+     * "guitar_gear_guitar_brands": null,
+     * "guitar_gear_amp_brands": null,
+     * "guitar_gear_pedal_brands": null,
+     * "guitar_gear_string_brands": null,
+     * "piano_playing_since_year": null,
+     * "piano_gear_photo": "",
+     * "piano_gear_piano_brands": null,
+     * "piano_gear_keyboard_brands": null,
+     * "notify_on_lesson_comment_reply": true,
+     * "notify_weekly_update": true,
+     * "notify_on_forum_post_like": true,
+     * "notify_on_forum_followed_thread_reply": true,
+     * "notify_on_forum_post_reply": true,
+     * "notify_on_lesson_comment_like": true,
+     * "notifications_summary_frequency_minutes": null
+     * }
+     * }
+     * }
      */
     public function store(UserJsonCreateRequest $request)
     {
@@ -162,7 +389,8 @@ class UserJsonController extends Controller
             ->respond(201);
     }
 
-    /**
+    /**  Update an existing user.
+     *
      * @param UserJsonUpdateRequest $request
      * @param integer $id
      * @return JsonResponse
@@ -170,6 +398,59 @@ class UserJsonController extends Controller
      * @throws ORMException
      * @throws OptimisticLockException
      * @throws ReflectionException
+     *
+     * @permission Must be logged in
+     * @permission Must have the update-users permission to update
+     *
+     * @queryParam user_id required Example:1
+     *
+     * @response {
+     * "data": {
+     * "type": "user",
+     * "id": "151248",
+     * "attributes": {
+     * "email": "08borda25@gmail.com",
+     * "display_name": "borda91",
+     * "created_at": "2017-05-27 23:46:12",
+     * "updated_at": "2019-04-01 00:41:14",
+     * "first_name": null,
+     * "last_name": null,
+     * "gender": "",
+     * "country": null,
+     * "region": null,
+     * "city": null,
+     * "birthday": null,
+     * "phone_number": "",
+     * "biography": null,
+     * "profile_picture_url": "",
+     * "timezone": "",
+     * "permission_level": null,
+     * "drums_playing_since_year": null,
+     * "drums_gear_photo": "",
+     * "drums_gear_cymbal_brands": null,
+     * "drums_gear_set_brands": null,
+     * "drums_gear_hardware_brands": null,
+     * "drums_gear_stick_brands": null,
+     * "guitar_playing_since_year": null,
+     * "guitar_gear_photo": "",
+     * "guitar_gear_guitar_brands": null,
+     * "guitar_gear_amp_brands": null,
+     * "guitar_gear_pedal_brands": null,
+     * "guitar_gear_string_brands": null,
+     * "piano_playing_since_year": null,
+     * "piano_gear_photo": "",
+     * "piano_gear_piano_brands": null,
+     * "piano_gear_keyboard_brands": null,
+     * "notify_on_lesson_comment_reply": true,
+     * "notify_weekly_update": true,
+     * "notify_on_forum_post_like": true,
+     * "notify_on_forum_followed_thread_reply": true,
+     * "notify_on_forum_post_reply": true,
+     * "notify_on_lesson_comment_like": true,
+     * "notifications_summary_frequency_minutes": null
+     * }
+     * }
+     * }
      */
     public function update(UserJsonUpdateRequest $request, $id)
     {
@@ -204,11 +485,17 @@ class UserJsonController extends Controller
             ->respond(200);
     }
 
-    /**
+    /** Delete an user
+     *
      * @param integer $id
      * @return JsonResponse
      * @throws ORMException
      * @throws OptimisticLockException
+     *
+     * @permission Must be logged in
+     * @permission Must have the delete-users permission to delete
+     *
+     * @queryParam user_id required Example:1
      */
     public function delete($id)
     {

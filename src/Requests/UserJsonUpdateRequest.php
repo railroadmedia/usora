@@ -2,6 +2,35 @@
 
 namespace Railroad\Usora\Requests;
 
+/**
+ * Class UserJsonUpdateRequest
+ *
+ * @package Railroad\Usora\Requests
+ *
+ * @bodyParam data.type string required  Must be 'user'. Example: user
+ * @bodyParam data.attributes.email string Example:test@test.te
+ * @bodyParam data.attributes.display_name string  Example:John Snow
+ * @bodyParam data.attributes.first_name string  Example:John
+ * @bodyParam data.attributes.last_name string Example:Snow
+
+ * @bodyParam data.attributes.gender string  Example:female
+ * @bodyParam data.attributes.country string
+ * @bodyParam data.attributes.region string
+ * @bodyParam data.attributes.city string
+ * @bodyParam data.attributes.birthday datetime Example:2019-05-21 21:20:10
+ * @bodyParam data.attributes.phone_number string Example:0045124512
+ * @bodyParam data.attributes.biography text
+ * @bodyParam data.attributes.profile_picture_url string Example:''
+ * @bodyParam data.attributes.timezone string
+ * @bodyParam data.attributes.permission_level integer
+ * @bodyParam data.attributes.notify_on_lesson_comment_reply boolean Example:true
+ * @bodyParam data.attributes.notify_weekly_update boolean Example:true
+ * @bodyParam data.attributes.notify_on_forum_post_like boolean Example:true
+ * @bodyParam data.attributes.notify_on_forum_followed_thread_reply boolean Example:true
+ * @bodyParam data.attributes.notify_on_forum_post_reply boolean Example:true
+ * @bodyParam data.attributes.notify_on_lesson_comment_like boolean Example:true
+ * @bodyParam data.attributes.notifications_summary_frequency_minutes boolean Example:true
+ */
 class UserJsonUpdateRequest extends FormRequest
 {
     /**

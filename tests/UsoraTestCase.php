@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use MikeMcLin\WpPassword\WpPasswordProvider;
+use Mpociot\ApiDoc\ApiDocGeneratorServiceProvider;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Railroad\Doctrine\Hydrators\FakeDataHydrator;
@@ -140,6 +141,8 @@ class UsoraTestCase extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $defaultConfig = require(__DIR__ . '/../config/usora.php');
+        $apiDocConfig = require(__DIR__ . '/../config/apidoc.php');
+
 
         foreach ($defaultConfig as $key => $value) {
             config()->set('usora.' . $key, $value);
@@ -209,6 +212,13 @@ class UsoraTestCase extends TestCase
         config()->set('permissions.table_users', config('usora.tables.users'));
         config()->set('permissions.brand', 'drumeo');
 
+        //apidoc
+        $app['config']->set('apidoc.output', $apiDocConfig['output']);
+        $app['config']->set('apidoc.routes', $apiDocConfig['routes']);
+        $app['config']->set('apidoc.example_languages', $apiDocConfig['example_languages']);
+        $app['config']->set('apidoc.fractal', $apiDocConfig['fractal']);
+
         $app->register(WpPasswordProvider::class);
+        $app->register(ApiDocGeneratorServiceProvider::class);
     }
 }
