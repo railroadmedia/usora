@@ -19,6 +19,12 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\JWTAuth;
 
+/**
+ * Class ApiController
+ *
+ * @package Railroad\Usora\Controllers
+ * @group APP endpoints
+ */
 class ApiController extends Controller
 {
     /**
@@ -57,7 +63,26 @@ class ApiController extends Controller
     }
 
     /**
+     * User login
+     *
      * @param Request $request
+     *
+     * @permission Without restrictions
+     * @bodyParam email string required Example:email@email.ro
+     * @bodyParam password string required Example: password
+     * @response {
+     * "success": true,
+     * "token":
+     *     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvZGV2LmRydW1lby5jb21cL2xhcmF2ZWxcL3B1YmxpY1wvYXBpXC9sb2dpbiIsImlhdCI6MTU2NTcwNDczNiwiZXhwIjoxNTY1NzA4MzM2LCJuYmYiOjE1NjU3MDQ3MzYsImp0aSI6Im8yMWJFaVU3WUcyS3VCa0wiLCJzdWIiOjE0OTYyOCwicHJ2IjoiOWY4YTIzODlhMjBjYTA3NTJhYTllOTUwOTM1MTU1MTdlOTBlMTk0YyJ9.ayJrvjNMrfDg78Aedglp6sEEoz6jzMLbHl7Gcy6Cygg",
+     * "isEdge": true,
+     * "isEdgeExpired": false,
+     * "edgeExpirationDate": null,
+     * "isPackOwner": true,
+     * "tokenType": "bearer",
+     * "expiresIn": 3600,
+     * "userId": 149628
+     * }
+     *
      * @return JsonResponse
      */
     public function login(Request $request)
@@ -88,8 +113,17 @@ class ApiController extends Controller
     }
 
     /**
+     * Logout the authenticated user and invalidate the jwt token
+     *
+     * @permission Only authenticated user
      * @param Request $request
      * @return JsonResponse
+     *
+     * @response {
+     * "success": true,
+     * "message": "Successfully logged out"
+     * }
+     *
      */
     public function logout(Request $request)
     {
@@ -114,10 +148,37 @@ class ApiController extends Controller
         }
     }
 
-    /**
+    /** Get authenticated user
+     *
+     * @permission Only authenticated user
+     *
      * @param Request $request
      * @return Fractal
      * @throws JWTException
+     *
+     * @response {
+     * "id": 149628,
+     * "wordpressId": 152167,
+     * "ipbId": 150228,
+     * "email": "roxana.riza@artsoft-consult.ro",
+     * "permission_level": "administrator",
+     * "login_username": "roxana.riza@artsoft-consult.ro",
+     * "display_name": "Roxana",
+     * "first_name": "Roxana",
+     * "last_name": "",
+     * "gender": "",
+     * "country": "Romania",
+     * "region": "",
+     * "city": "",
+     * "birthday": "2017-07-04 00:00:00",
+     * "phone_number": "",
+     * "bio": "",
+     * "created_at": "2017-07-31 22:54:41",
+     * "updated_at": "2019-08-01 07:05:50",
+     * "avatarUrl": "https:\/\/drumeo-profile-images.s3.us-west-2.amazonaws.com\/149628_avatar_url_1563362703.jpeg",
+     * "totalXp": 54280,
+     * "xpRank": "Master II"
+     * }
      */
     public function getAuthUser(Request $request)
     {
@@ -146,10 +207,20 @@ class ApiController extends Controller
         return ResponseService::userArray($user);
     }
 
-    /**Send the password reset link to the user
+    /**
+     * Send the password reset link to the user
+     *
+     * @permission Without restrictions
+     * @bodyParam email string required Example:email@email.ro
+     * @response {
+     * "success": true,
+     * "title": "Please check your email",
+     * "message": "Follow the instructions sent to your email address to reset your password."
+     * }
      *
      * @param Request $request
      * @return JsonResponse
+     *
      */
     public function forgotPassword(Request $request)
     {
@@ -203,6 +274,32 @@ class ApiController extends Controller
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \ReflectionException
+     *
+     * @permission Only authenticated user
+     * @response
+     * {
+     * "id": 149628,
+     * "wordpressId": 152167,
+     * "ipbId": 150228,
+     * "email": "roxana.riza@artsoft-consult.ro",
+     * "permission_level": "administrator",
+     * "login_username": "roxana.riza@artsoft-consult.ro",
+     * "display_name": "Roxana",
+     * "first_name": "Roxana",
+     * "last_name": "",
+     * "gender": "",
+     * "country": "Romania",
+     * "region": "",
+     * "city": "",
+     * "birthday": "2017-07-04 00:00:00",
+     * "phone_number": "",
+     * "bio": "",
+     * "created_at": "2017-07-31 22:54:41",
+     * "updated_at": "2019-08-01 07:05:50",
+     * "avatarUrl": "https:\/\/drumeo-profile-images.s3.us-west-2.amazonaws.com\/149628_avatar_url_1563362703.jpeg",
+     * "totalXp": 54280,
+     * "xpRank": "Master II"
+     * }
      */
     public function updateUser(UserJsonUpdateRequest $request)
     {

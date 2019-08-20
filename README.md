@@ -2,6 +2,26 @@
 
 Usora is a user management system including auth, user settings, user information, and single sign on.
 
+- [Usora](#usora)
+  * [How To Install](#how-to-install)
+  * [Single Sign On](#single-sign-on)
+    + [How it Works](#how-it-works)
+  * [API Reference](#api-reference)
+    + [User Form API](#user-form-api)
+    + [Email Change Form API](#email-change-form-api)
+  * [JSON endpoints](docs/Users-JSON-endpoints.md#json-endpoints)
+      + [Pull users](docs/Users-JSON-endpoints.md#pull-users)
+      + [Show user](docs/Users-JSON-endpoints.md#pull-user)
+      + [Create new user](docs/Users-JSON-endpoints.md#create-new-user)
+      + [Update an existing user.](docs/Users-JSON-endpoints.md#update-an-existing-user)
+      + [Delete an user](docs/Users-JSON-endpoints.md#delete-an-user)
+  * [APP endpoints](docs/APP-endpoints.md#app-endpoints)
+     + [User login](docs/APP-endpoints.md#user-login)
+     + [Logout the authenticated user and invalidate the jwt token](docs/APP-endpoints.md##logout-the-authenticated-user-and-invalidate-the-jwt-token)
+     + [Get authenticated user](docs/APP-endpoints.md#get-authenticated-user)
+     + [Send the password reset link to the user](docs/APP-endpoints.md#send-the-password-reset-link-to-the-user)
+     + [Update user profile](docs/APP-endpoints.md#usora-api-profile-update)
+
 ## How To Install
 
 1. composer require railroad/usora
