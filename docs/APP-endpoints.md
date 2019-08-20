@@ -25,7 +25,7 @@
     + [Request Parameters](#request-parameters-3)
     + [Request Example:](#request-example--3)
     + [Response Example (200):](#response-example--200---3)
-  * [usora/api/profile/update](#usora-api-profile-update)
+  * [Update user profile](#usora-api-profile-update)
     + [HTTP Request](#http-request-4)
     + [Permissions](#permissions-4)
     + [Request Parameters](#request-parameters-4)
