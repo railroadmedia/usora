@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\MessageBag;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\UserRepository;
 
@@ -73,6 +74,8 @@ class ResetPasswordController extends Controller
                         event(new PasswordReset($user));
 
                         auth()->loginUsingId($user->getId());
+
+                        event(new UserEvent($user->getId(), 'authenticated'));
                     }
                 );
 
