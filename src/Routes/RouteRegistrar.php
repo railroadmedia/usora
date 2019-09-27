@@ -233,15 +233,25 @@ class RouteRegistrar
         $this->router->group(
             [
                 'prefix' => config('usora.route_prefix'),
-                'middleware' => config('usora.route_middleware_logged_in_groups'),
+                'middleware' => config('usora.route_middleware_app_logged_in_groups'),
             ],
             function () {
-                $this->router->put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
                 $this->router->put('api/logout', \Railroad\Usora\Controllers\ApiController::class . '@logout');
                 $this->router->put('api/profile', \Railroad\Usora\Controllers\ApiController::class . '@getAuthUser');
-                $this->router->put('api/forgot', \Railroad\Usora\Controllers\ApiController::class . '@forgotPassword');
                 $this->router->post('api/profile/update', \Railroad\Usora\Controllers\ApiController::class . '@updateUser');
             }
         );
+
+        $this->router->group(
+            [
+                'prefix' => config('usora.route_prefix'),
+            ],
+            function () {
+                $this->router->put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
+                $this->router->put('api/forgot', \Railroad\Usora\Controllers\ApiController::class . '@forgotPassword');
+            }
+        );
+
+
     }
 }

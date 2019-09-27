@@ -44,6 +44,7 @@ return [
     'autoload_all_routes' => true,
     'route_middleware_public_groups' => ['usora_public'],
     'route_middleware_logged_in_groups' => ['usora_logged_in'],
+    'route_middleware_app_logged_in_groups' => ['app_authed'],
     'route_prefix' => 'usora',
 
     // authentication domains
