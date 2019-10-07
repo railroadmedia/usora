@@ -329,6 +329,7 @@ $.ajax({
 |body|data.attributes.notify_on_forum_post_reply|    ||
 |body|data.attributes.notify_on_lesson_comment_like|    ||
 |body|data.attributes.notifications_summary_frequency_minutes|    ||
+|body|data.attributes.support_note|    |string|
 
 ### Validation Rules
 ```php
@@ -525,6 +526,7 @@ $.ajax({
 |body|data.attributes.notify_on_forum_post_reply|    ||
 |body|data.attributes.notify_on_lesson_comment_like|    ||
 |body|data.attributes.notifications_summary_frequency_minutes|    ||
+|body|data.attributes.support_note|    |string|
 
 ### Validation Rules
 ```php
