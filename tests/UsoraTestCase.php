@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Tests;
 
+use App\Providers\EcommerceUserProvider;
 use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\AuthManager;
@@ -19,12 +20,14 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Railroad\Doctrine\Hydrators\FakeDataHydrator;
 use Railroad\Doctrine\Providers\DoctrineServiceProvider;
+use Railroad\DoctrineArrayHydrator\Contracts\UserProviderInterface;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Faker\Factory;
 use Railroad\Usora\Faker\Faker;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\UserRepository;
+use Railroad\Usora\Tests\Providers\UsoraTestingUserProvider;
 
 class UsoraTestCase extends TestCase
 {
@@ -130,6 +133,8 @@ class UsoraTestCase extends TestCase
 
         $this->app['router']->middlewareGroup('test_public_route_group', []);
         $this->app['router']->middlewareGroup('test_logged_in_route_group', []);
+
+        $this->app->instance(UserProviderInterface::class, app()->make(UsoraTestingUserProvider::class));
     }
 
     /**

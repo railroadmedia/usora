@@ -137,6 +137,7 @@ class UserJsonController extends Controller
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
      * "notifications_summary_frequency_minutes": null
+     * "support_note": 'Text'
      * }
      * },
      * {
@@ -182,6 +183,7 @@ class UserJsonController extends Controller
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
      * "notifications_summary_frequency_minutes": null
+     * "support_note": 'Text'
      * }
      * }
      * ],
@@ -293,7 +295,8 @@ class UserJsonController extends Controller
      * "notify_on_forum_followed_thread_reply": true,
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
-     * "notifications_summary_frequency_minutes": null
+     * "notifications_summary_frequency_minutes": null,
+     * "support_note": 'Text'
      * }
      * }
      * }
@@ -365,7 +368,8 @@ class UserJsonController extends Controller
      * "notify_on_forum_followed_thread_reply": true,
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
-     * "notifications_summary_frequency_minutes": null
+     * "notifications_summary_frequency_minutes": null,
+     * "support_note": 'Text'
      * }
      * }
      * }
@@ -447,7 +451,8 @@ class UserJsonController extends Controller
      * "notify_on_forum_followed_thread_reply": true,
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
-     * "notifications_summary_frequency_minutes": null
+     * "notifications_summary_frequency_minutes": null,
+     * "support_note": null
      * }
      * }
      * }

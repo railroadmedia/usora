@@ -31,6 +31,7 @@ namespace Railroad\Usora\Requests;
  * @bodyParam data.attributes.notify_on_forum_post_reply boolean Example:true
  * @bodyParam data.attributes.notify_on_lesson_comment_like boolean Example:true
  * @bodyParam data.attributes.notifications_summary_frequency_minutes boolean Example:true
+ * @bodyParam data.attributes.support_note string Example:'Note Text'
  */
 class UserJsonCreateRequest extends FormRequest
 {
@@ -141,6 +142,7 @@ class UserJsonCreateRequest extends FormRequest
                 'data.attributes.piano_gear_photo',
                 'data.attributes.piano_gear_piano_brands',
                 'data.attributes.piano_gear_keyboard_brands',
+                'data.attributes.support_note',
             ]
         );
     }

@@ -141,6 +141,7 @@ class UserJsonUpdateRequest extends FormRequest
                 'data.attributes.piano_gear_photo',
                 'data.attributes.piano_gear_piano_brands',
                 'data.attributes.piano_gear_keyboard_brands',
+                'data.attributes.support_note',
             ]
         );
     }
