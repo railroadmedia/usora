@@ -5,6 +5,7 @@ namespace Railroad\Usora\Providers;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Cache\PhpFileCache;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
@@ -134,6 +135,9 @@ class UsoraServiceProvider extends ServiceProvider
         // redis cache instance is referenced in laravel container to be reused when needed
         app()->instance(RedisCache::class, $redisCache);
 
+        // file cache
+        $phpFileCache = new PhpFileCache($proxyDir);
+
         AnnotationRegistry::registerLoader('class_exists');
 
         $annotationReader = new AnnotationReader();
@@ -170,8 +174,8 @@ class UsoraServiceProvider extends ServiceProvider
         $eventManager->addEventSubscriber($timestampableListener);
 
         $ormConfiguration = new Configuration();
-        $ormConfiguration->setMetadataCacheImpl($redisCache);
-        $ormConfiguration->setQueryCacheImpl($redisCache);
+        $ormConfiguration->setMetadataCacheImpl($phpFileCache);
+        $ormConfiguration->setQueryCacheImpl($phpFileCache);
         $ormConfiguration->setResultCacheImpl($redisCache);
         $ormConfiguration->setProxyDir($proxyDir);
         $ormConfiguration->setProxyNamespace('DoctrineProxies');
