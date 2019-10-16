@@ -133,6 +133,7 @@ class UsoraTestCase extends TestCase
 
         $this->app['router']->middlewareGroup('test_public_route_group', []);
         $this->app['router']->middlewareGroup('test_logged_in_route_group', []);
+        $this->app['router']->middlewareGroup('app_authed', []);
 
         $this->app->instance(UserProviderInterface::class, app()->make(UsoraTestingUserProvider::class));
     }
