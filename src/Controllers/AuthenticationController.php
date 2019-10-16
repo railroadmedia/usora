@@ -230,8 +230,14 @@ class AuthenticationController extends Controller
         return view(
             'usora::authentication-check',
             [
-                'loginSuccessRedirectUrl' => url()->to(config('usora.login_success_redirect_path')),
-                'loginPageUrl' => session()->get('failure-redirect-url', url()->to(config('usora.login_page_path'))),
+                'loginSuccessRedirectUrl' => session()->get(
+                    'login-success-redirect-url',
+                    url()->to(config('usora.login_success_redirect_path'))
+                ),
+                'loginPageUrl' => session()->get(
+                    'login-page-url',
+                    url()->to(config('usora.login_page_path'))
+                ),
                 'domains' => $domains,
             ]
         );
