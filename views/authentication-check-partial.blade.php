@@ -112,7 +112,7 @@
 @foreach($domains as $domain)
     <iframe id="receiver"
             class="cookie-iframe"
-            src="https://{{ $domain }}/{{ ltrim(parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
+            src="https://{{ $domain }}/{{ ltrim(config('usora.post_verification_token_path') ?? parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
             style="width:0;height:0;border:0; border:none;">
     </iframe>
 @endforeach

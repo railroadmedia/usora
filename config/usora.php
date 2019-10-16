@@ -59,6 +59,9 @@ return [
         'sub.domain2.com',
     ],
 
+    // this must be used on drumeo website, on others the setting may be omited
+    'post_verification_token_path' => 'usora/authenticate/render-post-message-verification-token',
+
     // authentication
     'login_page_path' => 'login',
     'login_success_redirect_path' => 'my-restricted-area',
