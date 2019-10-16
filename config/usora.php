@@ -65,6 +65,7 @@ return [
     // authentication
     'login_page_path' => 'login',
     'login_success_redirect_path' => 'my-restricted-area',
+    'force_remember' => true,
 
     // how long until the remember tokens expire in seconds
     'remember_me_token_expiration_time' => 31536000, // 1 year

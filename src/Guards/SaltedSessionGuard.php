@@ -64,15 +64,15 @@ class SaltedSessionGuard extends SessionGuard
 
         $recaller = $this->recaller();
 
-//        if (is_null($this->user) && !is_null($recaller)) {
-//            $this->user = $this->userFromRecaller($recaller);
-//
-//            if ($this->user) {
-//                $this->login($this->user, true);
-//
-//                return $this->user;
-//            }
-//        }
+        if (is_null($this->user) && !is_null($recaller)) {
+            $this->user = $this->userFromRecaller($recaller);
+
+            if ($this->user) {
+                $this->login($this->user, true);
+
+                return $this->user;
+            }
+        }
 
         return null;
     }
@@ -86,16 +86,16 @@ class SaltedSessionGuard extends SessionGuard
     {
         $this->updateSession($user->getAuthIdentifier());
 
-//        if ($remember) {
-//            $this->createAndQueueRememberToken($user);
-//
-//            $this->getCookieJar()
-//                ->queue(
-//                    $this->createRecaller(
-//                        $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword()
-//                    )
-//                );
-//        }
+        if ($remember || config('usora.force_remember', false) == true) {
+            $this->createAndQueueRememberToken($user);
+
+            $this->getCookieJar()
+                ->queue(
+                    $this->createRecaller(
+                        $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword()
+                    )
+                );
+        }
 
         if (self::$updateSalt && empty($user->getSessionSalt())) {
             $salt = Str::random(60);
@@ -147,9 +147,9 @@ class SaltedSessionGuard extends SessionGuard
         $this->provider->updateSessionSalt($user, '');
 
         if (!is_null($this->user) && !empty($this->recaller())) {
-//            $recaller = $this->recaller();
-//
-//            $this->provider->deleteRememberToken($recaller->token(), $user->getAuthIdentifier());
+            $recaller = $this->recaller();
+
+            $this->provider->deleteRememberToken($recaller->token(), $user->getAuthIdentifier());
         }
 
         if (isset($this->events)) {
