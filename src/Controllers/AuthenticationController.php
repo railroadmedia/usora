@@ -86,7 +86,13 @@ class AuthenticationController extends Controller
                     ->withErrors($exception->errors());
         }
 
-        $request->attributes->set('remember', (boolean)$request->get('remember', false));
+        $remember = false;
+
+        if (config('usora.force_remember', false) == true || (boolean)$request->get('remember', false) == true) {
+            $remember = true;
+        }
+
+        $request->attributes->set('remember', $remember);
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
@@ -104,10 +110,7 @@ class AuthenticationController extends Controller
                     ->withErrors($errors);
         }
 
-        if (auth()->attempt(
-            $request->only('email', 'password'),
-            $request->get('remember', config('usora.force_remember', false))
-        )) {
+        if (auth()->attempt($request->only('email', 'password'), $remember)) {
             $user = $this->userRepository->find(auth()->id());
 
             foreach (config('usora.domains_to_authenticate_on') as $domain) {
@@ -131,10 +134,7 @@ class AuthenticationController extends Controller
                 if (WpPassword::check(trim($request->get('password')), $userByEmail->getPassword())) {
 
                     SaltedSessionGuard::$updateSalt = false;
-                    auth()->loginUsingId(
-                        $userByEmail->getId(),
-                        $request->get('remember', config('usora.force_remember', false))
-                    );
+                    auth()->loginUsingId($userByEmail->getId(), $remember);
 
                     foreach (config('usora.domains_to_authenticate_on') as $domain) {
                         ClientRelayService::authorizeUserOnDomain(
