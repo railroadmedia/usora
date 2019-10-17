@@ -62,7 +62,7 @@
 
         setTimeout(function () {
             window.location.replace(loginPageUrl);
-        }, 7000);
+        }, 9000);
 
         function extractHostname(url) {
             var hostname;

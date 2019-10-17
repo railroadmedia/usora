@@ -3,6 +3,7 @@
 namespace Railroad\Usora\Controllers;
 
 use Carbon\Carbon;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\Recaller;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\ValidationException;
 use MikeMcLin\WpPassword\Facades\WpPassword;
+use Railroad\Usora\Entities\RememberToken;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Guards\SaltedSessionGuard;
@@ -337,6 +339,14 @@ class AuthenticationController extends Controller
             $verificationToken = substr($verificationToken, 15);
 
             $rememberTokens = $user->getRememberTokens();
+
+            $iterator = $rememberTokens->getIterator();
+            $iterator->uasort(function (RememberToken $a, RememberToken $b) {
+                return ($a->getCreatedAt() > $b->getCreatedAt()) ? -1 : 1;
+            });
+
+            // only look at the last 15 tokens
+            $rememberTokens = new ArrayCollection(array_slice(iterator_to_array($iterator), 0, 20));
 
             foreach ($rememberTokens as $rememberToken) {
 
