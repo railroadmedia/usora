@@ -68,7 +68,7 @@ class SaltedSessionGuard extends SessionGuard
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
-                $this->login($this->user, true);
+                $this->login($this->user, false);
 
                 return $this->user;
             }
@@ -86,7 +86,7 @@ class SaltedSessionGuard extends SessionGuard
     {
         $this->updateSession($user->getAuthIdentifier());
 
-        if ($remember || config('usora.force_remember', false) == true) {
+        if ($remember) {
             $this->createAndQueueRememberToken($user);
 
             $this->getCookieJar()

@@ -104,7 +104,10 @@ class AuthenticationController extends Controller
                     ->withErrors($errors);
         }
 
-        if (auth()->attempt($request->only('email', 'password'), $request->get('remember', false))) {
+        if (auth()->attempt(
+            $request->only('email', 'password'),
+            $request->get('remember', config('usora.force_remember', false))
+        )) {
             $user = $this->userRepository->find(auth()->id());
 
             foreach (config('usora.domains_to_authenticate_on') as $domain) {
@@ -128,7 +131,10 @@ class AuthenticationController extends Controller
                 if (WpPassword::check(trim($request->get('password')), $userByEmail->getPassword())) {
 
                     SaltedSessionGuard::$updateSalt = false;
-                    auth()->loginUsingId($userByEmail->getId(), $request->get('remember', false));
+                    auth()->loginUsingId(
+                        $userByEmail->getId(),
+                        $request->get('remember', config('usora.force_remember', false))
+                    );
 
                     foreach (config('usora.domains_to_authenticate_on') as $domain) {
                         ClientRelayService::authorizeUserOnDomain(
@@ -281,7 +287,7 @@ class AuthenticationController extends Controller
                 ->getRecallerName()
         );
 
-        if (!empty($rememberTokenCookieValue) && auth()->viaRemember()) {
+        if (!empty($rememberTokenCookieValue)) {
             $recaller = new Recaller($rememberTokenCookieValue);
 
             $hash = 'remember_token|' . $this->hasher->make($user->getId() . $user->getPassword() . $recaller->token());
