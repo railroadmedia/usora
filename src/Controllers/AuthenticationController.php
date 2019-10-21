@@ -346,10 +346,12 @@ class AuthenticationController extends Controller
             });
 
             // only look at the last 15 tokens
+            // todo: only keep 25 remember tokens per user, delete previous ones after that?
             $rememberTokens = new ArrayCollection(array_slice(iterator_to_array($iterator), 0, 20));
 
             foreach ($rememberTokens as $rememberToken) {
 
+                // why is this hash checking so slow??
                 if ($this->hasher->check(
                         $user->getId() . $user->getPassword() . $rememberToken->getToken(),
                         $verificationToken

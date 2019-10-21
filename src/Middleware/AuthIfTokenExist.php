@@ -3,6 +3,7 @@
 namespace Railroad\Usora\Middleware;
 
 use Closure;
+use Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 use Tymon\JWTAuth\JWTAuth;
@@ -31,12 +32,16 @@ class AuthIfTokenExist extends BaseMiddleware
         if ($this->auth->parser()
             ->setRequest($request)
             ->hasToken()) {
-            $user =
-                $this->auth->parseToken()
-                    ->getPayload()
-                    ->get('sub');
+            try {
+                $user =
+                    $this->auth->parseToken()
+                        ->getPayload()
+                        ->get('sub');
 
-            auth()->loginUsingId($user, false);
+                auth()->loginUsingId($user, false);
+            } catch (Exception $exception) {
+
+            }
         }
 
         return $next($request);
