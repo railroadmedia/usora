@@ -2,9 +2,7 @@
 
 namespace Railroad\Usora\Repositories;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Managers\UsoraEntityManager;
 
@@ -28,5 +26,35 @@ class UserRepository extends EntityRepository
     public function __construct(UsoraEntityManager $em)
     {
         parent::__construct($em, $em->getClassMetadata(User::class));
+    }
+
+    /**
+     * @param array $ids
+     * @param bool $keyById
+     * @return User[]|array
+     */
+    public function findByIds(array $ids, $keyById = true)
+    {
+        $qb = $this->createQueryBuilder('user');
+
+        $users = $qb->where(
+            $qb->expr()
+                ->in('user.id', ':userIds')
+        )
+            ->setParameter('userIds', $ids)
+            ->getQuery()
+            ->getResult();
+
+        $usersKeyedById = [];
+
+        if ($keyById) {
+            foreach ($users as $user) {
+                $usersKeyedById[$user->getId()] = $user;
+            }
+
+            return $usersKeyedById;
+        }
+
+        return $users;
     }
 }
