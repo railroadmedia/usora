@@ -135,7 +135,6 @@ class AuthenticationController extends Controller
             if (!is_null($userByEmail)) {
                 if (WpPassword::check(trim($request->get('password')), $userByEmail->getPassword())) {
 
-                    SaltedSessionGuard::$updateSalt = false;
                     auth()->loginUsingId($userByEmail->getId(), $remember);
 
                     foreach (config('usora.domains_to_authenticate_on') as $domain) {

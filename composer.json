@@ -41,7 +41,7 @@
     "phpunit/phpunit": "^7.0",
     "orchestra/testbench": "~3.6",
     "fzaninotto/faker": "^1.4",
-    "mpociot/laravel-apidoc-generator": "dev-master"
+    "mpociot/laravel-apidoc-generator": "^3.1"
   },
   "autoload": {
     "psr-4": {
