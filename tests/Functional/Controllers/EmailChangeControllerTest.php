@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Railroad\Usora\DataFixtures\EmailChangeFixtureLoader;
 use Railroad\Usora\DataFixtures\UserFixtureLoader;
+use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest;
 use Railroad\Usora\Tests\UsoraTestCase;
 
@@ -29,21 +30,30 @@ class EmailChangeControllerTest extends UsoraTestCase
         Event::fake();
         Notification::fake();
 
-        $user = [
-            'email' => 'test+1@test.com',
-        ];
+        $user = new User();
+
+        $user->setEmail($this->faker->email);
+        $password = $this->faker->word;
+        $user->setPassword($password);
+        $user->setDisplayName($this->faker->word);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         $this->authManager->guard()
-            ->onceUsingId(1);
+            ->onceUsingId($user->getId());
 
         $newEmail = $this->faker->email;
 
-        $this->assertNotEquals($newEmail, $user['email']);
+        $this->assertNotEquals($newEmail, $user->getEmail());
 
         $response = $this->call(
             'POST',
             'usora/email-change/request',
-            ['email' => $newEmail]
+            [
+                'email' => $newEmail,
+                'user_password' => $password,
+            ]
         );
 
         $token = '';
@@ -69,7 +79,7 @@ class EmailChangeControllerTest extends UsoraTestCase
         $this->assertDatabaseHas(
             config('usora.tables.email_changes'),
             [
-                'user_id' => 1,
+                'user_id' => $user->getId(),
                 'email' => $newEmail,
                 'token' => $token,
             ]
@@ -116,7 +126,7 @@ class EmailChangeControllerTest extends UsoraTestCase
         );
 
         $response->assertSessionHasErrors(
-            ['email']
+            ['user_password']
         );
     }
 

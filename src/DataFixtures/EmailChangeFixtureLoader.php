@@ -32,6 +32,10 @@ class EmailChangeFixtureLoader implements FixtureInterface
         $emailChange2->setEmail('test_change2@test.com');
         $emailChange2->setToken('token2');
         $emailChange2->setUser($user2);
+        $emailChange2->setUpdatedAt(
+            Carbon::now()
+                ->subYear(1)
+        );
         $emailChange2->setCreatedAt(
             Carbon::now()
                 ->subYear(1)

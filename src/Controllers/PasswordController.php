@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
+use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Usora\Entities\User;
@@ -88,9 +89,12 @@ class PasswordController extends Controller
         /**
          * @var $user User
          */
-        $user = auth()->user();
+        $user = $this->userRepository->find(auth()->id());
 
-        if (!auth()->attempt(['email' => $user->getEmail(), 'password' => $request->get('current_password')])) {
+        if (
+            !$this->hasher->check($request->get('current_password'), $user->getPassword())
+            && !WpPassword::check(trim($request->get('current_password')), $user->getPassword())
+        ) {
             return redirect()
                 ->back()
                 ->withErrors(

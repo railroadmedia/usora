@@ -29,6 +29,7 @@ class EmailChangeRequest extends FormRequest
                 '.' .
                 config('usora.tables.users') .
                 ',email',
+            'user_password' => 'required|max:255',
         ];
     }
 }

@@ -6,12 +6,14 @@ use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\Entities\EmailChange;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
@@ -38,12 +40,21 @@ class EmailChangeController extends Controller
     private $userRepository;
 
     /**
+     * @var Hasher
+     */
+    private $hasher;
+
+    /**
      * EmailChangeController constructor.
      *
+     * @param Hasher $hasher
      * @param EntityManager $entityManager
      */
-    public function __construct(UsoraEntityManager $entityManager)
-    {
+    public function __construct(
+        Hasher $hasher,
+        UsoraEntityManager $entityManager
+    ) {
+        $this->hasher = $hasher;
         $this->entityManager = $entityManager;
 
         $this->userRepository = $this->entityManager->getRepository(User::class);
@@ -60,14 +71,26 @@ class EmailChangeController extends Controller
      */
     public function request(EmailChangeRequest $request)
     {
+        $user = $this->userRepository->find(auth()->id());
+
+        if (
+            !$this->hasher->check($request->get('user_password'), $user->getPassword())
+            && !WpPassword::check(trim($request->get('user_password')), $user->getPassword())
+        ) {
+            return redirect()
+                ->withInput($request->except('user_password'))
+                ->back()
+                ->withErrors(
+                    ['current_password' => 'The current password you entered is incorrect.']
+                );
+        }
+
         $payload = [
             'email' => $request->get('email'),
             'token' => $this->createNewToken($request->get('email')),
             'created_at' => Carbon::now()
                 ->toDateTimeString(),
         ];
-
-        $user = $this->userRepository->find(auth()->id());
 
         $emailChange = $this->emailChangeRepository->findOneBy(['user' => $user->getId()]);
 
@@ -136,6 +159,7 @@ class EmailChangeController extends Controller
             ) <
             Carbon::now()
                 ->subHours(config('usora.email_change_token_ttl'))) {
+
             return redirect()
                 ->back()
                 ->withErrors(['token' => 'Your email reset token has expired.']);
