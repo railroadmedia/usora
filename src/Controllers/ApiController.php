@@ -344,9 +344,9 @@ class ApiController extends Controller
         $user = $this->userRepository->findOneBy(['email' => $request->get('email')]);
 
         if ($user) {
-            return response()->json(['exists' => false]);
+            return response()->json(['exists' => true]);
         }
 
-        return response()->json(['exists' => true]);
+        return response()->json(['exists' => false]);
     }
 }

@@ -179,7 +179,7 @@ class APIControllerTest extends UsoraTestCase
         );
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertFalse($response->decodeResponseJson('exists'));
+        $this->assertTrue($response->decodeResponseJson('exists'));
     }
 
     public function test_is_email_unique_when_email_not_exists()
@@ -193,6 +193,6 @@ class APIControllerTest extends UsoraTestCase
         );
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(true, $response->decodeResponseJson('exists'));
+        $this->assertFalse($response->decodeResponseJson('exists'));
     }
 }
