@@ -157,4 +157,42 @@ class APIControllerTest extends UsoraTestCase
                 ->id()
         );
     }
+
+    public function test_is_email_unique()
+    {
+        $response = $this->call(
+            'GET',
+            'usora/is-email-unique'
+        );
+
+        $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    public function test_is_email_unique_when_email_exists()
+    {
+        $response = $this->call(
+            'GET',
+            'usora/is-email-unique',
+            [
+                'email' => 'login_user_test@email.com'
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertFalse($response->decodeResponseJson('exists'));
+    }
+
+    public function test_is_email_unique_when_email_not_exists()
+    {
+        $response = $this->call(
+            'GET',
+            'usora/is-email-unique',
+            [
+                'email' => 'login_usedr_test@email.com'
+            ]
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(true, $response->decodeResponseJson('exists'));
+    }
 }

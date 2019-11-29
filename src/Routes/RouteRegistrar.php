@@ -3,6 +3,7 @@
 namespace Railroad\Usora\Routes;
 
 use Illuminate\Routing\Router;
+use Railroad\Usora\Controllers\ApiController;
 use Railroad\Usora\Controllers\AuthenticationController;
 
 class RouteRegistrar
@@ -71,6 +72,11 @@ class RouteRegistrar
                 )
                     ->name('usora.authenticate.set-authentication-cookie');
 
+                $this->router->get(
+                    'is-email-unique',
+                    ApiController::class . '@isEmailUnique'
+                )
+                    ->name('usora.is-email-unique');
             }
         );
 

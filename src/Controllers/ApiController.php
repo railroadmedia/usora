@@ -323,4 +323,30 @@ class ApiController extends Controller
         return ResponseService::userJson($user)
             ->respond(200);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function isEmailUnique(Request $request)
+    {
+        $validator = validator(
+            $request->all(),
+            [
+                'email' => 'required|email',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->getMessageBag()], 422);
+        }
+
+        $user = $this->userRepository->findOneBy(['email' => $request->get('email')]);
+
+        if ($user) {
+            return response()->json(['exists' => false]);
+        }
+
+        return response()->json(['exists' => true]);
+    }
 }
