@@ -58,7 +58,7 @@ class EmailChange extends Notification
         return (new MailMessage)->line(
             'You are receiving this email because we received an email change request for your account.'
         )
-            ->action('Confirm', url()->route('usora.email-change.confirm', ['token' => $this->token]))
+            ->action('Confirm', url()->route('usora.email-change.confirm', ['code' => $this->token]))
             ->line('If you did not request the email change, no further action is required.');
     }
 

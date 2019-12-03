@@ -136,7 +136,7 @@ class EmailChangeController extends Controller
         $validator = validator(
             $request->all(),
             [
-                'token' => 'bail|required|string|exists:' .
+                'code' => 'bail|required|string|exists:' .
                     config('usora.database_connection_name') .
                     '.' .
                     config('usora.tables.email_changes') .
@@ -150,7 +150,7 @@ class EmailChangeController extends Controller
                 ->withErrors($validator);
         }
 
-        $emailChangeData = $this->emailChangeRepository->findOneBy(['token' => $request->get('token')]);
+        $emailChangeData = $this->emailChangeRepository->findOneBy(['token' => $request->get('code')]);
 
         if (Carbon::parse(
                 $emailChangeData->getUpdatedAt()
@@ -161,7 +161,7 @@ class EmailChangeController extends Controller
 
             return redirect()
                 ->back()
-                ->withErrors(['token' => 'Your email reset token has expired.']);
+                ->withErrors(['code' => 'Your email reset code has expired.']);
         }
 
         $user = $this->userRepository->findOneBy(
