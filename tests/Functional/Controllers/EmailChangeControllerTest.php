@@ -137,7 +137,7 @@ class EmailChangeControllerTest extends UsoraTestCase
         $response = $this->call(
             'GET',
             'usora/email-change/confirm',
-            ['token' => 'token1']
+            ['code' => 'token1']
         );
 
         // assert the new email was saved in users table
@@ -168,7 +168,7 @@ class EmailChangeControllerTest extends UsoraTestCase
 
         // assert session has error for missing token
         $response->assertSessionHasErrors(
-            ['token']
+            ['code']
         );
 
         app('session.store')->flush();
@@ -176,12 +176,12 @@ class EmailChangeControllerTest extends UsoraTestCase
         $response = $this->call(
             'GET',
             'usora/email-change/confirm',
-            ['token' => Str::random(40)]
+            ['code' => Str::random(40)]
         );
 
         // assert session has error for invalid token
         $response->assertSessionHasErrors(
-            ['token']
+            ['code']
         );
 
         app('session.store')->flush();
@@ -189,12 +189,12 @@ class EmailChangeControllerTest extends UsoraTestCase
         $response = $this->call(
             'GET',
             'usora/email-change/confirm',
-            ['token' => 'token2']
+            ['code' => 'token2']
         );
 
         // assert session has error for expired token
         $response->assertSessionHasErrors(
-            ['token']
+            ['code']
         );
     }
 }
