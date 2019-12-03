@@ -77,11 +77,10 @@ class EmailChangeController extends Controller
             !$this->hasher->check($request->get('user_password'), $user->getPassword())
             && !WpPassword::check(trim($request->get('user_password')), $user->getPassword())
         ) {
-            return redirect()
+            return back()
                 ->withInput($request->except('user_password'))
-                ->back()
                 ->withErrors(
-                    ['current_password' => 'The current password you entered is incorrect.']
+                    ['user_password' => 'The current password you entered is incorrect.']
                 );
         }
 
