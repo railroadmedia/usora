@@ -401,11 +401,9 @@ class AuthenticationController extends Controller
 
         $user = auth()->user();
 
-        if (empty($user)) {
-            throw new NotFoundHttpException();
+        if (!empty($user)) {
+            auth()->logout();
         }
-
-        auth()->logout();
 
         return $request->has('redirect') ? redirect()->away($request->get('redirect')) :
             redirect()->to(config('usora.login_page_path'));
