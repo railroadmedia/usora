@@ -19,7 +19,7 @@ class ResponseService extends FractalResponseService
      */
     public static function userJson($entityOrEntities, QueryBuilder $queryBuilder = null, array $includes = [])
     {
-        return self::create($entityOrEntities, 'user', new UserTransformer(), new JsonApiSerializer(), $queryBuilder)
+        return self::create($entityOrEntities, 'user', new UserTransformer(), new JsonApiSerializer(), $queryBuilder, true)
             ->parseIncludes($includes);
     }
 
@@ -31,7 +31,7 @@ class ResponseService extends FractalResponseService
      */
     public static function userArray($entityOrEntities, QueryBuilder $queryBuilder = null, array $includes = [])
     {
-        return self::create($entityOrEntities, 'user', new UserTransformer(), new ArraySerializer(), $queryBuilder)
+        return self::create($entityOrEntities, 'user', new UserTransformer(), new ArraySerializer(), $queryBuilder, true)
             ->parseIncludes($includes);
     }
 }
