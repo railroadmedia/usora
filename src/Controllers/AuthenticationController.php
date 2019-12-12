@@ -241,10 +241,7 @@ class AuthenticationController extends Controller
                     'login-success-redirect-url',
                     url()->to(config('usora.login_success_redirect_path'))
                 ),
-                'loginPageUrl' => session()->get(
-                    'login-page-url',
-                    url()->to(config('usora.login_page_path'))
-                ),
+                'loginPageUrl' => config('usora.login_page_path') . '?' . $request->getQueryString(),
                 'domains' => $domains,
             ]
         );
