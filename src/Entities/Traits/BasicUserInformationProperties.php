@@ -79,6 +79,24 @@ trait BasicUserInformationProperties
     protected $permissionLevel;
 
     /**
+     * @ORM\Column(type="text")
+     * @var string
+     */
+    protected $firebaseTokenWeb;
+
+    /**
+     * @ORM\Column(type="text")
+     * @var string
+     */
+    protected $firebaseTokenIOS;
+
+    /**
+     * @ORM\Column(type="text")
+     * @var string
+     */
+    protected $firebaseTokenAndroid;
+
+    /**
      * @return string
      */
     public function getFirstName()
@@ -268,5 +286,53 @@ trait BasicUserInformationProperties
     public function setPermissionLevel($permissionLevel)
     {
         $this->permissionLevel = $permissionLevel;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirebaseTokenWeb()
+    {
+        return $this->firebaseTokenWeb;
+    }
+
+    /**
+     * @param string $firebaseTokenWeb
+     */
+    public function setFirebaseTokenWeb($firebaseTokenWeb)
+    {
+        $this->firebaseTokenWeb = $firebaseTokenWeb;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirebaseTokenIOS()
+    {
+        return $this->firebaseTokenIOS;
+    }
+
+    /**
+     * @param string $firebaseTokenIOS
+     */
+    public function setFirebaseTokenIOS($firebaseTokenIOS)
+    {
+        $this->firebaseTokenIOS = $firebaseTokenIOS;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirebaseTokenAndroid()
+    {
+        return $this->firebaseTokenAndroid;
+    }
+
+    /**
+     * @param string $firebaseTokenAndroid
+     */
+    public function setFirebaseTokenAndroid($firebaseTokenAndroid)
+    {
+        $this->firebaseTokenAndroid = $firebaseTokenAndroid;
     }
 }
