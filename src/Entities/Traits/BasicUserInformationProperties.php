@@ -79,19 +79,19 @@ trait BasicUserInformationProperties
     protected $permissionLevel;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="json_array")
      * @var string
      */
     protected $firebaseTokenWeb;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="json_array")
      * @var string
      */
     protected $firebaseTokenIOS;
 
     /**
-     * @ORM\Column(type="array")
+     * @ORM\Column(type="json_array")
      * @var string
      */
     protected $firebaseTokenAndroid;
