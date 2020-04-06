@@ -82,19 +82,19 @@ trait BasicUserInformationProperties
      * @ORM\Column(type="array")
      * @var array
      */
-    protected $firebaseTokenWeb;
+    protected $firebaseTokenWeb = array();
 
     /**
      * @ORM\Column(type="array")
      * @var array
      */
-    protected $firebaseTokenIOS;
+    protected $firebaseTokenIOS = array();
 
     /**
      * @ORM\Column(type="array")
      * @var array
      */
-    protected $firebaseTokenAndroid;
+    protected $firebaseTokenAndroid = array();
 
     /**
      * @return string
