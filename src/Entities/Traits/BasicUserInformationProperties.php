@@ -79,24 +79,6 @@ trait BasicUserInformationProperties
     protected $permissionLevel;
 
     /**
-     * @ORM\Column(type="json_array")
-     * @var array
-     */
-    protected $firebaseTokenWeb = array();
-
-    /**
-     * @ORM\Column(type="json_array")
-     * @var array
-     */
-    protected $firebaseTokenIOS = array();
-
-    /**
-     * @ORM\Column(type="json_array")
-     * @var array
-     */
-    protected $firebaseTokenAndroid = array();
-
-    /**
      * @return string
      */
     public function getFirstName()
@@ -286,56 +268,5 @@ trait BasicUserInformationProperties
     public function setPermissionLevel($permissionLevel)
     {
         $this->permissionLevel = $permissionLevel;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getFirebaseTokenWeb()
-    : ?array
-    {
-        return $this->firebaseTokenWeb;
-    }
-
-    /**
-     * @param array $firebaseTokenWeb
-     */
-    public function setFirebaseTokenWeb(array $firebaseTokenWeb)
-    {
-        $this->firebaseTokenWeb = $firebaseTokenWeb;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getFirebaseTokenIOS()
-    : ?array
-    {
-        return $this->firebaseTokenIOS;
-    }
-
-    /**
-     * @param array $firebaseTokenIOS
-     */
-    public function setFirebaseTokenIOS(array $firebaseTokenIOS)
-    {
-        $this->firebaseTokenIOS = $firebaseTokenIOS;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getFirebaseTokenAndroid()
-    : ?array
-    {
-        return $this->firebaseTokenAndroid;
-    }
-
-    /**
-     * @param array $firebaseTokenAndroid
-     */
-    public function setFirebaseTokenAndroid(array $firebaseTokenAndroid)
-    {
-        $this->firebaseTokenAndroid = $firebaseTokenAndroid;
     }
 }
