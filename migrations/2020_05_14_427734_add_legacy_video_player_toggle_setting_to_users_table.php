@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DropFirebaseTokenColumnsFromUsersTable extends Migration
+class AddLegacyVideoPlayerToggleSettingToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -17,7 +17,11 @@ class DropFirebaseTokenColumnsFromUsersTable extends Migration
             ->table(
                 config('usora.tables.users'),
                 function (Blueprint $table) {
-                    $table->dropColumn(['firebase_token_web', 'firebase_token_ios', 'firebase_token_android']);
+
+                    $table->boolean('use_legacy_video_player')
+                        ->after('notify_on_lesson_comment_reply')
+                        ->default(false);
+
                 }
             );
     }
@@ -33,15 +37,9 @@ class DropFirebaseTokenColumnsFromUsersTable extends Migration
             ->table(
                 config('usora.tables.users'),
                 function (Blueprint $table) {
-                    $table->text('firebase_token_web')
-                        ->after('support_note')
-                        ->nullable();
-                    $table->text('firebase_token_ios')
-                        ->after('firebase_token_web')
-                        ->nullable();
-                    $table->text('firebase_token_android')
-                        ->after('firebase_token_ios')
-                        ->nullable();
+
+                    $table->dropColumn('use_legacy_video_player');
+
                 }
             );
     }

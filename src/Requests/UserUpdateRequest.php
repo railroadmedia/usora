@@ -58,6 +58,7 @@ class UserUpdateRequest extends FormRequest
             'notify_on_forum_post_reply' => 'nullable|boolean',
             'notify_on_lesson_comment_like' => 'nullable|boolean',
             'notifications_summary_frequency_minutes' => 'nullable|integer|max:43200',
+            'use_legacy_video_player' => 'nullable|boolean',
 
             'drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
             'drums_gear_photo' => 'nullable|url|max:1000',
@@ -108,6 +109,7 @@ class UserUpdateRequest extends FormRequest
                 'notify_on_forum_post_reply',
                 'notify_on_lesson_comment_like',
                 'notifications_summary_frequency_minutes',
+                'use_legacy_video_player',
                 'drums_playing_since_year',
                 'drums_gear_photo',
                 'drums_gear_cymbal_brands',

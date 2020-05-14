@@ -14,6 +14,7 @@ use Railroad\Usora\Entities\Traits\GuitarUserProperties;
 use Railroad\Usora\Entities\Traits\LaravelAuthUserProperties;
 use Railroad\Usora\Entities\Traits\PianoUserProperties;
 use Railroad\Usora\Entities\Traits\SupportNoteProperties;
+use Railroad\Usora\Entities\Traits\UserInterfaceSettingsProperties;
 use Railroad\Usora\Entities\Traits\UserNotificationSettingsProperties;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -33,6 +34,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     use LaravelAuthUserProperties;
     use UserNotificationSettingsProperties;
     use SupportNoteProperties;
+    use UserInterfaceSettingsProperties;
 
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
