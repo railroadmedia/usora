@@ -30,6 +30,7 @@ namespace Railroad\Usora\Requests;
  * @bodyParam data.attributes.notify_on_forum_post_reply boolean Example:true
  * @bodyParam data.attributes.notify_on_lesson_comment_like boolean Example:true
  * @bodyParam data.attributes.notifications_summary_frequency_minutes boolean Example:true
+ * @bodyParam data.attributes.use_legacy_video_player boolean Example:true
  */
 class UserJsonUpdateRequest extends FormRequest
 {
@@ -75,6 +76,7 @@ class UserJsonUpdateRequest extends FormRequest
             'data.attributes.notify_on_forum_post_reply' => 'nullable|boolean',
             'data.attributes.notify_on_lesson_comment_like' => 'nullable|boolean',
             'data.attributes.notifications_summary_frequency_minutes' => 'nullable|integer|max:43200',
+            'data.attributes.use_legacy_video_player' => 'nullable|boolean',
 
             'data.attributes.drums_playing_since_year' => 'nullable|integer|between:1900,' . date('Y'),
             'data.attributes.drums_gear_photo' => 'nullable|url|max:1000',
@@ -125,6 +127,7 @@ class UserJsonUpdateRequest extends FormRequest
                 'data.attributes.notify_on_forum_post_reply',
                 'data.attributes.notify_on_lesson_comment_like',
                 'data.attributes.notifications_summary_frequency_minutes',
+                'data.attributes.use_legacy_video_player',
                 'data.attributes.drums_playing_since_year',
                 'data.attributes.drums_gear_photo',
                 'data.attributes.drums_gear_cymbal_brands',

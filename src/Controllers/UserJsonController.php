@@ -296,6 +296,7 @@ class UserJsonController extends Controller
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
      * "notifications_summary_frequency_minutes": null,
+     * "use_legacy_video_player": true,
      * "support_note": 'Text'
      * }
      * }
@@ -369,6 +370,7 @@ class UserJsonController extends Controller
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
      * "notifications_summary_frequency_minutes": null,
+     * "use_legacy_video_player": true,
      * "support_note": 'Text'
      * }
      * }
@@ -452,6 +454,7 @@ class UserJsonController extends Controller
      * "notify_on_forum_post_reply": true,
      * "notify_on_lesson_comment_like": true,
      * "notifications_summary_frequency_minutes": null,
+     * "use_legacy_video_player": true,
      * "support_note": null
      * }
      * }
