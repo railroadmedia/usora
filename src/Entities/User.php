@@ -8,6 +8,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\Hash;
+use Railroad\Usora\Entities\Traits\AppReviewProperties;
 use Railroad\Usora\Entities\Traits\BasicUserInformationProperties;
 use Railroad\Usora\Entities\Traits\DrumsUserProperties;
 use Railroad\Usora\Entities\Traits\GuitarUserProperties;
@@ -35,6 +36,7 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     use UserNotificationSettingsProperties;
     use SupportNoteProperties;
     use UserInterfaceSettingsProperties;
+    use AppReviewProperties;
 
     /**
      * @ORM\Id @ORM\GeneratedValue @ORM\Column(type="integer")
