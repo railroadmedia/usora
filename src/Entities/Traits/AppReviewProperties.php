@@ -11,10 +11,10 @@ trait AppReviewProperties
     protected $iosLatestReviewDisplayDate;
 
     /**
-     * @ORM\Column(type="integer",  nullable=true)
+     * @ORM\Column(type="integer")
      * @var integer
      */
-    protected $iosCountReviewDisplay;
+    protected $iosCountReviewDisplay = 0;
 
     /**
      * @ORM\Column(type="datetime", name="google_latest_review_display_date", nullable=true)
@@ -23,13 +23,13 @@ trait AppReviewProperties
     protected $googleLatestReviewDisplayDate;
 
     /**
-     * @ORM\Column(type="integer",  nullable=true)
+     * @ORM\Column(type="integer")
      * @var integer
      */
-    protected $googleCountReviewDisplay;
+    protected $googleCountReviewDisplay = 0;
 
     /**
-     * @return date|null
+     * @return \DateTime
      */
     public function getIosLatestReviewDisplayDate()
     {
