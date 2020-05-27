@@ -11,7 +11,7 @@ trait AppReviewProperties
     protected $iosLatestReviewDisplayDate;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer",  nullable=true)
      * @var integer
      */
     protected $iosCountReviewDisplay;
@@ -23,7 +23,7 @@ trait AppReviewProperties
     protected $googleLatestReviewDisplayDate;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer",  nullable=true)
      * @var integer
      */
     protected $googleCountReviewDisplay;
