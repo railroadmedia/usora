@@ -38,7 +38,8 @@ return [
         'email_changes' => 'usora_email_changes',
         'password_resets' => 'usora_password_resets',
         'remember_tokens' => 'usora_remember_tokens',
-        'firebase_tokens' => 'usora_user_firebase_tokens'
+        'firebase_tokens' => 'usora_user_firebase_tokens',
+        'user_topics' => 'usora_user_topics',
     ],
 
     // routes
