@@ -160,6 +160,7 @@ class UsoraTestCase extends TestCase
         }
 
         // misc
+        config()->set('app.debug', true);
         config()->set('usora.data_mode', 'host');
         config()->set('usora.authentication_controller_middleware', []);
 
