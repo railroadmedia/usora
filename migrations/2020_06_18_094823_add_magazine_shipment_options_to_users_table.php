@@ -19,10 +19,12 @@ class AddMagazineShipmentOptionsToUsersTable extends Migration
                 function (Blueprint $table) {
 
                     $table->boolean('drumeo_ship_magazine')
+                        ->index()
                         ->after('use_legacy_video_player')
                         ->nullable();
 
                     $table->integer('magazine_shipping_address_id')
+                        ->index()
                         ->after('drumeo_ship_magazine')
                         ->nullable();
                 }
