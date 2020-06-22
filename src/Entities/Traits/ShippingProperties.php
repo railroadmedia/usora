@@ -19,7 +19,7 @@ trait ShippingProperties
     /**
      * @return bool
      */
-    public function isDrumeoShipMagazine(): bool
+    public function getDrumeoShipMagazine(): bool
     {
         return $this->drumeoShipMagazine ?? false;
     }
