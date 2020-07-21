@@ -35,6 +35,12 @@ trait PianoUserProperties
     protected $pianoGearKeyboardBrands;
 
     /**
+     * @ORM\Column(type="integer")
+     * @var integer
+     */
+    protected $pianoSkillLevel;
+
+    /**
      * @return int
      */
     public function getLegacyPianoteId()
@@ -112,5 +118,21 @@ trait PianoUserProperties
     public function setPianoGearKeyboardBrands($pianoGearKeyboardBrands)
     {
         $this->pianoGearKeyboardBrands = $pianoGearKeyboardBrands;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getPianoSkillLevel()
+    {
+        return $this->pianoSkillLevel;
+    }
+
+    /**
+     * @param integer $pianoSkillLevel
+     */
+    public function setPianoSkillLevel(int $pianoSkillLevel)
+    {
+        $this->pianoSkillLevel = $pianoSkillLevel;
     }
 }

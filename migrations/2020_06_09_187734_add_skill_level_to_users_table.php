@@ -18,8 +18,16 @@ class AddSkillLevelToUsersTable extends Migration
                 config('usora.tables.users'),
                 function (Blueprint $table) {
 
-                    $table->integer('skill_level')
+                    $table->integer('drums_skill_level')
                         ->after('use_legacy_video_player')
+                        ->nullable();
+
+                    $table->integer('guitar_skill_level')
+                        ->after('drums_skill_level')
+                        ->nullable();
+
+                    $table->integer('piano_skill_level')
+                        ->after('guitar_skill_level')
                         ->nullable();
                 }
             );
@@ -37,7 +45,11 @@ class AddSkillLevelToUsersTable extends Migration
                 config('usora.tables.users'),
                 function (Blueprint $table) {
 
-                    $table->dropColumn('skill_level');
+                    $table->dropColumn('drums_skill_level');
+
+                    $table->dropColumn('guitar_skill_level');
+
+                    $table->dropColumn('piano_skill_level');
                 }
             );
     }
