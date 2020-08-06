@@ -248,6 +248,10 @@ class UserJsonControllerTest extends UsoraTestCase
         // assert the user data is subset of response
         unset($attributes['id']);
         unset($attributes['password']);
+        unset($attributes['ios_latest_review_display_date']);
+        unset($attributes['ios_count_review_display']);
+        unset($attributes['google_latest_review_display_date']);
+        unset($attributes['google_count_review_display']);
 
         $this->assertArraySubset($attributes, $response->decodeResponseJson()['data']['attributes']);
 
@@ -374,6 +378,10 @@ class UserJsonControllerTest extends UsoraTestCase
         );
 
         unset($newAttributes['email']);
+        unset($newAttributes['ios_latest_review_display_date']);
+        unset($newAttributes['ios_count_review_display']);
+        unset($newAttributes['google_latest_review_display_date']);
+        unset($newAttributes['google_count_review_display']);
 
         // assert the user data is subset of response
         $this->assertArraySubset(
