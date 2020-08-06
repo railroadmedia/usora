@@ -31,7 +31,7 @@
     "railroad/doctrine": "^0.0",
     "jms/serializer": "1.*",
     "railroad/permissions": "1.0.*",
-    "tymon/jwt-auth": "1.0.0-rc.2",
+    "tymon/jwt-auth": "1.0.*",
     "spatie/laravel-fractal": "^5.4",
     "railroad/doctrine-array-hydrator": "1.0.*",
     "league/flysystem": "^1.0.40",
