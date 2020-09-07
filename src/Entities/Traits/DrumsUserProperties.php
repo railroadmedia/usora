@@ -59,6 +59,12 @@ trait DrumsUserProperties
     protected $drumsGearStickBrands;
 
     /**
+     * @ORM\Column(type="integer")
+     * @var integer
+     */
+    protected $drumsSkillLevel;
+
+    /**
      * @return integer
      */
     public function getLegacyDrumeoId()
@@ -200,5 +206,21 @@ trait DrumsUserProperties
     public function setDrumsGearStickBrands($drumsGearStickBrands)
     {
         $this->drumsGearStickBrands = $drumsGearStickBrands;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getDrumsSkillLevel()
+    {
+        return $this->drumsSkillLevel;
+    }
+
+    /**
+     * @param integer $drumsSkillLevel
+     */
+    public function setDrumsSkillLevel(int $drumsSkillLevel)
+    {
+        $this->drumsSkillLevel = $drumsSkillLevel;
     }
 }

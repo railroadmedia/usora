@@ -47,6 +47,12 @@ trait GuitarUserProperties
     protected $guitarGearStringBrands;
 
     /**
+     * @ORM\Column(type="integer")
+     * @var integer
+     */
+    protected $guitarSkillLevel;
+
+    /**
      * @return int
      */
     public function getLegacyGuitareoId()
@@ -156,5 +162,21 @@ trait GuitarUserProperties
     public function setGuitarGearStringBrands($guitarGearStringBrands)
     {
         $this->guitarGearStringBrands = $guitarGearStringBrands;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getGuitarSkillLevel()
+    {
+        return $this->guitarSkillLevel;
+    }
+
+    /**
+     * @param integer $guitarSkillLevel
+     */
+    public function setGuitarSkillLevel(int $guitarSkillLevel)
+    {
+        $this->guitarSkillLevel = $guitarSkillLevel;
     }
 }
