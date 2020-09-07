@@ -77,6 +77,12 @@ class RouteRegistrar
                     ApiController::class . '@isEmailUnique'
                 )
                     ->name('usora.is-email-unique');
+
+                $this->router->get(
+                    'is-display-name-unique',
+                    ApiController::class . '@isDisplayNameUnique'
+                )
+                    ->name('usora.is-display-name-unique');
             }
         );
 
