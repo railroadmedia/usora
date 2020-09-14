@@ -336,6 +336,32 @@ $.ajax({
      headers: {
         'Authorization': `Bearer ${token}`,
     },
+     "data": {
+        "type": "user",
+        "attributes": {
+            "email": "test@test.te",
+            "display_name": "John Snow",
+            "first_name": "John",
+            "last_name": "Snow",
+            "gender": "female",
+            "country": "doloribus",
+            "region": "libero",
+            "city": "ut",
+            "birthday": "2019-05-21 21:20:10",
+            "phone_number": "0045124512",
+            "biography": "eius",
+            "profile_picture_url": "''",
+            "timezone": "assumenda",
+            "permission_level": 3,
+            "notify_on_lesson_comment_reply": [],
+            "notify_weekly_update": [],
+            "notify_on_forum_post_like": [],
+            "notify_on_forum_followed_thread_reply": [],
+            "notify_on_forum_post_reply": [],
+            "notify_on_lesson_comment_like": [],
+            "notifications_summary_frequency_minutes": []
+        }
+    },
     success: function(response) {},
     error: function(response) {}
 });
