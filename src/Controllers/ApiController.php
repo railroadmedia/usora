@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
 use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Events\User\UserUpdated;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
 use Railroad\Usora\Services\ResponseService;
