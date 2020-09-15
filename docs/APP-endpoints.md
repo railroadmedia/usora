@@ -336,6 +336,32 @@ $.ajax({
      headers: {
         'Authorization': `Bearer ${token}`,
     },
+     "data": {
+        "type": "user",
+        "attributes": {
+            "email": "test@test.te",
+            "display_name": "John Snow",
+            "first_name": "John",
+            "last_name": "Snow",
+            "gender": "female",
+            "country": "doloribus",
+            "region": "libero",
+            "city": "ut",
+            "birthday": "2019-05-21 21:20:10",
+            "phone_number": "0045124512",
+            "biography": "eius",
+            "profile_picture_url": "https:\/\/drumeo-profile-images.s3.us-west-2.amazonaws.com\/149628_avatar_url_1563362703.jpeg",
+            "timezone": "assumenda",
+            "permission_level": 3,
+            "notify_on_lesson_comment_reply": true,
+            "notify_weekly_update": true,
+            "notify_on_forum_post_like":true,
+            "notify_on_forum_followed_thread_reply": true,
+            "notify_on_forum_post_reply": true,
+            "notify_on_lesson_comment_like": true,
+            "notifications_summary_frequency_minutes": 500
+        }
+    },
     success: function(response) {},
     error: function(response) {}
 });
@@ -345,27 +371,51 @@ $.ajax({
 
 ```json
 {
-    "id": 149628,
-    "wordpressId": 152167,
-    "ipbId": 150228,
-    "email": "roxana.riza@artsoft-consult.ro",
-    "permission_level": "administrator",
-    "login_username": "roxana.riza@artsoft-consult.ro",
-    "display_name": "Roxana",
-    "first_name": "Roxana",
-    "last_name": "",
-    "gender": "",
-    "country": "Romania",
-    "region": "",
-    "city": "",
-    "birthday": "2017-07-04 00:00:00",
-    "phone_number": "",
-    "bio": "",
-    "created_at": "2017-07-31 22:54:41",
-    "updated_at": "2019-08-01 07:05:50",
-    "avatarUrl": "https:\/\/drumeo-profile-images.s3.us-west-2.amazonaws.com\/149628_avatar_url_1563362703.jpeg",
-    "totalXp": 54280,
-    "xpRank": "Master II"
+    "data": {
+        "type": "user",
+        "id": "151248",
+        "attributes": {
+           "email": "test@test.te",
+            "display_name": "John Snow",
+            "first_name": "John",
+            "last_name": "Snow",
+            "created_at": "2017-05-27 23:46:12",
+            "updated_at": "2019-04-01 00:41:14",
+            "gender": "",
+           "country": "doloribus",
+            "region": "libero",
+            "city": "ut",
+            "birthday": "2019-05-21 21:20:10",
+            "phone_number": "0045124512",
+            "biography": "eius",
+            "profile_picture_url": "https:\/\/drumeo-profile-images.s3.us-west-2.amazonaws.com\/149628_avatar_url_1563362703.jpeg",
+            "timezone": "assumenda",
+            "permission_level": 3,
+            "drums_playing_since_year": null,
+            "drums_gear_photo": "",
+            "drums_gear_cymbal_brands": null,
+            "drums_gear_set_brands": null,
+            "drums_gear_hardware_brands": null,
+            "drums_gear_stick_brands": null,
+            "guitar_playing_since_year": null,
+            "guitar_gear_photo": "",
+            "guitar_gear_guitar_brands": null,
+            "guitar_gear_amp_brands": null,
+            "guitar_gear_pedal_brands": null,
+            "guitar_gear_string_brands": null,
+            "piano_playing_since_year": null,
+            "piano_gear_photo": "",
+            "piano_gear_piano_brands": null,
+            "piano_gear_keyboard_brands": null,
+            "notify_on_lesson_comment_reply": true,
+            "notify_weekly_update": true,
+            "notify_on_forum_post_like": true,
+            "notify_on_forum_followed_thread_reply": true,
+            "notify_on_forum_post_reply": true,
+            "notify_on_lesson_comment_like": true,
+            "notifications_summary_frequency_minutes": 500
+        }
+    }
 }
 ```
 

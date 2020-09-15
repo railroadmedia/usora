@@ -262,6 +262,55 @@ class UserJsonControllerTest extends UsoraTestCase
         );
     }
 
+    public function test_users_store_with_nullables()
+    {
+        $attributes = $this->fakeDataHydrator->getAttributeArray(User::class, new UserTransformer());
+
+        $attributes['password'] = 'password12345';
+        $attributes['email'] = 'test_email@test.com';
+
+        unset($attributes['created_at']);
+        unset($attributes['updated_at']);
+        unset($attributes['ios_latest_review_display_date']);
+        unset($attributes['ios_count_review_display']);
+        unset($attributes['google_latest_review_display_date']);
+        unset($attributes['google_count_review_display']);
+        unset($attributes['drumeo_ship_magazine']);
+        unset($attributes['magazine_shipping_address_id']);
+
+        $this->permissionServiceMock->method('can')
+            ->willReturn(true);
+
+        $response = $this->call(
+            'PUT',
+            'usora/json-api/user/store',
+            [
+                'data' => [
+                    'type' => 'user',
+                    'attributes' => $attributes,
+                ],
+            ]
+        );
+
+        // assert response status code
+        $this->assertEquals(201, $response->getStatusCode());
+
+        // assert the users password was encrypted and saved, and that they can login
+        $this->assertTrue(auth()->attempt(['email' => $attributes, 'password' => $attributes['password']]));
+
+        // assert the user data is subset of response
+        unset($attributes['id']);
+        unset($attributes['password']);
+
+        $this->assertArraySubset($attributes, $response->decodeResponseJson()['data']['attributes']);
+
+        // assert the users data was saved in the db
+        $this->assertDatabaseHas(
+            config('usora.tables.users'),
+            $attributes
+        );
+    }
+
     public function test_users_store_without_permission()
     {
         $attributes = $this->fakeDataHydrator->getAttributeArray(User::class, new UserTransformer());

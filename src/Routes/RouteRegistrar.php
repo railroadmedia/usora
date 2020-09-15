@@ -77,6 +77,12 @@ class RouteRegistrar
                     ApiController::class . '@isEmailUnique'
                 )
                     ->name('usora.is-email-unique');
+
+                $this->router->get(
+                    'is-display-name-unique',
+                    ApiController::class . '@isDisplayNameUnique'
+                )
+                    ->name('usora.is-display-name-unique');
             }
         );
 
@@ -244,7 +250,7 @@ class RouteRegistrar
             function () {
                 $this->router->put('api/logout', \Railroad\Usora\Controllers\ApiController::class . '@logout');
                 $this->router->put('api/profile', \Railroad\Usora\Controllers\ApiController::class . '@getAuthUser');
-                $this->router->post('api/profile/update', \Railroad\Usora\Controllers\ApiController::class . '@updateUser');
+                $this->router->patch('api/profile/update', \Railroad\Usora\Controllers\ApiController::class . '@updateUser');
             }
         );
 

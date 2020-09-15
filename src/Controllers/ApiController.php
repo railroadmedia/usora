@@ -350,4 +350,37 @@ class ApiController extends Controller
 
         return response()->json(['exists' => false]);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function isDisplayNameUnique(Request $request)
+    {
+        $validator = validator(
+            $request->all(),
+            [
+                'display_name' => 'required',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->getMessageBag()], 422);
+        }
+
+        $qb = $this->userRepository->createQueryBuilder('u')->where('u.displayName = :name')->setParameter('name', $request->get('display_name'));
+
+        if(auth()->id()){
+            $qb->andWhere('u.id != :id')->setParameter('id', auth()->id());
+        }
+
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        if ($user) {
+            return response()->json(['unique' => false]);
+        }
+
+        return response()->json(['unique' => true]);
+    }
 }
