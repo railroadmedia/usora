@@ -219,7 +219,7 @@ trait DrumsUserProperties
     /**
      * @param integer $drumsSkillLevel
      */
-    public function setDrumsSkillLevel(int $drumsSkillLevel)
+    public function setDrumsSkillLevel(?int $drumsSkillLevel)
     {
         $this->drumsSkillLevel = $drumsSkillLevel;
     }

@@ -131,7 +131,7 @@ trait PianoUserProperties
     /**
      * @param integer $pianoSkillLevel
      */
-    public function setPianoSkillLevel(int $pianoSkillLevel)
+    public function setPianoSkillLevel(?int $pianoSkillLevel)
     {
         $this->pianoSkillLevel = $pianoSkillLevel;
     }

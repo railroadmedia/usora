@@ -175,7 +175,7 @@ trait GuitarUserProperties
     /**
      * @param integer $guitarSkillLevel
      */
-    public function setGuitarSkillLevel(int $guitarSkillLevel)
+    public function setGuitarSkillLevel(?int $guitarSkillLevel)
     {
         $this->guitarSkillLevel = $guitarSkillLevel;
     }
