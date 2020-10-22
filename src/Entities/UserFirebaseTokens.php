@@ -42,6 +42,12 @@ class UserFirebaseTokens
     protected $token;
 
     /**
+     * @ORM\Column(type="text")
+     * @var string
+     */
+    protected $brand;
+
+    /**
      * @var Carbon
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -88,6 +94,21 @@ class UserFirebaseTokens
         $this->token = $token;
     }
 
+    /**
+     * @return string
+     */
+    public function getBrand()
+    {
+        return $this->brand;
+    }
+
+    /**
+     * @param $brand
+     */
+    public function setBrand($brand)
+    {
+        $this->brand = $brand;
+    }
     /**
      * @return string
      */
