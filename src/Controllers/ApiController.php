@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
+use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Managers\UsoraEntityManager;
@@ -88,16 +89,30 @@ class ApiController extends Controller
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
-        $jwt_token = null;
 
-        if (!$jwt_token = $this->jwtAuth->attempt($input)) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Invalid Email or Password',
-                ],
-                401
-            );
+        $user = $this->userRepository->findOneBy(['email' => $request->get('email')]);
+
+        $jwt_token = $this->jwtAuth->attempt($input); // new laravel users
+
+        if (!$jwt_token) {
+            $error = null;
+
+            if (!is_null($user)) {
+                if (WpPassword::check(trim($request->get('password')), $user->getPassword())) {
+                    auth()->loginUsingId($user->getId(), false);
+                    $jwt_token = $this->jwtAuth->fromUser($user);
+                }
+            }
+
+            if (!$jwt_token) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Invalid Email or Password',
+                    ],
+                    401
+                );
+            }
         }
 
         return response()->json(
