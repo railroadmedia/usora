@@ -55,14 +55,7 @@ class UserJsonUpdateRequest extends FormRequest
                 ',display_name,' .
                 $this->route('id'),
 
-            /*
-             * password validation rules exist in four locations:
-             * 1. account creation, by user: \Railroad\Ecommerce\Requests\OrderFormSubmitRequest::rules
-             * 2. password change, by user: \Railroad\Usora\Controllers\PasswordController::update
-             * 3. reset forgotten password, by user: \Railroad\Usora\Controllers\ResetPasswordController::reset
-             * 4. reset user's password, by staff: \Railroad\Usora\Requests\UserJsonUpdateRequest::rules
-             */
-            'data.attributes.password' => 'string|min:8|max:128|confirmed',
+            'data.attributes.password' => 'string|' . config('usora.password_creation_rules', 'confirmed|min:8|max:128'),
 
             'data.attributes.first_name' => 'nullable|string|max:64',
             'data.attributes.last_name' => 'nullable|string|max:64',

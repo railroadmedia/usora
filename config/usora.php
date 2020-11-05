@@ -99,4 +99,6 @@ return [
             'path' => '/path/inside/bucket/',
         ],
     ],
+
+    'password_creation_rules' => 'confirmed|min:8|max:128', // also defined in ecommerce
 ];

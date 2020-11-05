@@ -80,18 +80,11 @@ class PasswordController extends Controller
             throw new NotAllowedException('You do not have permission to update this users password.');
         }
 
-        /*
-         * password validation rules exist in four locations:
-         * 1. account creation, by user: \Railroad\Ecommerce\Requests\OrderFormSubmitRequest::rules
-         * 2. password change, by user: \Railroad\Usora\Controllers\PasswordController::update
-         * 3. reset forgotten password, by user: \Railroad\Usora\Controllers\ResetPasswordController::reset
-         * 4. reset user's password, by staff: \Railroad\Usora\Requests\UserJsonUpdateRequest::rules
-         */
         try{
             $request->validate(
                 [
                     'current_password' => 'required',
-                    'new_password' => 'required|confirmed|min:8|max:128',
+                    'new_password' => 'required|' . config('usora.password_creation_rules', 'confirmed|min:8|max:128'),
                 ]
             );
         }catch(ValidationException $e){
