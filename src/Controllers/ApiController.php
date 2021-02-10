@@ -144,7 +144,7 @@ class ApiController extends Controller
     public function logout(Request $request)
     {
         try {
-            $this->jwtAuth->invalidate($this->jwtAuth->parseToken());
+            auth()->logout();
 
             return response()->json(
                 [
