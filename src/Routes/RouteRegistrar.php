@@ -265,6 +265,10 @@ class RouteRegistrar
                     'api/is-email-unique',
                     ApiController::class . '@isEmailUnique'
                 );
+                $this->router->get(
+                    'api/is-display-name-unique',
+                    ApiController::class . '@isDisplayNameUnique'
+                );
             }
         );
 
