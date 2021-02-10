@@ -261,6 +261,10 @@ class RouteRegistrar
             function () {
                 $this->router->put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
                 $this->router->put('api/forgot', \Railroad\Usora\Controllers\ApiController::class . '@forgotPassword');
+                $this->router->get(
+                    'api/is-email-unique',
+                    ApiController::class . '@isEmailUnique'
+                );
             }
         );
 
