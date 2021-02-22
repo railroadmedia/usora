@@ -84,6 +84,10 @@ Users can be signed in on any domain running this package with a single login at
     + ```'secure' => true,```
   + your post-login page must render some <img tags by calling this function in the blade/html
     + ```{!! \Railroad\Usora\Services\ClientRelayService::getBodyTop() !!}```
+  
+- laravel usora.php config file (this packages config file)
+  + must have force remember cookies enabled otherwise users cannot have separate login sessions per device
+    + ```'force_remember' => true,```
 
 
 API Reference
