@@ -55,11 +55,11 @@ return [
     // so we must configure the usora url for the vt endpoint in manually
     'domains_to_authenticate_on_with_request_urls' => [
         'www.domain2.com' => [
-            'with-verification-token' => 'https://www.domain2.com/usora/authenticate/with-verification-token',
+            'with-verification-token' => 'https://www.domain2.com/usora/authenticate/set-authentication-cookie',
             'render-post-message-verification-token' => 'https://www.domain2.com/usora/authenticate/render-post-message-verification-token',
         ],
         'domain3.com' => [
-            'with-verification-token' => 'https://domain3.com/laravel/public/usora/authenticate/with-verification-token',
+            'with-verification-token' => 'https://domain3.com/laravel/public/usora/authenticate/set-authentication-cookie',
             'render-post-message-verification-token' => 'https://domain3.com/laravel/public/usora/authenticate/render-post-message-verification-token',
         ],
     ],
@@ -67,11 +67,11 @@ return [
     // if the env variable APP_DEBUG is true, these domains will be authed instead (used for dev.domain.com, staging, etc)
     'dev_domains_to_authenticate_on_with_request_urls' => [
         'dev.domain2.com' => [
-            'with-verification-token' => 'https://dev.domain2.com/usora/authenticate/with-verification-token',
+            'with-verification-token' => 'https://dev.domain2.com/usora/authenticate/set-authentication-cookie',
             'render-post-message-verification-token' => 'https://dev.domain2.com/usora/authenticate/render-post-message-verification-token',
         ],
         'dev2.domain2.com' => [
-            'with-verification-token' => 'https://dev2.domain2.com/laravel/public/usora/authenticate/with-verification-token',
+            'with-verification-token' => 'https://dev2.domain2.com/laravel/public/usora/authenticate/set-authentication-cookie',
             'render-post-message-verification-token' => 'https://dev2.domain2.com/laravel/public/usora/authenticate/render-post-message-verification-token',
         ],
     ],

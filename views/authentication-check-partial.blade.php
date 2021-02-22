@@ -21,7 +21,6 @@
 
             if (failed || token.length < 1 || domainsToAuthenticateFromChecked[domain] === undefined) {
                 failedDomains++;
-                console.log('Failed: ' + domain);
 
                 if (failedDomains >= domainsToAuthenticateFromCount) {
                     window.location.replace(loginPageUrl);
@@ -31,8 +30,6 @@
             }
 
             messageReceived = true;
-
-            console.log('Success: ' + domain);
 
             var xhr = new XMLHttpRequest();
 
@@ -82,15 +79,9 @@
             attemptedDomains++;
 
             if (attemptedDomains >= domainsToAuthenticateFromCount) {
-                console.log('NOW!');
-
                 setTimeout(function () {
-                    console.log(messageReceived);
-
                     if (!messageReceived) {
                         messageReceived = true;
-
-                        console.log('SSO failed, could not contact other domains.');
 
                         window.location.replace(loginPageUrl);
                     }

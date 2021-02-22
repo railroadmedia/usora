@@ -79,6 +79,22 @@ class SaltedSessionGuard extends SessionGuard
 
     /**
      * @param AuthenticatableContract $user
+     * @param $rememberTokenValue
+     */
+    public function setRememberToken(AuthenticatableContract $user, $rememberTokenValue)
+    {
+        $this->getCookieJar()
+            ->queue(
+                $this->createRecaller(
+                    $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword()
+                )
+            );
+
+        $user->setRememberToken($rememberTokenValue);
+    }
+
+    /**
+     * @param AuthenticatableContract $user
      * @param bool $remember
      * @throws ORMException
      */

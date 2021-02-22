@@ -38,7 +38,7 @@ class ClientRelayService
         self::addToBodyTop(
             '<img src="' .
             $baseUrl .
-            '?vt=' .
+            '?vt=remember_token|' .
             urlencode($verificationToken) .
             '&uid=' .
             urlencode($userId) .
