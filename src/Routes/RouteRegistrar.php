@@ -257,6 +257,7 @@ class RouteRegistrar
         $this->router->group(
             [
                 'prefix' => config('usora.route_prefix'),
+                'middleware' => config('usora.route_middleware_app_public_groups', []),
             ],
             function () {
                 $this->router->put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');

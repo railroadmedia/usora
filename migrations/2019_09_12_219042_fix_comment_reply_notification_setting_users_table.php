@@ -26,12 +26,12 @@ class FixCommentReplyNotificationSettingUsersTable extends Migration
                 config('usora.tables.users'),
                 function (Blueprint $table) {
 
-                    DB::statement("ALTER TABLE usora_users CHANGE notify_on_lesson_comment_reply notify_on_lesson_comment_reply TINYINT(1) DEFAULT '1' NOT NULL");
+//                    DB::statement("ALTER TABLE usora_users CHANGE notify_on_lesson_comment_reply notify_on_lesson_comment_reply TINYINT(1) DEFAULT '1' NOT NULL");
 
                     // broken due to dbal/laravel bug
-//                    $table->boolean('notify_on_lesson_comment_reply')
-//                        ->default(true)
-//                        ->change();
+                    $table->boolean('notify_on_lesson_comment_reply')
+                        ->default(true)
+                        ->change();
                 }
             );
     }

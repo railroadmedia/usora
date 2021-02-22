@@ -19,6 +19,7 @@ class AddBrandToUsoraUserFirebaseTokensTable extends Migration
                 function (Blueprint $table) {
 
                     $table->string('brand')
+                        ->nullable()
                         ->after('token');
                 }
             );
