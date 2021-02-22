@@ -28,13 +28,16 @@ class ClientRelayService
      */
     public static function authorizeUserOnDomain($userId, $verificationToken, $domain)
     {
-        $urlPath = parse_url(route('usora.authenticate.with-verification-token'))['path'] ?? '';
+        if (!empty(config('usora.domains_to_authenticate_on_with_request_urls')[$domain])) {
+            $baseUrl = config('usora.domains_to_authenticate_on_with_request_urls')[$domain]['with-verification-token'];
+        } else {
+            error_log('Usora error: domain to authenticate on is not configured properly');
+            return;
+        }
 
         self::addToBodyTop(
-            '<img src="https://' .
-            rtrim($domain, '/') .
-            '/' .
-            ltrim($urlPath, '/') .
+            '<img src="' .
+            $baseUrl .
             '?vt=' .
             urlencode($verificationToken) .
             '&uid=' .
