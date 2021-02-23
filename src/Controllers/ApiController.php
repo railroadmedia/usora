@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Usora\Entities\User;
@@ -240,20 +241,35 @@ class ApiController extends Controller
      */
     public function forgotPassword(Request $request)
     {
-        $request->validate(
-            [
-                'email' => 'required|email|exists:' .
-                    config('usora.database_connection_name') .
-                    '.' .
-                    config('usora.tables.users') .
-                    ',email',
-            ]
+        $rules = [
+            'email' => 'required|email|exists:' .
+                config('usora.database_connection_name') .
+                '.' .
+                config('usora.tables.users') .
+                ',email',
+        ];
+
+        $validator = Validator::make(
+            $request->all(),
+            $rules
         );
+
+        if ($validator->fails()) {
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'title' => 'Incorrect email address',
+                    'message' => 'Sorry, we cant find an account with this email address. Please try again.',
+                ],
+                401
+            );
+        }
 
         $response =
             $this->broker()
                 ->sendResetLink(
-                    $request->only('email')
+                   $request->only('email')
                 );
 
         if ($response === Password::RESET_LINK_SENT) {
