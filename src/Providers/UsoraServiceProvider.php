@@ -88,6 +88,12 @@ class UsoraServiceProvider extends ServiceProvider
 
         // views
         $this->loadViewsFrom(__DIR__ . '/../../views', 'usora');
+
+        // dev routes for sso
+        if (env('APP_DEBUG', false) == true &&
+            !empty(config('usora.dev_domains_to_authenticate_on_with_request_urls'))) {
+            config(['usora.domains_to_authenticate_on_with_request_urls' => config('usora.dev_domains_to_authenticate_on_with_request_urls', [])]);
+        }
     }
 
     /**

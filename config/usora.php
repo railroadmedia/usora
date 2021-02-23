@@ -50,16 +50,30 @@ return [
     'route_middleware_app_logged_in_groups' => ['app_authed'],
     'route_prefix' => 'usora',
 
-    // authentication domains
-    // if you dont set a subdomain, the current request subdomain will be used
-    'domains_to_authenticate_on' => [
-        'domain1.com',
-        'sub.domain2.com',
+    // the system will authenticate on each of these domains after login
+    // the verification token urls don't always follow the same pattern on other domains
+    // so we must configure the usora url for the vt endpoint in manually
+    'domains_to_authenticate_on_with_request_urls' => [
+        'www.domain2.com' => [
+            'with-verification-token' => 'https://www.domain2.com/usora/authenticate/set-authentication-cookie',
+            'render-post-message-verification-token' => 'https://www.domain2.com/usora/authenticate/render-post-message-verification-token',
+        ],
+        'domain3.com' => [
+            'with-verification-token' => 'https://domain3.com/laravel/public/usora/authenticate/set-authentication-cookie',
+            'render-post-message-verification-token' => 'https://domain3.com/laravel/public/usora/authenticate/render-post-message-verification-token',
+        ],
     ],
 
-    'domains_to_check_for_authentication' => [
-        'domain2.com',
-        'sub.domain2.com',
+    // if the env variable APP_DEBUG is true, these domains will be authed instead (used for dev.domain.com, staging, etc)
+    'dev_domains_to_authenticate_on_with_request_urls' => [
+        'dev.domain2.com' => [
+            'with-verification-token' => 'https://dev.domain2.com/usora/authenticate/set-authentication-cookie',
+            'render-post-message-verification-token' => 'https://dev.domain2.com/usora/authenticate/render-post-message-verification-token',
+        ],
+        'dev2.domain2.com' => [
+            'with-verification-token' => 'https://dev2.domain2.com/laravel/public/usora/authenticate/set-authentication-cookie',
+            'render-post-message-verification-token' => 'https://dev2.domain2.com/laravel/public/usora/authenticate/render-post-message-verification-token',
+        ],
     ],
 
     // this must be used on drumeo website, on others the setting may be omited

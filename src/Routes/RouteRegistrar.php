@@ -66,7 +66,8 @@ class RouteRegistrar
                 )
                     ->name('usora.authenticate.render-post-message-verification-token');
 
-                $this->router->post(
+                $this->router->match(
+                    ['GET', 'POST'],
                     'authenticate/set-authentication-cookie',
                     AuthenticationController::class . '@setAuthenticationCookieViaVerificationToken'
                 )
