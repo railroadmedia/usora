@@ -4,7 +4,7 @@
         var loginPageUrl = '{{ $loginPageUrl }}';
         var domainsToAuthenticateFromChecked = [];
         var domainsToAuthenticateFromCount =
-                {{ count(config('usora.domains_to_authenticate_on_with_request_urls')) }};
+                {{ count(config('usora.domains_to_authenticate_on_with_request_urls', [])) }};
         var failedDomains = 0;
         var attemptedDomains = 0;
         var messageReceived = false;
