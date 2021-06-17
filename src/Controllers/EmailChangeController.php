@@ -17,6 +17,7 @@ use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Usora\Entities\EmailChange;
 use Railroad\Usora\Entities\User;
 use Railroad\Usora\Events\EmailChangeRequest as EmailChangeRequestEvent;
+use Railroad\Usora\Events\User\UserUpdated;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Repositories\EmailChangeRepository;
 use Railroad\Usora\Repositories\UserRepository;
@@ -170,10 +171,15 @@ class EmailChangeController extends Controller
                     ->getId(),
             ]
         );
+
+        $oldUser = clone($user);
+
         $user->setEmail($emailChangeData->getEmail());
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        event(new UserUpdated($user, $oldUser));
 
         $this->entityManager->remove($emailChangeData);
         $this->entityManager->flush();
