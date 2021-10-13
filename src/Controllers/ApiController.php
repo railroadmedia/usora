@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Events\MobileAppLogin;
 use Railroad\Usora\Events\User\UserUpdated;
 use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Managers\UsoraEntityManager;
@@ -122,6 +123,12 @@ class ApiController extends Controller
                     401
                 );
             }
+        }
+
+        if($request->has('firebase_token') && $request->has('platform')) {
+            event(
+                new MobileAppLogin($user, $request->get('firebase_token'), $request->get('platform'))
+            );
         }
 
         return response()->json(
