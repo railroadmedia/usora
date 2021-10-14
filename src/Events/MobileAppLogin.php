@@ -20,7 +20,7 @@ class MobileAppLogin
      *
      * @param User $user
      */
-    public function __construct(User $user, $firebaseToken, $platform)
+    public function __construct(User $user, $firebaseToken = null, $platform = null)
     {
         $this->user = $user;
         $this->firebaseToken = $firebaseToken;
@@ -38,7 +38,7 @@ class MobileAppLogin
     /**
      * @return string
      */
-    public function getFirebaseToken(): string
+    public function getFirebaseToken(): ?string
     {
         return $this->firebaseToken;
     }
@@ -46,7 +46,7 @@ class MobileAppLogin
     /**
      * @return string
      */
-    public function getPlatform(): string
+    public function getPlatform(): ?string
     {
         return $this->platform;
     }

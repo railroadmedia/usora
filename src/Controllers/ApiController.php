@@ -125,22 +125,18 @@ class ApiController extends Controller
             }
         }
 
-        if($request->has('firebase_token') && $request->has('platform')) {
-            event(
-                new MobileAppLogin($user, $request->get('firebase_token'), $request->get('platform'))
-            );
-        }
+        event(
+            new MobileAppLogin($user, $request->get('firebase_token'), $request->get('platform'))
+        );
 
-        return response()->json(
-            [
+        return response()->json([
                 'success' => true,
                 'token' => $jwt_token,
                 'userId' => auth()->id(),
                 'tokenType' => 'bearer',
                 'expiresIn' => $this->jwtAuth->factory()
                         ->getTTL() * 60,
-            ]
-        );
+            ]);
     }
 
     /**
@@ -161,12 +157,10 @@ class ApiController extends Controller
         try {
             auth()->logout();
 
-            return response()->json(
-                [
+            return response()->json([
                     'success' => true,
                     'message' => 'Successfully logged out',
-                ]
-            );
+                ]);
         } catch (JWTException $exception) {
 
             return response()->json(
@@ -287,20 +281,16 @@ class ApiController extends Controller
                 );
 
         if ($response === Password::RESET_LINK_SENT) {
-            return response()->json(
-                [
+            return response()->json([
                     'success' => true,
                     'message' => 'Password reset link has been sent to your email.',
-                ]
-            );
+                ]);
         }
 
-        return response()->json(
-            [
+        return response()->json([
                 'success' => false,
                 'errors' => 'Failed to reset password, please double check your email or contact support.',
-            ]
-        );
+            ]);
     }
 
     /**
@@ -346,22 +336,19 @@ class ApiController extends Controller
 
         $response =
             $this->broker()
-                ->reset(
-                    $passwordResetData,
-                    function ($user, $password) {
+                ->reset($passwordResetData, function ($user, $password) {
 
-                        $user->setPassword($password);
+                    $user->setPassword($password);
 
-                        $this->entityManager->persist($user);
-                        $this->entityManager->flush();
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
 
-                        event(new PasswordReset($user));
+                    event(new PasswordReset($user));
 
-                        auth()->loginUsingId($user->getId());
+                    auth()->loginUsingId($user->getId());
 
-                        event(new UserEvent($user->getId(), 'authenticated'));
-                    }
-                );
+                    event(new UserEvent($user->getId(), 'authenticated'));
+                });
 
         if ($response !== Password::PASSWORD_RESET) {
             return response()->json(
@@ -468,12 +455,9 @@ class ApiController extends Controller
      */
     public function isEmailUnique(Request $request)
     {
-        $validator = validator(
-            $request->all(),
-            [
+        $validator = validator($request->all(), [
                 'email' => 'required|email',
-            ]
-        );
+            ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->getMessageBag()], 422);
@@ -495,12 +479,9 @@ class ApiController extends Controller
      */
     public function isDisplayNameUnique(Request $request)
     {
-        $validator = validator(
-            $request->all(),
-            [
+        $validator = validator($request->all(), [
                 'display_name' => 'required',
-            ]
-        );
+            ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->getMessageBag()], 422);
