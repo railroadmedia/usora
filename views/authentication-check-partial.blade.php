@@ -4,14 +4,13 @@
         var loginPageUrl = '{{ $loginPageUrl }}';
         var domainsToAuthenticateFromChecked = [];
         var domainsToAuthenticateFromCount =
-                {{ count(config('usora.domains_to_check_for_authentication')) }};
+                {{ count(config('usora.domains_to_authenticate_on_with_request_urls', [])) }};
         var failedDomains = 0;
         var attemptedDomains = 0;
         var messageReceived = false;
 
         @foreach($domains as $domain)
             domainsToAuthenticateFromChecked['{{ $domain }}'] = true;
-
         @endforeach
 
         function receiveMessage(e) {
@@ -22,7 +21,6 @@
 
             if (failed || token.length < 1 || domainsToAuthenticateFromChecked[domain] === undefined) {
                 failedDomains++;
-                console.log('Failed: ' + domain);
 
                 if (failedDomains >= domainsToAuthenticateFromCount) {
                     window.location.replace(loginPageUrl);
@@ -32,8 +30,6 @@
             }
 
             messageReceived = true;
-
-            console.log('Success: ' + domain);
 
             var xhr = new XMLHttpRequest();
 
@@ -83,15 +79,9 @@
             attemptedDomains++;
 
             if (attemptedDomains >= domainsToAuthenticateFromCount) {
-                console.log('NOW!');
-
                 setTimeout(function () {
-                    console.log(messageReceived);
-
                     if (!messageReceived) {
                         messageReceived = true;
-
-                        console.log('SSO failed, could not contact other domains.');
 
                         window.location.replace(loginPageUrl);
                     }
@@ -109,10 +99,10 @@
     });
 </script>
 
-@foreach($domains as $domain)
+@foreach($postMessageUrls as $postMessageUrl)
     <iframe id="receiver"
             class="cookie-iframe"
-            src="https://{{ $domain }}/{{ ltrim(config('usora.post_verification_token_path') ?? parse_url(route('usora.authenticate.render-post-message-verification-token'))['path'] ?? '', '/') }}"
+            src="{{ $postMessageUrl }}"
             style="width:0;height:0;border:0; border:none;">
     </iframe>
 @endforeach

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddBrandToUserTopicsTable extends Migration
+class AddBrandToUsoraUserFirebaseTokensTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,12 +15,12 @@ class AddBrandToUserTopicsTable extends Migration
     {
         Schema::connection(config('usora.database_connection_name'))
             ->table(
-                config('usora.tables.user_topics'),
+                config('usora.tables.firebase_tokens'),
                 function (Blueprint $table) {
 
                     $table->string('brand')
                         ->nullable()
-                        ->after('topic');
+                        ->after('token');
                 }
             );
     }
@@ -34,7 +34,7 @@ class AddBrandToUserTopicsTable extends Migration
     {
         Schema::connection(config('usora.database_connection_name'))
             ->table(
-                config('usora.tables.user_topics'),
+                config('usora.tables.firebase_tokens'),
                 function (Blueprint $table) {
 
                     $table->dropColumn('brand');

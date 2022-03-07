@@ -66,7 +66,8 @@ class RouteRegistrar
                 )
                     ->name('usora.authenticate.render-post-message-verification-token');
 
-                $this->router->post(
+                $this->router->match(
+                    ['GET', 'POST'],
                     'authenticate/set-authentication-cookie',
                     AuthenticationController::class . '@setAuthenticationCookieViaVerificationToken'
                 )
@@ -257,11 +258,19 @@ class RouteRegistrar
         $this->router->group(
             [
                 'prefix' => config('usora.route_prefix'),
-                'middleware' => config('usora.route_middleware_app_public_groups'),
+                'middleware' => config('usora.route_middleware_app_public_groups', []),
             ],
             function () {
                 $this->router->put('api/login', \Railroad\Usora\Controllers\ApiController::class . '@login');
                 $this->router->put('api/forgot', \Railroad\Usora\Controllers\ApiController::class . '@forgotPassword');
+                $this->router->get(
+                    'api/is-email-unique',
+                    ApiController::class . '@isEmailUnique'
+                );
+                $this->router->get(
+                    'api/is-display-name-unique',
+                    ApiController::class . '@isDisplayNameUnique'
+                );
             }
         );
 

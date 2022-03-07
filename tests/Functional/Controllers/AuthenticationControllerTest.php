@@ -220,7 +220,7 @@ class AuthenticationControllerTest extends UsoraTestCase
         $response->assertSeeText(config('usora.login_success_redirect_path'));
         $response->assertSeeText(config('usora.login_page_path'));
 
-        foreach (config('usora.domains_to_check_for_authentication') as $domain) {
+        foreach (config('usora.domains_to_authenticate_on_with_request_urls') as $domain => $urls) {
             $response->assertSeeText($domain);
         }
     }

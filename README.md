@@ -76,6 +76,19 @@ Single Sign On
 
 Users can be signed in on any domain running this package with a single login attempt from any of the domains as long as they are all connected to the same usora database. This is possible by setting authentication cookies on all participating domains after the login succeeds using html img tags.
 
+**Requirements**
+- laravel session.php file
+  + session cookie path must include **SameSite=none:** 
+    + ```'path' => '/;SameSite=None; secure',```
+  + session cookie must be secure only
+    + ```'secure' => true,```
+  + your post-login page must render some <img tags by calling this function in the blade/html
+    + ```{!! \Railroad\Usora\Services\ClientRelayService::getBodyTop() !!}```
+  
+- laravel usora.php config file (this packages config file)
+  + must have force remember cookies enabled otherwise users cannot have separate login sessions per device
+    + ```'force_remember' => true,```
+
 
 API Reference
 -----------------------------------------

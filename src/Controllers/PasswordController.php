@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Services\PermissionService;
@@ -79,12 +80,28 @@ class PasswordController extends Controller
             throw new NotAllowedException('You do not have permission to update this users password.');
         }
 
-        $request->validate(
-            [
-                'current_password' => 'required|min:6',
-                'new_password' => 'required|confirmed|min:6',
-            ]
-        );
+        try{
+            $request->validate(
+                [
+                    'current_password' => 'required',
+                    'new_password' => 'required|' . config('usora.password_creation_rules', 'confirmed|min:8|max:128'),
+                ]
+            );
+        }catch(ValidationException $e){
+
+            $messagesByField = $e->validator->getMessageBag()->getMessages();
+
+            $messagesForFieldFailingField = reset($messagesByField);
+
+            foreach($messagesForFieldFailingField as $messagesForField){
+                $errorMessageToUser = $messagesForField;
+                break;
+            }
+
+            $default = 'Please try again, and contact support if the problem persists.';
+
+            return redirect()->back()->with('error-message', 'Error: ' . ($errorMessageToUser ?? $default));
+        }
 
         /**
          * @var $user User
@@ -95,11 +112,7 @@ class PasswordController extends Controller
             !$this->hasher->check($request->get('current_password'), $user->getPassword())
             && !WpPassword::check(trim($request->get('current_password')), $user->getPassword())
         ) {
-            return redirect()
-                ->back()
-                ->withErrors(
-                    ['current_password' => 'The current password you entered is incorrect.']
-                );
+            return redirect()->back()->with('error-message', 'The current password you entered is incorrect.');
         }
 
         $user->setPassword($request->get('new_password'));

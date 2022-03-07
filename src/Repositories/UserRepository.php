@@ -57,4 +57,35 @@ class UserRepository extends EntityRepository
 
         return $users;
     }
+
+    /**
+     * @param array $emails
+     * @param bool $keyById
+     *
+     * @return User[]|array
+     */
+    public function findByEmails(array $emails, $keyById = true)
+    {
+        $qb = $this->createQueryBuilder('user');
+
+        $users = $qb->where(
+            $qb->expr()
+                ->in('user.email', ':emails')
+        )
+            ->setParameter('emails', $emails)
+            ->getQuery()
+            ->getResult();
+
+        $usersKeyedById = [];
+
+        if ($keyById) {
+            foreach ($users as $user) {
+                $usersKeyedById[$user->getId()] = $user;
+            }
+
+            return $usersKeyedById;
+        }
+
+        return $users;
+    }
 }

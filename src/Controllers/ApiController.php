@@ -3,17 +3,27 @@
 namespace Railroad\Usora\Controllers;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
+use MikeMcLin\WpPassword\Facades\WpPassword;
 use Railroad\DoctrineArrayHydrator\JsonApiHydrator;
 use Railroad\Usora\Entities\User;
+use Railroad\Usora\Events\MobileAppLogin;
 use Railroad\Usora\Events\User\UserUpdated;
+use Railroad\Usora\Events\UserEvent;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Requests\UserJsonUpdateRequest;
 use Railroad\Usora\Services\ResponseService;
+use ReflectionException;
 use Spatie\Fractal\Fractal;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
@@ -89,28 +99,44 @@ class ApiController extends Controller
     public function login(Request $request)
     {
         $input = $request->only('email', 'password');
-        $jwt_token = null;
 
-        if (!$jwt_token = $this->jwtAuth->attempt($input)) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Invalid Email or Password',
-                ],
-                401
-            );
+        $user = $this->userRepository->findOneBy(['email' => $request->get('email')]);
+
+        $jwt_token = $this->jwtAuth->attempt($input); // new laravel users
+
+        if (!$jwt_token) {
+            $error = null;
+
+            if (!is_null($user)) {
+                if (WpPassword::check(trim($request->get('password')), $user->getPassword())) {
+                    auth()->loginUsingId($user->getId(), false);
+                    $jwt_token = $this->jwtAuth->fromUser($user);
+                }
+            }
+
+            if (!$jwt_token) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Invalid Email or Password',
+                    ],
+                    401
+                );
+            }
         }
 
-        return response()->json(
-            [
+        event(
+            new MobileAppLogin($user, $request->get('firebase_token'), $request->get('platform'))
+        );
+
+        return response()->json([
                 'success' => true,
                 'token' => $jwt_token,
                 'userId' => auth()->id(),
                 'tokenType' => 'bearer',
                 'expiresIn' => $this->jwtAuth->factory()
                         ->getTTL() * 60,
-            ]
-        );
+            ]);
     }
 
     /**
@@ -129,14 +155,12 @@ class ApiController extends Controller
     public function logout(Request $request)
     {
         try {
-            $this->jwtAuth->invalidate($this->jwtAuth->parseToken());
+            auth()->logout();
 
-            return response()->json(
-                [
+            return response()->json([
                     'success' => true,
                     'message' => 'Successfully logged out',
-                ]
-            );
+                ]);
         } catch (JWTException $exception) {
 
             return response()->json(
@@ -225,15 +249,30 @@ class ApiController extends Controller
      */
     public function forgotPassword(Request $request)
     {
-        $request->validate(
-            [
-                'email' => 'required|email|exists:' .
-                    config('usora.database_connection_name') .
-                    '.' .
-                    config('usora.tables.users') .
-                    ',email',
-            ]
+        $rules = [
+            'email' => 'required|email|exists:' .
+                config('usora.database_connection_name') .
+                '.' .
+                config('usora.tables.users') .
+                ',email',
+        ];
+
+        $validator = Validator::make(
+            $request->all(),
+            $rules
         );
+
+        if ($validator->fails()) {
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'title' => 'Incorrect email address',
+                    'message' => 'Sorry, we cant find an account with this email address. Please try again.',
+                ],
+                401
+            );
+        }
 
         $response =
             $this->broker()
@@ -242,20 +281,105 @@ class ApiController extends Controller
                 );
 
         if ($response === Password::RESET_LINK_SENT) {
-            return response()->json(
-                [
+            return response()->json([
                     'success' => true,
                     'message' => 'Password reset link has been sent to your email.',
-                ]
+                ]);
+        }
+
+        return response()->json([
+                'success' => false,
+                'errors' => 'Failed to reset password, please double check your email or contact support.',
+            ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function resetPassword(Request $request)
+    {
+        $rules = [
+            'rp_key' => 'required',
+            'user_login' => 'required|email|exists:' .
+                config('usora.database_connection_name') .
+                '.' .
+                config('usora.tables.users') .
+                ',email',
+            'pass1' => 'required|min:6',
+        ];
+
+        $validator = Validator::make(
+            $request->all(),
+            $rules
+        );
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'errors' => $validator->getMessageBag(),
+                ],
+                422
             );
         }
 
-        return response()->json(
-            [
-                'success' => false,
-                'errors' => 'Failed to reset password, please double check your email or contact support.',
-            ]
-        );
+        // request param keys should be updated in mobile apps
+        $passwordResetData = [
+            'email' => $request->get('user_login'),
+            'password' => $request->get('pass1'),
+            'password_confirmation' => $request->get('pass1'),
+            'token' => $request->get('rp_key'),
+        ];
+
+        $response =
+            $this->broker()
+                ->reset($passwordResetData, function ($user, $password) {
+
+                    $user->setPassword($password);
+
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
+
+                    event(new PasswordReset($user));
+
+                    auth()->loginUsingId($user->getId());
+
+                    event(new UserEvent($user->getId(), 'authenticated'));
+                });
+
+        if ($response !== Password::PASSWORD_RESET) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Password reset failed, please try again.',
+                ],
+                500
+            );
+        }
+
+        $user = $this->userRepository->findOneBy(['id' => auth()->id()]);
+
+        if (!$user) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'title' => 'Invalid user identification',
+                    'message' => 'Password reset failed, please try again.',
+                ],
+                500
+            );
+        }
+
+        $profileData = [
+            'success' => true,
+            'token' => $this->jwtAuth->fromUser($user),
+            'id' => $user->getId(),
+        ];
+
+        return response()->json($profileData);
     }
 
     /**
@@ -271,10 +395,10 @@ class ApiController extends Controller
     /**
      * @param UserJsonUpdateRequest $request
      * @return JsonResponse
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \ReflectionException
+     * @throws DBALException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws ReflectionException
      *
      * @permission Only authenticated user
      * @response
@@ -331,12 +455,9 @@ class ApiController extends Controller
      */
     public function isEmailUnique(Request $request)
     {
-        $validator = validator(
-            $request->all(),
-            [
+        $validator = validator($request->all(), [
                 'email' => 'required|email',
-            ]
-        );
+            ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->getMessageBag()], 422);
@@ -354,28 +475,31 @@ class ApiController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function isDisplayNameUnique(Request $request)
     {
-        $validator = validator(
-            $request->all(),
-            [
+        $validator = validator($request->all(), [
                 'display_name' => 'required',
-            ]
-        );
+            ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->getMessageBag()], 422);
         }
 
-        $qb = $this->userRepository->createQueryBuilder('u')->where('u.displayName = :name')->setParameter('name', $request->get('display_name'));
+        $qb =
+            $this->userRepository->createQueryBuilder('u')
+                ->where('u.displayName = :name')
+                ->setParameter('name', $request->get('display_name'));
 
-        if(auth()->id()){
-            $qb->andWhere('u.id != :id')->setParameter('id', auth()->id());
+        if (auth()->id()) {
+            $qb->andWhere('u.id != :id')
+                ->setParameter('id', auth()->id());
         }
 
-        $user = $qb->getQuery()->getOneOrNullResult();
+        $user =
+            $qb->getQuery()
+                ->getOneOrNullResult();
 
         if ($user) {
             return response()->json(['unique' => false]);

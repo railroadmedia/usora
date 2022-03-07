@@ -54,7 +54,8 @@ class UserJsonUpdateRequest extends FormRequest
                 config('usora.tables.users') .
                 ',display_name,' .
                 $this->route('id'),
-            'data.attributes.password' => 'string|min:8|max:128|confirmed',
+
+            'data.attributes.password' => 'string|' . config('usora.password_creation_rules', 'confirmed|min:8|max:128'),
 
             'data.attributes.first_name' => 'nullable|string|max:64',
             'data.attributes.last_name' => 'nullable|string|max:64',

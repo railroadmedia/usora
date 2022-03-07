@@ -17,7 +17,7 @@ class AuthenticateViaThirdParty
     {
         if (!auth()->check() &&
             session()->get('skip-third-party-auth-check') != true &&
-            !empty(config('usora.domains_to_check_for_authentication'))) {
+            !empty(config('usora.domains_to_authenticate_on_with_request_urls'))) {
 
             session()->put('skip-third-party-auth-check', true);
             session()->reflash();

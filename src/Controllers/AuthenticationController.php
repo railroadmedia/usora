@@ -115,10 +115,11 @@ class AuthenticationController extends Controller
         if (auth()->attempt($request->only('email', 'password'), $remember)) {
             $user = $this->userRepository->find(auth()->id());
 
-            foreach (config('usora.domains_to_authenticate_on') as $domain) {
+            foreach (config('usora.domains_to_authenticate_on_with_request_urls', []) as $domain => $urls) {
                 ClientRelayService::authorizeUserOnDomain(
                     $user->getId(),
-                    $this->hasher->make($user->getId() . $user->getPassword() . $user->getSessionSalt()),
+                    $this->hasher->make($user->getId() . $user->getPassword() .
+                        ($remember ? $user->getRememberToken() : $user->getSessionSalt())),
                     $domain
                 );
             }
@@ -137,12 +138,11 @@ class AuthenticationController extends Controller
 
                     auth()->loginUsingId($userByEmail->getId(), $remember);
 
-                    foreach (config('usora.domains_to_authenticate_on') as $domain) {
+                    foreach (config('usora.domains_to_authenticate_on_with_request_urls') as $domain => $urls) {
                         ClientRelayService::authorizeUserOnDomain(
                             $userByEmail->getId(),
-                            $this->hasher->make(
-                                $userByEmail->getId() . $userByEmail->getPassword() . $userByEmail->getSessionSalt()
-                            ),
+                            $this->hasher->make($userByEmail->getId() . $userByEmail->getPassword() .
+                                ($remember ? $userByEmail->getRememberToken() : $userByEmail->getSessionSalt())),
                             $domain
                         );
                     }
@@ -223,15 +223,11 @@ class AuthenticationController extends Controller
             return redirect()->to(config('usora.login_success_redirect_path'));
         }
 
-        $domains = config('usora.domains_to_check_for_authentication');
-        $currentSubdomain = array_reverse(explode('.', $request->getHttpHost()))[2] ?? '';
+        $domains = array_keys(config('usora.domains_to_authenticate_on_with_request_urls', []));
+        $postMessageUrls = [];
 
-        foreach ($domains as $domainIndex => $domain) {
-            $explodedDomain = explode('.', $domain);
-
-            if (count($explodedDomain) == 2 && !empty($currentSubdomain)) {
-                $domains[$domainIndex] = $currentSubdomain . '.' . $domain;
-            }
+        foreach (config('usora.domains_to_authenticate_on_with_request_urls', []) as $domain => $urls) {
+            $postMessageUrls[] = $urls['render-post-message-verification-token'];
         }
 
         return view(
@@ -243,6 +239,7 @@ class AuthenticationController extends Controller
                 ),
                 'loginPageUrl' => config('usora.login_page_path') . '?' . $request->getQueryString(),
                 'domains' => $domains,
+                'postMessageUrls' => $postMessageUrls,
             ]
         );
     }
@@ -267,7 +264,7 @@ class AuthenticationController extends Controller
             );
         }
 
-        $domains = config('usora.domains_to_check_for_authentication');
+        $domains = array_keys(config('usora.domains_to_authenticate_on_with_request_urls', []));
         $currentSubdomain = array_reverse(explode('.', $request->getHttpHost()))[2] ?? '';
 
         foreach ($domains as $domainIndex => $domain) {
@@ -353,18 +350,11 @@ class AuthenticationController extends Controller
                         $verificationToken
                     ) && $rememberToken->getExpiresAt() > Carbon::now()) {
 
-                    cookie()->queue(
-                        cookie()->make(
-                            auth()
-                                ->guard()
-                                ->getRecallerName(),
-                            $user->getAuthIdentifier() .
-                            '|' .
-                            $rememberToken->getToken() .
-                            '|' .
-                            $user->getAuthPassword()
-                        )
-                    );
+                    $user->setRememberToken($rememberToken->getToken());
+
+                    auth()->setRememberToken($user, $rememberToken->getToken());
+
+                    return response()->json(['success' => 'true']);
                 }
             }
 

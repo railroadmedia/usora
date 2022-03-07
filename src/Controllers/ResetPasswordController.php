@@ -51,7 +51,7 @@ class ResetPasswordController extends Controller
             [
                 'token' => 'required',
                 'email' => 'required|email',
-                'password' => 'required|confirmed|min:6',
+                'password' => 'required|' . config('usora.password_creation_rules', 'confirmed|min:8|max:128'),
             ]
         );
 
