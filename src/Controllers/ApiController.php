@@ -25,10 +25,10 @@ use Railroad\Usora\Requests\UserJsonUpdateRequest;
 use Railroad\Usora\Services\ResponseService;
 use ReflectionException;
 use Spatie\Fractal\Fractal;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use Tymon\JWTAuth\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenInvalidException;
+use PHPOpenSourceSaver\JWTAuth\JWTAuth;
 
 /**
  * Class ApiController

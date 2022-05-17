@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Faker\ORM\Doctrine\Populator;
@@ -13,7 +14,9 @@ use Railroad\Usora\Transformers\UserTransformer;
 
 class UserJsonControllerTest extends UsoraTestCase
 {
-    protected function setUp()
+    use ArraySubsetAsserts;
+
+    protected function setUp(): void
     {
         parent::setUp();
 

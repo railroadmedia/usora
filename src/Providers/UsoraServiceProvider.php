@@ -4,16 +4,16 @@ namespace Railroad\Usora\Providers;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\CachedReader;
-use Doctrine\Common\Cache\PhpFileCache;
-use Doctrine\Common\Cache\RedisCache;
+use Doctrine\Common\Annotations\IndexedReader;
+use Doctrine\Common\Annotations\PsrCachedReader;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\Common\EventManager;
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Gedmo\DoctrineExtensions;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -30,8 +30,9 @@ use Railroad\Doctrine\Types\Domain\UrlType;
 use Railroad\Usora\Commands\MigrateUserFieldsToColumns;
 use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Routes\RouteRegistrar;
-use Redis;
-use Tymon\JWTAuth\Providers\LaravelServiceProvider;
+use PHPOpenSourceSaver\JWTAuth\Providers\LaravelServiceProvider;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class UsoraServiceProvider extends ServiceProvider
 {
@@ -106,6 +107,8 @@ class UsoraServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        parent::register();
+
         // laravel auth integration
         $this->app->register(AuthenticationServiceProvider::class);
 
@@ -129,27 +132,24 @@ class UsoraServiceProvider extends ServiceProvider
         // set proxy dir to temp folder on server
         $proxyDir = sys_get_temp_dir();
 
-        // setup redis
-        $redis = new Redis();
-        $redis->connect(
-            config('usora.redis_host'),
-            config('usora.redis_port')
-        );
-        $redisCache = new RedisCache();
-        $redisCache->setRedis($redis);
-
-        // redis cache instance is referenced in laravel container to be reused when needed
-        app()->instance(RedisCache::class, $redisCache);
+        // array cache
+        $arrayCacheAdapter = new ArrayAdapter();
+        $doctrineArrayCache = DoctrineProvider::wrap($arrayCacheAdapter);
+        app()->instance('EcommerceArrayCache', $doctrineArrayCache);
 
         // file cache
-        $phpFileCache = new PhpFileCache($proxyDir);
+        $phpFileCacheAdapter = new FilesystemAdapter('', 0, $proxyDir);
+        $doctrineFileCache = DoctrineProvider::wrap($arrayCacheAdapter);
 
+        // annotation reader
         AnnotationRegistry::registerLoader('class_exists');
 
-        $annotationReader = new AnnotationReader();
+        $annotationReader = new IndexedReader(new AnnotationReader());
 
-        $cachedAnnotationReader = new CachedReader(
-            $annotationReader, $redisCache
+        $cachedAnnotationReader = new PsrCachedReader(
+            $annotationReader,
+            $phpFileCacheAdapter,
+            env('APP_DEBUG', false)
         );
 
         $driverChain = new MappingDriverChain();
@@ -170,9 +170,6 @@ class UsoraServiceProvider extends ServiceProvider
             );
         }
 
-        // driver chain instance is referenced in laravel container to be reused when needed
-        app()->instance(MappingDriverChain::class, $driverChain);
-
         $timestampableListener = new TimestampableListener();
         $timestampableListener->setAnnotationReader($cachedAnnotationReader);
 
@@ -180,9 +177,9 @@ class UsoraServiceProvider extends ServiceProvider
         $eventManager->addEventSubscriber($timestampableListener);
 
         $ormConfiguration = new Configuration();
-        $ormConfiguration->setMetadataCacheImpl($phpFileCache);
-        $ormConfiguration->setQueryCacheImpl($phpFileCache);
-        $ormConfiguration->setResultCacheImpl($redisCache);
+        $ormConfiguration->setMetadataCache($phpFileCacheAdapter);
+        $ormConfiguration->setQueryCache($phpFileCacheAdapter);
+        $ormConfiguration->setResultCache($arrayCacheAdapter);
         $ormConfiguration->setProxyDir($proxyDir);
         $ormConfiguration->setProxyNamespace('DoctrineProxies');
         $ormConfiguration->setAutoGenerateProxyClasses(
