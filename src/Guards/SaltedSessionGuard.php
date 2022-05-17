@@ -169,7 +169,7 @@ class SaltedSessionGuard extends SessionGuard
         }
 
         if (isset($this->events)) {
-            $this->events->dispatch(new Logout($user));
+            $this->events->dispatch(new Logout($this->name, $user));
         }
 
         $this->user = null;

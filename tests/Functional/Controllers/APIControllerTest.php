@@ -2,6 +2,7 @@
 
 namespace Railroad\Usora\Tests\Functional;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Faker\ORM\Doctrine\Populator;
@@ -12,7 +13,9 @@ use Railroad\Usora\Tests\UsoraTestCase;
 
 class APIControllerTest extends UsoraTestCase
 {
-    protected function setUp()
+    use ArraySubsetAsserts;
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,10 +51,10 @@ class APIControllerTest extends UsoraTestCase
 
         $response->assertJson(['success' => 'true']);
 
-        $this->assertArrayHasKey('token', $response->decodeResponseJson());
-        $this->assertArrayHasKey('userId', $response->decodeResponseJson());
-        $this->assertEquals('bearer', $response->decodeResponseJson()['tokenType']);
-        $this->assertEquals(3600, $response->decodeResponseJson()['expiresIn']);
+        $this->assertArrayHasKey('token', $response->json());
+        $this->assertArrayHasKey('userId', $response->json());
+        $this->assertEquals('bearer', $response->json()['tokenType']);
+        $this->assertEquals(3600, $response->json()['expiresIn']);
     }
 
     public function test_invalid_credentials_auth()
@@ -72,7 +75,7 @@ class APIControllerTest extends UsoraTestCase
         );
 
         $this->assertEquals(401, $response->getStatusCode());
-        $this->assertArrayNotHasKey('token', $response->decodeResponseJson());
+        $this->assertArrayNotHasKey('token', $response->json());
     }
 
     public function test_logout()
@@ -88,7 +91,7 @@ class APIControllerTest extends UsoraTestCase
             ]
         );
 
-        $token = $login->decodeResponseJson()['token'];
+        $token = $login->json()['token'];
 
         $result = $this->call(
             'PUT',
@@ -114,7 +117,7 @@ class APIControllerTest extends UsoraTestCase
             ]
         );
 
-        $token = $response->decodeResponseJson()['token'];
+        $token = $response->json()['token'];
 
         $result = $this->call(
             'PUT',
@@ -124,7 +127,7 @@ class APIControllerTest extends UsoraTestCase
             ]
         );
 
-        $this->assertArraySubset(['email' => 'login_user_test@email.com'], $result->decodeResponseJson());
+        $this->assertArraySubset(['email' => 'login_user_test@email.com'], $result->json());
     }
 
     public function test_send_reset_link_email_validation_failed()
@@ -135,7 +138,7 @@ class APIControllerTest extends UsoraTestCase
             ['email' => '123']
         );
 
-        $response->assertSessionHasErrors(['email']);
+        $this->assertStringContainsString('Incorrect email address', $response->getContent());
     }
 
     public function test_send_reset_link_email()
@@ -179,7 +182,7 @@ class APIControllerTest extends UsoraTestCase
         );
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertTrue($response->decodeResponseJson('exists'));
+        $this->assertTrue($response->json('exists'));
     }
 
     public function test_is_email_unique_when_email_not_exists()
@@ -193,6 +196,6 @@ class APIControllerTest extends UsoraTestCase
         );
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertFalse($response->decodeResponseJson('exists'));
+        $this->assertFalse($response->json('exists'));
     }
 }

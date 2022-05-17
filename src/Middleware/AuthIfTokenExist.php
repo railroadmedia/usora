@@ -4,9 +4,9 @@ namespace Railroad\Usora\Middleware;
 
 use Closure;
 use Exception;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
-use Tymon\JWTAuth\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Http\Middleware\BaseMiddleware;
+use PHPOpenSourceSaver\JWTAuth\JWTAuth;
 
 class AuthIfTokenExist extends BaseMiddleware
 {

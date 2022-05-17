@@ -2,7 +2,6 @@
 
 namespace Railroad\Usora\Tests;
 
-use App\Providers\EcommerceUserProvider;
 use Carbon\Carbon;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\AuthManager;
@@ -15,7 +14,6 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use MikeMcLin\WpPassword\WpPasswordProvider;
-use Mpociot\ApiDoc\ApiDocGeneratorServiceProvider;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Railroad\Doctrine\Hydrators\FakeDataHydrator;
@@ -86,27 +84,23 @@ class UsoraTestCase extends TestCase
      */
     protected $fakeDataHydrator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         // Run the schema update tool using our entity metadata
         $this->entityManager = app(UsoraEntityManager::class);
 
-        $this->entityManager->getMetadataFactory()
-            ->getCacheDriver()
-            ->deleteAll();
-
         // make sure laravel is using the same connection
         DB::connection()
             ->setPdo(
                 $this->entityManager->getConnection()
-                    ->getWrappedConnection()
+                    ->getNativeConnection()
             );
         DB::connection()
             ->setReadPdo(
                 $this->entityManager->getConnection()
-                    ->getWrappedConnection()
+                    ->getNativeConnection()
             );
 
         $this->artisan('migrate:fresh', []);
@@ -149,7 +143,6 @@ class UsoraTestCase extends TestCase
     {
         $defaultConfig = require(__DIR__ . '/../config/usora.php');
         $apiDocConfig = require(__DIR__ . '/../config/apidoc.php');
-
 
         foreach ($defaultConfig as $key => $value) {
             config()->set('usora.' . $key, $value);
@@ -227,6 +220,5 @@ class UsoraTestCase extends TestCase
         $app['config']->set('apidoc.fractal', $apiDocConfig['fractal']);
 
         $app->register(WpPasswordProvider::class);
-        $app->register(ApiDocGeneratorServiceProvider::class);
     }
 }

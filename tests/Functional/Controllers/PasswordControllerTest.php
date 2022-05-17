@@ -11,7 +11,7 @@ use Railroad\Usora\Tests\UsoraTestCase;
 
 class PasswordControllerTest extends UsoraTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

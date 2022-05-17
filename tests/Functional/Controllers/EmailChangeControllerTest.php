@@ -16,7 +16,7 @@ use Railroad\Usora\Tests\UsoraTestCase;
 
 class EmailChangeControllerTest extends UsoraTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -112,8 +112,8 @@ class EmailChangeControllerTest extends UsoraTestCase
         $user = [
             'email' => $this->faker->email,
             'password' => $this->hasher->make($rawPassword),
-            'remember_token' => str_random(60),
-            'session_salt' => str_random(60),
+            'remember_token' => Str::random(60),
+            'session_salt' => Str::random(60),
             'display_name' => $this->faker->words(4, true),
             'created_at' => time(),
             'updated_at' => time(),

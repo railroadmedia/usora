@@ -18,7 +18,7 @@ use Railroad\Usora\Entities\Traits\ShippingProperties;
 use Railroad\Usora\Entities\Traits\SupportNoteProperties;
 use Railroad\Usora\Entities\Traits\UserInterfaceSettingsProperties;
 use Railroad\Usora\Entities\Traits\UserNotificationSettingsProperties;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 /**
  * @ORM\Entity(repositoryClass="Railroad\Usora\Repositories\UserRepository")

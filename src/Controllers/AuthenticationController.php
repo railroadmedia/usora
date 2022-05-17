@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Illuminate\Auth\Recaller;
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +26,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthenticationController extends Controller
 {
-    use ThrottlesLogins;
     use ValidatesRequests;
 
     /**
@@ -96,22 +94,6 @@ class AuthenticationController extends Controller
 
         $request->attributes->set('remember', $remember);
 
-        if ($this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-
-            $errors = ['throttle' => 'Too many login attempts. Try again later.'];
-
-            session()->put('skip-third-party-auth-check', true);
-
-            return $request->has('redirect') ?
-                redirect()
-                    ->to(config('usora.login_page_path') . '?redirect_to=' . $request->get('redirect'))
-                    ->withErrors($errors) :
-                redirect()
-                    ->to(config('usora.login_page_path'))
-                    ->withErrors($errors);
-        }
-
         if (auth()->attempt($request->only('email', 'password'), $remember)) {
             $user = $this->userRepository->find(auth()->id());
 
@@ -156,8 +138,6 @@ class AuthenticationController extends Controller
                 }
             }
         }
-
-        $this->incrementLoginAttempts($request);
 
         $errors = ['invalid-credentials' => 'Invalid authentication credentials, please try again.'];
 

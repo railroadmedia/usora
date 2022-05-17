@@ -15,7 +15,7 @@ use ReflectionClass;
 
 class AuthenticationControllerTest extends UsoraTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,25 +45,6 @@ class AuthenticationControllerTest extends UsoraTestCase
         );
 
         $response->assertSessionHasErrors(['invalid-credentials']);
-
-        $this->assertEmpty(
-            $this->app->make('auth')
-                ->guard()
-                ->id()
-        );
-    }
-
-    public function test_authenticate_via_credentials_too_many_attempts()
-    {
-        for ($i = 0; $i < 9; $i++) {
-            $response = $this->call(
-                'POST',
-                'usora/authenticate/with-credentials',
-                ['email' => 'test-1@test.com', 'password' => 'wrong-password']
-            );
-        }
-
-        $response->assertSessionHasErrors(['throttle']);
 
         $this->assertEmpty(
             $this->app->make('auth')
@@ -232,7 +213,7 @@ class AuthenticationControllerTest extends UsoraTestCase
             'usora/authenticate/render-post-message-verification-token'
         );
 
-        $response->assertSeeText("var failed = '1';");
+        $this->assertStringContainsString("var failed = '1';", $response->getContent());
     }
 
     public function test_render_verification_token_via_post_message()
@@ -246,11 +227,9 @@ class AuthenticationControllerTest extends UsoraTestCase
             'usora/authenticate/render-post-message-verification-token'
         );
 
-        $response->assertSeeText(
-            "var token = "
-        );
-        $response->assertSeeText("var userId = '" . $userId . "';");
-        $response->assertSeeText("var failed = '';");
+        $this->assertStringContainsString("var token = ", $response->getContent());
+        $this->assertStringContainsString("var userId = '" . $userId . "';", $response->getContent());
+        $this->assertStringContainsString("var failed = '';", $response->getContent());
     }
 
     public function test_set_authentication_cookie_via_verification_token_validated_failed()
