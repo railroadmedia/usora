@@ -81,6 +81,9 @@ class UserJsonUpdateRequest extends FormRequest
             'data.attributes.drumeo_ship_magazine' => 'nullable|boolean',
             'data.attributes.magazine_shipping_address_id' => 'nullable|integer',
 
+            'data.attributes.send_email_notifications' => 'nullable|boolean',
+            'data.attributes.send_mobile_app_push_notifications' => 'nullable|boolean',
+
             'data.attributes.ios_latest_review_display_date' => 'nullable|date',
             'data.attributes.ios_count_review_display' => 'nullable|integer',
             'data.attributes.google_latest_review_display_date' => 'nullable|date',
@@ -135,6 +138,8 @@ class UserJsonUpdateRequest extends FormRequest
                 'data.attributes.notify_on_forum_post_reply',
                 'data.attributes.notify_on_lesson_comment_like',
                 'data.attributes.notifications_summary_frequency_minutes',
+                'data.attributes.send_email_notifications',
+                'data.attributes.send_mobile_app_push_notifications',
                 'data.attributes.use_legacy_video_player',
                 'data.attributes.drumeo_ship_magazine',
                 'data.attributes.magazine_shipping_address_id',

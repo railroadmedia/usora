@@ -62,6 +62,9 @@ class UserUpdateRequest extends FormRequest
             'drumeo_ship_magazine' => 'nullable|boolean',
             'magazine_shipping_address_id' => 'nullable|integer',
 
+            'send_email_notifications' => 'nullable|boolean',
+            'send_mobile_app_push_notifications' => 'nullable|boolean',
+
             'ios_latest_review_display_date' => 'nullable|date',
             'ios_count_review_display' => 'nullable|integer',
             'google_latest_review_display_date' => 'nullable|date',
@@ -116,6 +119,8 @@ class UserUpdateRequest extends FormRequest
                 'notify_on_forum_post_reply',
                 'notify_on_lesson_comment_like',
                 'notifications_summary_frequency_minutes',
+                'send_email_notifications',
+                'send_mobile_app_push_notifications',
                 'use_legacy_video_player',
                 'drumeo_ship_magazine',
                 'magazine_shipping_address_id',

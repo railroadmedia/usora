@@ -49,6 +49,18 @@ trait UserNotificationSettingsProperties
     protected $notificationsSummaryFrequencyMinutes = null;
 
     /**
+     * @ORM\Column(type="boolean")
+     * @var boolean
+     */
+    protected $sendEmailNotifications = true;
+
+    /**
+     * @ORM\Column(type="boolean")
+     * @var boolean
+     */
+    protected $sendMobileAppPushNotifications = true;
+
+    /**
      * @return bool
      */
     public function getNotifyOnLessonCommentReply()
@@ -158,6 +170,38 @@ trait UserNotificationSettingsProperties
     public function setNotificationsSummaryFrequencyMinutes($notificationsSummaryFrequencyMinutes)
     {
         $this->notificationsSummaryFrequencyMinutes = $notificationsSummaryFrequencyMinutes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSendEmailNotifications()
+    {
+        return $this->sendEmailNotifications;
+    }
+
+    /**
+     * @param bool $sendEmailNotifications
+     */
+    public function setSendEmailNotifications($sendEmailNotifications)
+    {
+        $this->sendEmailNotifications = $sendEmailNotifications;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSendMobileAppPushNotifications()
+    {
+        return $this->sendMobileAppPushNotifications;
+    }
+
+    /**
+     * @param bool $sendMobileAppPushNotifications
+     */
+    public function setSendMobileAppPushNotifications($sendMobileAppPushNotifications)
+    {
+        $this->sendMobileAppPushNotifications = $sendMobileAppPushNotifications;
     }
 
 
