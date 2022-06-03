@@ -27,45 +27,19 @@ class MigrateUserFieldsToColumns extends Command
     protected $description = 'MigrateUserFieldsToColumns';
 
     /**
-     * @var DatabaseManager
+     * Execute the console command.
+     *
+     * @return mixed
      */
-    private $databaseManager;
-
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(
+    public function handle(
         DatabaseManager $databaseManager,
         UserRepository $userRepository,
         UsoraEntityManager $entityManager
     ) {
-        parent::__construct();
-
-        $this->databaseManager = $databaseManager;
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     */
-    public function handle()
-    {
         $this->info('Started migrating fields to columns');
 
         $fields =
-            $this->databaseManager->connection(config('usora.database_connection_name'))
+            $databaseManager->connection(config('usora.database_connection_name'))
                 ->table(config('usora.tables.user_fields'))
                 ->get();
 
@@ -75,7 +49,7 @@ class MigrateUserFieldsToColumns extends Command
             /**
              * @var $user User
              */
-            $user = $this->userRepository->find($field->user_id);
+            $user = $userRepository->find($field->user_id);
 
             if (empty($user)) {
                 $this->info('Skipped field: ' . var_export($field, true));
@@ -121,9 +95,9 @@ class MigrateUserFieldsToColumns extends Command
                     break;
             }
 
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-            $this->entityManager->clear();
+            $entityManager->persist($user);
+            $entityManager->flush();
+            $entityManager->clear();
 
             if ($fieldIndex % 250 == 0) {
                 $this->info($fieldIndex . ' done.');
