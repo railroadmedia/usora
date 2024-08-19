@@ -28,7 +28,7 @@
     "railroad/permissions": "3.0.*",
     "php-open-source-saver/jwt-auth": "2.7.*",
     "spatie/laravel-fractal": "^6.0",
-    "railroad/doctrine-array-hydrator": "2.0.*",
+    "railroad/doctrine-array-hydrator": "3.0.*",
     "league/flysystem": "^3.0",
     "league/flysystem-aws-s3-v3": "^3.0"
   },
