@@ -142,8 +142,7 @@ class UsoraServiceProvider extends ServiceProvider
         $doctrineFileCache = DoctrineProvider::wrap($arrayCacheAdapter);
 
         // annotation reader
-        AnnotationRegistry::registerLoader('class_exists');
-
+        // Update the AnnotationRegistry usage
         $annotationReader = new IndexedReader(new AnnotationReader());
 
         $cachedAnnotationReader = new PsrCachedReader(

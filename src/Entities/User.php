@@ -203,4 +203,9 @@ class User implements Authenticatable, CanResetPassword, JWTSubject
     {
         $this->displayName = $displayName;
     }
+
+    public function getAuthPasswordName()
+    {
+        return 'test';
+    }
 }

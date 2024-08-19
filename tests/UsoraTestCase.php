@@ -15,6 +15,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use MikeMcLin\WpPassword\WpPasswordProvider;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Railroad\Doctrine\Hydrators\FakeDataHydrator;
 use Railroad\Doctrine\Providers\DoctrineServiceProvider;
@@ -26,6 +27,7 @@ use Railroad\Usora\Managers\UsoraEntityManager;
 use Railroad\Usora\Providers\UsoraServiceProvider;
 use Railroad\Usora\Repositories\UserRepository;
 use Railroad\Usora\Tests\Providers\UsoraTestingUserProvider;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 class UsoraTestCase extends TestCase
 {
@@ -220,5 +222,79 @@ class UsoraTestCase extends TestCase
         $app['config']->set('apidoc.fractal', $apiDocConfig['fractal']);
 
         $app->register(WpPasswordProvider::class);
+    }
+
+    protected function assertArraySubset(array $subset, array $array, bool $strict = false, string $message = '')
+    {
+        $differences = [];
+
+        $findDifferences = function ($subset, $array, $path = '') use (&$findDifferences, $strict, &$differences) {
+            foreach ($subset as $key => $value) {
+                $currentPath = $path ? "{$path}.{$key}" : $key;
+
+                if (!array_key_exists($key, $array)) {
+                    $differences[] = ["path" => $currentPath, "expected" => $value, "actual" => "<<missing>>"];
+                    continue;
+                }
+
+                if (is_array($value)) {
+                    if (!is_array($array[$key])) {
+                        $differences[] = ["path" => $currentPath, "expected" => "array", "actual" => gettype($array[$key])];
+                    } else {
+                        $findDifferences($value, $array[$key], $currentPath);
+                    }
+                } else {
+                    $match = $strict ? $array[$key] === $value : $array[$key] == $value;
+                    if (!$match) {
+                        $differences[] = [
+                            "path" => $currentPath,
+                            "expected" => $value,
+                            "actual" => $array[$key]
+                        ];
+                    }
+                }
+            }
+        };
+
+        $findDifferences($subset, $array);
+
+        $formatValue = function ($value) {
+            if (is_bool($value)) {
+                return $value ? 'true' : 'false';
+            }
+            if (is_null($value)) {
+                return 'null';
+            }
+            if (is_string($value)) {
+                return "'{$value}'";
+            }
+            if (is_array($value)) {
+                return 'array(' . count($value) . ')';
+            }
+            return var_export($value, true);
+        };
+
+        if (!empty($differences)) {
+            $context = $strict ? 'strict' : 'non-strict';
+            $failureDescription = sprintf(
+                "Failed asserting that an array has the subset.\nDifferences found (%s mode):\n%s",
+                $context,
+                implode("\n", array_map(function ($diff) use ($formatValue) {
+                    return sprintf(
+                        "  At path '%s':\n    Expected: %s\n    Actual: %s",
+                        $diff['path'],
+                        $formatValue($diff['expected']),
+                        $formatValue($diff['actual'])
+                    );
+                }, $differences))
+            );
+
+            throw new ExpectationFailedException(
+                $message . "\n" . $failureDescription,
+                new ComparisonFailure($subset, $array, var_export($subset, true), var_export($array, true))
+            );
+        }
+
+        $this->assertEmpty($differences);
     }
 }

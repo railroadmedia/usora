@@ -2,7 +2,7 @@
 
 return [
 
-    'secret' => env('JWT_SECRET','jwt_secret_key_123_mobile'),
+    'secret' => env('JWT_SECRET','jwt_secret_key_123_mobile1231231'),
 
     'keys' => [
 

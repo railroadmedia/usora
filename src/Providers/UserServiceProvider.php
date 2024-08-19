@@ -170,4 +170,12 @@ class UserServiceProvider implements UserProvider
 
         return $this->hasher->check($plain, $user->getAuthPassword());
     }
+
+    public function rehashPasswordIfRequired(
+        Authenticatable $user,
+        #[\SensitiveParameter] array $credentials,
+        bool $force = false
+    ) {
+        return;
+    }
 }
